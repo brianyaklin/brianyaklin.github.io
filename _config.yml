@@ -13,23 +13,40 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Your awesome title
-email: your-email@example.com
+lang: en-US
+title: def automate(brian)
+email: byaklin6@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Welcome to my site! I hope you enjoy my posts on networking
+  and automations! I really enjoy researching new networking technologies,
+  python, automation and tying it all together!
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+url: "https://www.yaklin.ca" # the base hostname & protocol for your site, e.g. http://example.com
+author:
+  name: Brian Yaklin
+  twitter: byaklin6
+  picture: /assets/images/profile.png
+twitter_username: byaklin6
+github_username: brianyaklin
+linkedin_username: brian-yaklin-6420173a
+
+# Added custom gtag for google analytics
+gtag: G-Q1WGH30J2R
 
 # Build settings
 markdown: kramdown
-theme: minima
+#theme: minima
+theme: jekyll-theme-basically-basic
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-paginate
 
+paginate: 10
+paginate_path: /page:num/
+
+search: true
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
@@ -41,3 +58,12 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+defaults:
+  # _posts
+  - scope:
+      path: "_posts"
+      type: posts
+    values:
+      layout: post
+      read_time: true
