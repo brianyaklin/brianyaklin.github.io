@@ -24,8 +24,8 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://www.yaklin.ca" # the base hostname & protocol for your site, e.g. http://example.com
 author:
   name: Brian Yaklin
-  twitter: byaklin6
-  picture: /assets/images/profile.png
+  email: byaklin6@gmail.com
+
 twitter_username: byaklin6
 github_username: brianyaklin
 linkedin_username: brian-yaklin-6420173a
@@ -35,18 +35,21 @@ gtag: G-Q1WGH30J2R
 
 # Build settings
 markdown: kramdown
-#theme: minima
-theme: jekyll-theme-basically-basic
+# theme: minima
+remote_theme: "mmistakes/jekyll-theme-basically-basic"
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-paginate
+  - jekyll-remote-theme
+
+feed:
+  path: atom.xml
 
 paginate: 10
 paginate_path: /page:num/
-
-search: true
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
