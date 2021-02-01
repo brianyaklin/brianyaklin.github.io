@@ -30,12 +30,10 @@ twitter_username: byaklin6
 github_username: brianyaklin
 linkedin_username: brian-yaklin-6420173a
 
-# Added custom gtag for google analytics
-gtag: G-Q1WGH30J2R
+search: true
 
 # Build settings
 markdown: kramdown
-# theme: minima
 remote_theme: "mmistakes/jekyll-theme-basically-basic"
 
 plugins:
