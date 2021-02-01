@@ -9,7 +9,7 @@ on different networking technologies and network automation.
 
 I have been working in IT and the networking industry since around 2002, focusing on in-depth
 incident and problem management, architecture, and network automation. I have worked for some of
-the largest MSP's in the world and currently find a home working for Optanix serving some
+the largest MSP's in the world and currently find a home working for [Optanix](https://www.optanix.com) serving some
 amazing clients.
 
 Lately I have been enjoying using Python to interface with various network components to
