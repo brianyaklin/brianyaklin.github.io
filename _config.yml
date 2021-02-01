@@ -14,8 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 lang: en-US
-title: def automate(brian)
-email: byaklin6@gmail.com
+title: def brian(automate)
 description: >- # this means to ignore newlines until "baseurl:"
   Welcome to my site! I hope you enjoy my posts on networking
   and automations! I really enjoy researching new networking technologies,
@@ -24,7 +23,6 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://www.yaklin.ca" # the base hostname & protocol for your site, e.g. http://example.com
 author:
   name: Brian Yaklin
-  email: byaklin6@gmail.com
 
 twitter_username: byaklin6
 github_username: brianyaklin
