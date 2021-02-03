@@ -24,6 +24,8 @@ url: "https://www.yaklin.ca" # the base hostname & protocol for your site, e.g. 
 author:
   name: Brian Yaklin
 
+logo: /assets/images/android-chrome-192x192.png
+
 twitter_username: byaklin6
 github_username: brianyaklin
 linkedin_username: brian-yaklin-6420173a
