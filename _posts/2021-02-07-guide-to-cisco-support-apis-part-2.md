@@ -5,6 +5,7 @@ tags:
   - API
   - Automation
   - Python
+last_modified_at: 2021-02-09T05:56:00-07:00
 ---
 
 The Cisco Support API's provide some very useful end-points that enable you
@@ -87,6 +88,7 @@ class ApiLogin():
         req = requests.post(
             SSO_URL,
             params=params,
+            timeout=10,
         )
         req.raise_for_status()
 
@@ -114,7 +116,7 @@ To query the Cisco API login service we perform the following:
 >>> api.auth_resp
 {'access_token': 'AAABBBCCCDDDEEEFFFGGG', 'token_type': 'Bearer', 'expires_in': 3599}
 ```
-5. If no error was received we can access the response data by assigning the JSON response to a python dictionary using the `resp.json()` function call. We assign this to our variable `self.auth_resp` for us to use at line 29 by assigning the `access_type` and `access_token` key values to `self.auth_token`.
+5. If no error was received we can access the response data by assigning the JSON response to a python dictionary using the `resp.json()` function call. We assign this to our variable `self.auth_resp` for us to use at line 30 by assigning the `access_type` and `access_token` key values to `self.auth_token`.
 6. Finally, a function called `auth_still_valid()` is defined which takese the compares the current time, `self.auth_start` and `self.auth_resp['expires_in']` to determine if the token has expired or not. If it has, it calles `login()` again to obtain a new token
 
 So how would you use this class?
@@ -163,7 +165,8 @@ class ApiEox():
     def __send_query(self, url: str,) -> Dict:
         req = requests.get(
             url,
-            headers=self.url_headers
+            headers=self.url_headers,
+            timeout=10,
         )
         req.raise_for_status()
         return req.json()
@@ -211,20 +214,20 @@ Looking at the code in more detail we see:
 3. The `__send_query` function is an internal class function that controls sending the HTTP request and returns the response. The details of this is covered in more detail in step 2 above for logging in to the Cisco API service
 4. The bulk of our code is handled in the `query_by_pid()` function at line 23 which accepts a single parameter; a list of PID's
 5. I have defined a BLACK_LIST which is a list of unacceptable PID's at line 24. Based on experience in how I have gathered inventory data from parsing "show version" or querying for the SNMP table of entPhysicalEntry there tends to be a few values returned in the PID column that are irrelevant
-6. At line 27 I use a [Python set comprehension](https://medium.com/swlh/set-comprehension-in-python3-for-beginners-80561a9b4007) which assigns the PID's to our previously declared `self.items` variable list and performs two things for me:
+6. At line 28 I use a [Python set comprehension](https://medium.com/swlh/set-comprehension-in-python3-for-beginners-80561a9b4007) which assigns the PID's to our previously declared `self.items` variable list and performs two things for me:
     1. It deduplicates the list of PID's that were provided, so we don't query Cisco's API for the same item twice (ex. you may have multiple Cisco ISR4321/K9, so why query for the same information more than once)
     2. I am able to compare each PID against my BLACK_LIST variable and discard it if its in the list
-7. We declare the API_URL for the Get EoX by Product ID at line 28
+7. We declare the API_URL for the Get EoX by Product ID at line 29
 8. Because you can query up to a maximum of 20 PID's in a single HTTP GET request to the API by comma seperating the PID's in the URL you are calling I accomplish this by:
-    1. Declaring a `start_index` of 0 and `end_index` of our MAX_ITEMS (in this case 20) at lines 30 and 31
+    1. Declaring a `start_index` of 0 and `end_index` of our MAX_ITEMS (in this case 20) at lines 31 and 32
     2. I then loop through all items for as long as our `start_index` is less than the length of our `self.items - 1`. We subtract 1 because Python lists are zero-indexed
-    3. I then define the URL to use in the query by doing a Python `join()` at lines 36 through 39. This `join()` statement will join together the PID's between the list indexes from the start_index up to the end_index (or to the end of the list if there aren't 20 items left), using a comma as a delimiter
-    4. Skipping down a few lines past the query and response details (discussed in another bullet below) I now increment my start_index and end_index values at lines 53 and 54 so that the next query, if necessary, will include the items in `self.items` from indexes 20 through 39
+    3. I then define the URL to use in the query by doing a Python `join()` at lines 37 through 40. This `join()` statement will join together the PID's between the list indexes from the start_index up to the end_index (or to the end of the list if there aren't 20 items left), using a comma as a delimiter
+    4. Skipping down a few lines past the query and response details (discussed in another bullet below) I now increment my start_index and end_index values at lines 54 and 55 so that the next query, if necessary, will include the items in `self.items` from indexes 20 through 39
 9. At line 40 I call our private function `__send_query` with the URL as an argument and assign the response to the `resp` variable
 10. A response from the Get EoX by Product ID API end-point is a JSON with keys ([full API details here](https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids)) describing the PaginationResponseRecord and the EOXRecord (which can contain multiple records, for all of the PID's you sent in the URL)
-11. If an `EOXRecord` exists in the response I extend our `self.records` list to include the new records in line 42
-12. We previously defined a page_index of 1 at line 33, but now we will review the PaginationResponseRecord to see if there is more than one page describing all of the records by looking at the LastIndex key at line 45. If there are multiple pages, we need to increment our page_index by one and query again. The while loop at line 35 will continue querying until our page_index value is the same as the LastIndex in the response and will then exit the loop
-13. Because Cisco's API's only allow so many queries per second and per minute I include a sleep function with `time.sleep(0.5)` at line 51
+11. If an `EOXRecord` exists in the response I extend our `self.records` list to include the new records in line 43
+12. We previously defined a page_index of 1 at line 34, but now we will review the PaginationResponseRecord to see if there is more than one page describing all of the records by looking at the LastIndex key at line 46. If there are multiple pages, we need to increment our page_index by one and query again. The while loop at line 36 will continue querying until our page_index value is the same as the LastIndex in the response and will then exit the loop
+13. Because Cisco's API's only allow so many queries per second and per minute I include a sleep function with `time.sleep(0.5)` at line 52
 
 So tying this all together we can use this code as follows:
 {% highlight Python %}
@@ -267,25 +270,36 @@ import csv
 
 FNAME = 'eox_report.csv'
 with open(FNAME, mode='w') as fhand:
-    fieldnames = ['EOLProductID', 'ProductIDDescription',
-                    'ProductBulletinNumber', 'LinkToProductBulletinURL',
-                    'EndOfSWMaintenanceReleases',
-                    'EOXExternalAnnouncementDate', 'EndOfSaleDate',
-                    'EndOfSecurityVulSupportDate',
-                    'EndOfRoutineFailureAnalysisDate',
-                    'EndOfServiceContractRenewal', 'LastDateOfSupport',
-                    'EndOfSvcAttachDate', 'UpdatedTimeStamp',
-                    'EOXMigrationDetails', 'EOXInputType',
-                    'EOXInputValue']
-    writer = csv.DictWriter(fhand, fieldnames=fieldnames)
-    writer.writeheader()
+    writer = csv.writer(fhand, delimiter=',', quotechar='"',
+                        quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['EOLProductID',
+                        'ProductIDDescription',
+                        'LastDateOfSupport',
+                        'EndOfSWMaintenanceReleases',
+                        'EOXExternalAnnouncementDate',
+                        'EndOfSaleDate',
+                        'EndOfSecurityVulSupportDate',
+                        'EndOfRoutineFailureAnalysisDate',
+                        'EndOfServiceContractRenewal',
+                        'EndOfSvcAttachDate',
+                        'LinkToProductBulletinURL', ])
     for record in eox.records:
-        writer.writerow(record)
+        writer.writerow([record['EOLProductID'],
+                            record['ProductIDDescription'],
+                            record['LastDateOfSupport']['value'],
+                            record['EndOfSWMaintenanceReleases']['value'],
+                            record['EOXExternalAnnouncementDate']['value'],
+                            record['EndOfSaleDate']['value'],
+                            record['EndOfSecurityVulSupportDate']['value'],
+                            record['EndOfRoutineFailureAnalysisDate']['value'],
+                            record['EndOfServiceContractRenewal']['value'],
+                            record['EndOfSvcAttachDate']['value'],
+                            record['LinkToProductBulletinURL'], ])
 
 print(f'EOX records written to file {FNAME}')
 {% endhighlight %}
 
-This code uses the Python CSV's DictWriter() function to loop through each record in eox.records and saves the contents of each record as a new row in that CSV file.
+This code uses the Python CSV's writer() function to loop through each record in eox.records and saves the contents of each record as a new row in that CSV file.
 
 ## Conclusion
 
