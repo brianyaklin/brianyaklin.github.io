@@ -30,6 +30,13 @@ twitter_username: byaklin6
 github_username: brianyaklin
 linkedin_username: brian-yaklin-6420173a
 
+social:
+  name: Brian Yaklin
+  links:
+    - https://twitter.com/byaklin6
+    - https://www.linkedin.com/in/brian-yaklin-6420173a
+    - https://github.com/brianyaklin
+
 copyright: Copyright 2021 Brian Yaklin
 search: true
 
@@ -62,7 +69,6 @@ paginate_path: /page:num/
 #   - vendor/ruby/
 
 defaults:
-  # _posts
   - scope:
       path: "_posts"
       type: posts
