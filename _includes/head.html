@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
   <link rel="manifest" href="/assets/images/site.webmanifest">
   
+  {% if jekyll.environment != "development" %}
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1WGH30J2R"></script>
   <script>
@@ -17,6 +18,7 @@
 
     gtag('config', 'G-Q1WGH30J2R');
   </script>
+  {% endif %}
 
   <!--- Cookie Consent -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
