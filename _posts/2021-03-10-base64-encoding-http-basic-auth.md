@@ -11,10 +11,10 @@ For those that aren't familiar with [Cisco's DevNet Sandboxes](https://devnetsan
 
 ## What is base64 encoding?
 
-There are quite a few articles out there, but the one that I found on [Stack Abuse explained it](https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/) quite well and simply enough. The main highlights on base64:
+There are quite a few articles out there, but the one that I found on [Stack Abuse explained it](https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/) quite well and simply enough. I encourage you to read the article to gain a better understand. The main highlights on base64:
 
 - It's a conversion between bytes and ASCII characters
-- There are 64 characters represented in total
+- There are 64 characters represented in total (26 Uppercase, 26 Lowercase, 10 numbers, and + and / characters)
 - Important: base64 is not an encryption algorithm as it can be easily reversed, so should not be used for security purposes
 
 ## Using base64 with HTTP Basic Auth
@@ -44,7 +44,7 @@ b'devnetuser:Cisco123!'
 b'ZGV2bmV0dXNlcjpDaXNjbzEyMyE='
 ```
 
-You can see above that we can create a byte string using the `.encode('ascii')` function on our auth_str object. We need to do this because the base64.b64encode() function requires a bytes-like object. We then create an auth_b64 byte string which is now our username and password encoded the way the REST API will require it.
+You can see above that we can create a byte string using the `.encode('ascii')` function on our auth_str object. We need to do this because the base64.b64encode() function requires a bytes-like object. We then create an auth_b64 byte string which is now our username and password encoded the way the REST API will require it. If you are using another tool like cURL or Postman to test REST API's, you can take this string and set it in your HTTP headers. The rest of this article focuses on using it with Pythons Request module.
 
 To authenticate with the DNA Center REST API we need to send a POST request to `/dna/system/api/v1/auth/token` with an Authorization and Content-Type HTTP header, and if we successfully authenticate we will be returned an API token which we can use in subsequent API requests.
 
