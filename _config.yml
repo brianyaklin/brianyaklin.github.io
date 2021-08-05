@@ -35,8 +35,8 @@ social:
     - https://www.linkedin.com/in/brian-yaklin-6420173a
     - https://github.com/brianyaklin
 
-disqus:
-  shortname: www-yaklin-ca
+#disqus:
+#  shortname: www-yaklin-ca
 
 copyright: Copyright 2021 Brian Yaklin
 search: true
