@@ -1,5 +1,5 @@
 ---
-title: "How to Upugrade Cisco ASA Firewalls (External)"
+title: "How to Upgrade Cisco ASA Firewalls (External)"
 tags:
   - Optanix
   - Network Management
