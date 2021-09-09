@@ -5,7 +5,7 @@ tags:
   - Ansible
 ---
 
-Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against he correct set of devices, and avoid any surprises!
+Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against the correct set of devices, and avoid any surprises!
 
 The ansible-playbook best practices covered in this post are:
 
@@ -53,7 +53,7 @@ ios:
         RouterB:
 ```
 
-Finally, the example playbook that I have is as shown below. The specific details about what each task does isn't important, whats important is that we have multiple tasks, some of which are related. This will become more apparent in my explanation of the list-tasks flag later on.
+Finally, the example playbook that I have is as shown below. The specific details about what each task does is not important, what is important is that we have multiple tasks, some of which are related. This will become more apparent in my explanation of the list-tasks flag later on.
 
 {% raw %}
 
@@ -151,7 +151,7 @@ Finally, the example playbook that I have is as shown below. The specific detail
 
 ## Best Practice # 1 - Manually specifying inventory file
 
-There are multiple ways for the ansible-playbook command to find an inventory file to execute against. This can be through the use of the ANSIBLE_INVENTORY variable, the default location of inventory/hosts.yml, by using the -i flag on the ansible-playbook command, dynamic inventory scripts, etc. With many different methods of defining your inventory, I find the safest method is to manually and explicitly identify it when executing a playbook. This ensures that if you created an inventory file for a specific change you are implementing, there is no chance of ansible-playbook picking up a different inventory file through one of the other methods. This will help you avoid uninentional changes being executed against devices you have not intended for.
+There are multiple ways for the ansible-playbook command to find an inventory file to execute against. This can be through the use of the ANSIBLE_INVENTORY variable, the default location of inventory/hosts.yml, by using the -i flag on the ansible-playbook command, dynamic inventory scripts, etc. With many different methods of defining your inventory, I find the safest method is to manually and explicitly identify it when executing a playbook. This ensures that if you created an inventory file for a specific change you are implementing, there is no chance of ansible-playbook picking up a different inventory file through one of the other methods. This will help you avoid uninentional changes being executed against devices unrelated to your change.
 
 In my example folder structure there are two inventory files, but the one that I want to execute my playbook against is ios_routers.yml. To specify this I use the -i flag with the ansible-playbook command:
 
@@ -161,9 +161,11 @@ hosts.yml  ios_routers.yml
 byaklin@ansiblevm:~/ansible-example$ ansible-playbook test-pb.yml -i inventory/ios_routers.yml
 ```
 
+In the words of [The Zen of Python](https://www.python.org/dev/peps/pep-0020/), **Explicit is better than implicit**.
+
 ## Best Practice # 2 - Using the ansible-playbook list-hosts flag
 
-In addition to manually specifying the inventory file you want to execute your playbook against, there are often times where you may wish to only run the playbook against a subset of hosts in that inventory. Perhaps you have one master inventory file and you execute your playbooks against a particular group, or a hostname pattern. To confirm that you are running your playbook against the specific intended hosts, you can use the --list-hosts flag to confirm before execution that Ansible has found the correct hosts.
+In addition to manually specifying the inventory file you want to execute your playbook against, there are often times where you may wish to only run the playbook against a subset of hosts in that inventory. Perhaps you have one master inventory file and you execute your playbooks against a particular group, or a host pattern. To confirm that you are running your playbook against the specific intended hosts, you can use the --list-hosts flag to confirm before execution that Ansible has found the correct hosts.
 
 > You get extra bonus points if your organization has a well defined host naming convention for your network devices. Naming conventions are super helpful in conveying context, such as location or function, and can help in allowing you to use simple pattern matching with your Ansible playbooks.
 
@@ -234,7 +236,7 @@ playbook: test-pb.yml
 
 > Providing meaningful names to your tasks is very important. It helps you and anyone else using your playbook know what each task is going to do without having to read through the playbook task by task. It also helps everyone use the --list-tasks flag effectively
 
-As an example, perhaps your organization just updated its device banner standards and only wants to run those tasks. Although Ansible tasks and modules are intended to be idempotent (only making changes when necessary and if needed), which means you could run all tasks and only the changes that are necessary (the banner) would be executed, it could drastically extend the amount of time the playbook tasks to execute. This is because Ansible needs to validate if each task needs to be made, before actually implementing it. Instead, if you know that you only want to update the banner, you can use the -t flag to specify the **banner** tag I have associated with each of those tasks. But how do you know that you didn't make a mistake when creating or specifying that tag? By using the --list-tasks flag:
+As an example, perhaps your organization just updated its device banner standards and only wants to run those tasks. Although Ansible tasks and modules are intended to be idempotent (only making changes when necessary and if needed), which means you could run all tasks and only the changes that are necessary (the banner) would be executed, it could drastically extend the amount of time the playbook tasks to execute. This is because Ansible needs to validate if each task needs to be executed, before actually implementing it. Instead, if you know that you only want to update the banner, you can use the -t flag to specify the **banner** tag I have associated with each of those tasks. But how do you know that you didn't make a mistake when creating or specifying that tag? By using the --list-tasks flag:
 
 ```bash
 byaklin@ansiblevm:~/ansible-example$ ansible-playbook test-pb.yml -t banner,save --list-tasks
