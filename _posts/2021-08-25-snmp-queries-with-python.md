@@ -3,6 +3,7 @@ title: "Simple SNMP Queries with Python"
 tags:
   - Python
   - Automation
+  - SNMP
 ---
 
 The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.
@@ -23,7 +24,7 @@ The code examples within this document hard code SNMP community values and SNMP 
 
 # Getting Started with PySNMP
 
-In the examples I present in this post I have chosen to use the Ansible [snmp_facts](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py) method of SNMP queries with PySNMP instead of the method presented in the [PySNMP quick start](https://pysnmp.readthedocs.io/en/latest/quick-start.html) documentation. I have found Ansible's method far easier to use for any queries to network devices for OID's not already in the standard MIB's that PySNMP can reference. PySNMP appears to be unable to take in standard MIB files and instead requires that they be converted to a specific [PySNMP format](https://github.com/etingof/pysnmp-mibs) using [PySMI' mibdump tool](https://github.com/etingof/pysmi/blob/master/scripts/mibdump.py). I have found this tool difficult to use, so for simplicity I will use the Ansible method of performing SNMP queries which uses OID's directly.
+In the examples I present in this post I have chosen to use the Ansible [snmp_facts](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py) method of SNMP queries with PySNMP instead of the method presented in the [PySNMP quick start](https://pysnmp.readthedocs.io/en/latest/quick-start.html) documentation. I have found Ansible's method far easier to use for any queries to network devices for OID's not already in the standard MIB's that PySNMP can reference. PySNMP appears to be unable to take in standard MIB files and instead requires that they be converted to a specific [PySNMP format](https://github.com/etingof/pysnmp-mibs) using [PySMI mibdump tool](https://github.com/etingof/pysmi/blob/master/scripts/mibdump.py). I have found this tool difficult to use, so for simplicity I will use the Ansible method of performing SNMP queries which uses OID's directly.
 
 Lets start with a simple example of using SNMP v2c to send a query to a network device for sysName.
 
