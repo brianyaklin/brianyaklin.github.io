@@ -4,11 +4,14 @@ tags:
   - Python
   - Automation
   - SNMP
+last_modified_at: 2022-01-11T13:21:00-07:00
 ---
 
 The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.
 
 Because of SNMP's common use, this article covers how you can use [PySNMP](https://pysnmp.readthedocs.io/en/latest/) and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you're looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP [history](https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html) and [design](https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html) page you may find useful.
+
+> This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to my latest post on using [PySNMP's HLAPI]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) for sending SNMP GET requests following the recommended method.
 
 ## What is PySNMP?
 
