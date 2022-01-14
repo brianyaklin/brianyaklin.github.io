@@ -220,6 +220,14 @@ If both MIB objects are available on the remote system, varBinds will have two e
 'SNMPv2-MIB::sysDescr.0 = Cisco IOS Software, IOSv Software (VIOS-ADVENTERPRISEK9-M), Version 15.9(3)M2, RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Tue 28-Jul-20 07:09 by prod_rel_team'
 ```
 
+If you need to send an SNMP GET for one particular MIB variable, make a decision on the value that is returned and based on that decision query the same device again, there is no need to create a whole new iterator. Instead you can use the _iterator_.send() function to query a new SNMP variable by supplying a _list_ of new ObjectType() class instances. An example of this is as follows:
+
+```python
+>>> errorIndication, errorStatus, errorIndex, varBinds = iterator.send([ObjectType(ObjectIdentity('SNMPv2-MIB', 'sysDescr', 0))])
+>>> varBinds[0].prettyPrint()
+'SNMPv2-MIB::sysDescr.0 = Cisco IOS Software, IOSv Software (VIOS-ADVENTERPRISEK9-M), Version 15.9(3)M2, RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Tue 28-Jul-20 07:09 by prod_rel_team'
+```
+
 ## Error Checking of the SNMP Response
 
 Each command generator (getCmd, nextCmd, bulkCmd, setCmd) return an errorIndication, errorStatus, errorIndex, and varBinds variable. The error related variables are described as follows:
