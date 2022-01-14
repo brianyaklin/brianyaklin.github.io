@@ -4,6 +4,7 @@ tags:
   - Python
   - Automation
   - SNMP
+last_modified_at: 2022-01-14T15:54:00-07:00
 ---
 
 I've [previously written]({% post_url 2021-08-25-snmp-queries-with-python %}) about [PySNMP's](https://pysnmp.readthedocs.io/en/latest/) simpler SNMP query using one-liner command generator as a method to send SNMP queries using an OID. That method allows you to avoid having to compile MIB's that do not come as a default in the PySNMP library. In the next few posts I want to outline how to use PySNMP's high-level API (hlapi) and how to complie any MIB's that may be missing. This will help you use PySNMP in its intended fashion, and using the name of the OID which provides for better readability.
@@ -300,4 +301,4 @@ When looking at the response for varBinds you can see that the MIB variable name
 'SNMPv2-SMI::mib-2.47.1.1.1.1.11.1 = 9ZEB8BXGIB6LD28LWUY1O'
 ```
 
-In an upcoming post I plan on highlighting how to compile MIB's so that you're able to reference a human readable name like entPhysicalIndex instead of its OID, and PySNMP in return is able to translate the OID back to a human readable name for you.
+In an [upcoming post]({% post_url 2022-01-14-compiling-mibs-for-pysnmp %}) I plan on highlighting how to compile MIB's so that you're able to reference a human readable name like entPhysicalIndex instead of its OID, and PySNMP in return is able to translate the OID back to a human readable name for you.
