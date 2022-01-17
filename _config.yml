@@ -39,7 +39,7 @@ social:
 #  shortname: www-yaklin-ca
 
 copyright: Copyright 2021 Brian Yaklin
-search: true
+search: false
 
 # Build settings
 markdown: kramdown
