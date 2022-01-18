@@ -1,11 +1,10 @@
 ---
 title: "Bulk Data Gathering with PySNMP nextCmd and bulkCmd"
-image:
-  path: /assets/images/alina-grubnyak-ZiQkhI7417A-unsplash.jpg
 tags:
   - Python
   - Automation
   - SNMP
+last_modified_at: 2022-01-17T21:13:00-07:00
 ---
 
 Up until now my articles ([PySNMP HLAPI]({% post_url 2022-01-11-pysnmp-hlapi-overview %}), [Compiling MIB's for PySNMP]({% post_url 2022-01-14-compiling-mibs-for-pysnmp %})) have focused on using simple SNMP GET requests with PySNMP's [getCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/getcmd.html). This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP's implementation of SNMP GET NEXT and GET BULK using the [nextCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/nextcmd.html) and [bulkCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/bulkcmd.html) command generators and how to retrieve the ifTable table of data from an SNMP agent.
@@ -91,7 +90,8 @@ while(count < MAX_REPS):
     count += 1
 ```
 
-> I previously wrote the above while() look at a while(True) loop, which probably isn't great. This can result in an infinite loop if the logic within the loop doesn't have a guaranteed break-away. This would normally be the StopIteration exception being seen, but I have now written a fail-safe with an arbitrarily set MAX_REPS value of 500 and a count variable that increments after each loop.
+I previously wrote the above while() look at a while(True) loop, which probably isn't great. This can result in an infinite loop if the logic within the loop doesn't have a guaranteed break-away. This would normally be the StopIteration exception being seen, but I have now written a fail-safe with an arbitrarily set MAX_REPS value of 500 and a count variable that increments after each loop.
+{: .notice--warning}
 
 Running the above code will result in all varBind variables being printed to screen. It is within this while() loop that you would perform additional handling of the SNMP responses such as storing them in a database, writing them to file, taking action based a response, etc. Running the code above will generate a large number of printed statements showing the entire ifTable contents:
 

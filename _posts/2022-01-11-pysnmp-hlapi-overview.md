@@ -4,12 +4,10 @@ tags:
   - Python
   - Automation
   - SNMP
-last_modified_at: 2022-01-14T15:54:00-07:00
+last_modified_at: 2022-01-17T21:13:00-07:00
 ---
 
 I've [previously written]({% post_url 2021-08-25-snmp-queries-with-python %}) about [PySNMP's](https://pysnmp.readthedocs.io/en/latest/) simpler SNMP query using one-liner command generator as a method to send SNMP queries using an OID. That method allows you to avoid having to compile MIB's that do not come as a default in the PySNMP library. In the next few posts I want to outline how to use PySNMP's high-level API (hlapi) and how to complie any MIB's that may be missing. This will help you use PySNMP in its intended fashion, and using the name of the OID which provides for better readability.
-
-> To get a very high-level summary of PySNMP please check out my [previous post]({% post_url 2021-08-25-snmp-queries-with-python %}) near the top.
 
 Within this article I will explore PySNMP's hlapi by breaking down it's own [quick start 'fetch SNMP variable](https://pysnmp.readthedocs.io/en/latest/quick-start.html) example. The hlapi was designed to be an easy to use API for as close to a 'one-liner' SNMP query as you can get. The examples in this guide will focus on the synchronous implementation (performing one SNMP task at a time), but there is the capability to implement PySNMP asynchronously if you are looking for increased speed and scalability.
 
@@ -70,7 +68,8 @@ To install PySNMP to work with Python 3.9.4, use:
 python3 -m pip install pysnmp
 ```
 
-> It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy.
+It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy. Although it has not been updated in quite some time, it still appears to be effective for performing SNMP queries with Python.
+{: .notice--warning}
 
 ## PySNMP Modules for a Simple SNMP GET
 
@@ -144,7 +143,8 @@ ObjectIdentity('1.3.6.1.2.1.1.5.0')
 ObjectIdentity((1,3,6,1,2,1,1,5,0))
 ```
 
-> If you don't have a compiled MIB for the OID that you are querying, the output of the ObjectIdentity on the returned value will be the OID instead of a human-readable value. See the section below on compiled MIB's with PySNMP.
+If you don't have a compiled MIB for the OID that you are querying, the output of the ObjectIdentity on the returned value will be the OID instead of a human-readable value. See the section below on compiled MIB's with PySNMP.
+{: .notice--info}
 
 ObjectType() encapsulates our ObjectIdentity() into a container which we can use with various SNMP commands. In this instance the only parameter that we provide to ObjectType is our ObjectIdentity():
 
@@ -192,7 +192,8 @@ By accessing the next available element in the iterator, the getCmd() iterator r
 - errorIndex - The index in varBinds that generated the error
 - varBinds - A sequence of MIB variable values returned via SNMP. These are [PySNMP ObjectType](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType) class instances
 
-> PySNMP supports other SNMP commands, such as bulkCmd(), nextCmd(), and setCmd(), by using the same generator/iterable approach.
+PySNMP supports other SNMP commands, such as bulkCmd(), nextCmd(), and setCmd(), by using the same generator/iterable approach.
+{: .notice--info}
 
 ## Querying Multiple SNMP OID's
 

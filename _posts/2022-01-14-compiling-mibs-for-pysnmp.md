@@ -4,15 +4,18 @@ tags:
   - Python
   - Automation
   - SNMP
+last_modified_at: 2022-01-17T21:13:00-07:00
 ---
 
 The ability to refer to a SNMP MIB variable by name is an important aspect for increasing readability and understanding of your Python scripts. [PySNMP](https://pysnmp.readthedocs.io/en/latest/) comes with several common pre-compiled MIB's in a format that its capable of using, but if you need to query a MIB variable it doesn't ship with, you're left refering to the variable as an SNMP OID. Having to remember what a particular OID is for, or creating a mapping table between a MIB variable name and its OID (such as a Python dictionary), can become tedious. Additionally, parsing a [PySNMP ObjectType](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType) class instance that isn't fully translated to the MIB variable name can make things more complicated.
 
 When you install PySNMP with PIP you also get [PySMI](https://github.com/etingof/pysmi) with it. PySMI was created by the same creator as PySNMP, and it allows you to compile other SNMP MIB's for your projects. This article will cover how to compile additional MIB's for your Python SNMP projects so that you can extend their capabilities!
 
-> Looking for an introduction to PySNMP? Check out my [previous post]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) to get familiar!
+Looking for an introduction to PySNMP? Check out my [previous post]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) to get familiar!
+{: .notice--info}
 
-> It should be pointed out that the PySNMP and PySMI packages were last updated in 2019 on Github ([PySNMP](https://github.com/etingof/pysnmp) and [PySMI](https://github.com/etingof/pysmi)). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy. That being said, I have had luck using these Packages in a Python 3.9 environment.
+It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy. Although it has not been updated in quite some time, it still appears to be effective for performing SNMP queries with Python.
+{: .notice--warning}
 
 ## PySNMP and MIB's
 
@@ -140,11 +143,12 @@ You can see that I provided a few flags:
 - `--destination-format pysnmp` so that the output file format is in PySNMP, but the other option is JSON
 - `IF-MIB` is the name of the MIB we want to compile. This searches for the IF-MIB.my file in the directory that you're running mibdump.py from
 
-> Note that you don't need to provide all of the name of the dependency MIB files. PySMI and mibdump.py can interpret IF-MIB.my to learn about these and search for them in the same directory.
+Note that you don't need to provide all of the name of the dependency MIB files. PySMI and mibdump.py can interpret IF-MIB.my to learn about these and search for them in the same directory.
+{: .notice--info}
 
 The output when running mibdump.py shows that the compiled MIB will be placed in the directory /Users/byaklin/.pysnmp/mibs (which PySNMP can search by default), but you can optionally provide a directory with the `--destination-directory` flag when running mibdump.py.
 
-> An alternative directory that you could store your compiled MIB file in would be that of where pysnmp is installed. In my case I'm using a Python virtual-environment, so the directory would be venv/lib/python3.9/site-packages/pysnmp/smi/mibs/
+An alternative directory that you could store your compiled MIB file in would be that of where pysnmp is installed. In my case I'm using a Python virtual-environment, so the directory would be venv/lib/python3.9/site-packages/pysnmp/smi/mibs/
 
 Now when we go to supply this MIB variable to our SNMP command, we don't need to reference an external source:
 
