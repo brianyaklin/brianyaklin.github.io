@@ -4,20 +4,22 @@ tags:
   - Python
   - Automation
   - SNMP
-last_modified_at: 2022-01-14T15:54:00-07:00
+last_modified_at: 2022-01-17T20:34:00-07:00
 ---
 
 The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.
 
-Because of SNMP's common use, this article covers how you can use [PySNMP](https://pysnmp.readthedocs.io/en/latest/) and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you're looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP [history](https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html) and [design](https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html) page you may find useful.
+This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to the following posts for more up-to-date articles on PySNMP: [PySNMP's HLAPI for SNMP GET Requests]({% post_url 2022-01-11-pysnmp-hlapi-overview %}), [Compiling MIB's for PySNMP with PySMI]({% post_url 2022-01-14-compiling-mibs-for-pysnmp %}), [Bulk Data Gathering with PySNMP's nextCmd and bulkCMD]({% post_url 2022-01-16-bulk-data-gathering-with-pysnmp %}).
+{: .notice--warning}
 
-> This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to my latest post on using [PySNMP's HLAPI]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) for sending SNMP GET requests following the recommended method.
+Because of SNMP's common use, this article covers how you can use [PySNMP](https://pysnmp.readthedocs.io/en/latest/) and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you're looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP [history](https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html) and [design](https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html) page you may find useful.
 
 ## What is PySNMP?
 
 [PySNMP](https://pysnmp.readthedocs.io/en/latest/) is a Python package used for all manners of SNMP related functions. You can use the package to send SNMP GET or GETNEXT requests, send SNMP traps, or act as an SNMP agent which will respond to SNMP requests. I will be focusing on the GET and GETNEXT requests. PySNMP also supports all versions of SNMP, most of my examples below will be SNMP version 2c followed by a brief section covering how to use SNMP v3. There are a lot of features with this package, such as methods for performing asynchronous SNMP queries, but I will just be touching on the high-level API.
 
-> It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy.
+It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy. Although it has not been updated in quite some time, it still appears to be effective for performing SNMP queries with Python.
+{: .notice--warning}
 
 I'm not entirely sure what has happened with the development of the PySNMP package, but it still seems to be commonly used. In my research of finding SNMP packages for use with Python, PySNMP is by far the most complete and feature-rich package. In fact, Ansible's [general community role](https://galaxy.ansible.com/community/general) still uses PySNMP for the [snmp_facts module](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py).
 
@@ -29,7 +31,8 @@ The code examples within this document hard code SNMP community values and SNMP 
 
 In the examples I present in this post I have chosen to use the Ansible [snmp_facts](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py) method of SNMP queries with PySNMP instead of the method presented in the [PySNMP quick start](https://pysnmp.readthedocs.io/en/latest/quick-start.html) documentation. I have found Ansible's method far easier to use for any queries to network devices for OID's not already in the standard MIB's that PySNMP can reference. PySNMP appears to be unable to take in standard MIB files and instead requires that they be converted to a specific [PySNMP format](https://github.com/etingof/pysnmp-mibs) using [PySMI mibdump tool](https://github.com/etingof/pysmi/blob/master/scripts/mibdump.py). I have found this tool difficult to use, so for simplicity I will use the Ansible method of performing SNMP queries which uses OID's directly.
 
-> UPDATE: I've become more acquainted with PySMI's capabilities of compiling MIB's. Check out my [latest post]({% post_url 2022-01-14-compiling-mibs-for-pysnmp %}) on how to use PySMI and mibdump.py to compile text MIB files into a format that PySNMP can read!
+UPDATE: I've become more acquainted with PySMI's capabilities of compiling MIB's. Check out my [latest post]({% post_url 2022-01-14-compiling-mibs-for-pysnmp %}) on how to use PySMI and mibdump.py to compile text MIB files into a format that PySNMP can read!
+{: .notice--success}
 
 Lets start with a simple example of using SNMP v2c to send a query to a network device for sysName.
 
@@ -118,7 +121,7 @@ So errorIndication has an actual string value associated with it indicating that
 
 You can see that the actual varBinds Tuple contains a single entry witih multiple parameters. If we iterate over that entry we can get the OID which was returned, along with the value.
 
-> Why would the returned OID be needed? Shouldn't we already know which OID we queried? You'll see that when querying using the nextCmd() method for a table of OID's, such as when querying the status of each interface on a device, you will need the returned OID as it will contain the high-level OID (e.g. 1.3.6.1.2.1.2.2.1.8 for ifOperStatus), concatenated with the ifIndex value for the interface
+Why would the returned OID be needed? Shouldn't we already know which OID we queried? You'll see that when querying using the nextCmd() method for a table of OID's, such as when querying the status of each interface on a device, you will need the returned OID as it will contain the high-level OID (e.g. 1.3.6.1.2.1.2.2.1.8 for ifOperStatus), concatenated with the ifIndex value for the interface
 
 ## Querying Multiple OID's at Once
 
@@ -151,7 +154,8 @@ Now when we inspect varBinds we see we have two variable responses. One for sysN
 1.3.6.1.2.1.1.1.0 0x436973636f20494f5320536f6674776172652c203238303020536f667477617265202843323830304e4d2d414456454e54455250524953454b392d4d292c2056657273696f6e2031322e3428313363292c2052454c4541534520534f4654574152452028666332290d0a546563686e6963616c20537570706f72743a20687474703a2f2f7777772e636973636f2e636f6d2f74656368737570706f72740d0a436f707972696768742028632920313938362d3230303720627920436973636f2053797374656d732c20496e632e0d0a436f6d70696c6564205468752031342d4a756e2d30372031383a35312062792070726f645f72656c5f7465616d
 ```
 
-> The sysDescr response is actually a hex representation that needs to be decoded. This is outside the scope of this post, but I would recommend reviewing the Ansible [snmp_facts](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py) module and its decode_hex() and to_text() functions.
+The sysDescr response is actually a hex representation that needs to be decoded. Using [PySNMP's HLAPI]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) will automatically decode this for us. However, if you wish to continue using cmdGen, decoding this is outside the scope of this post, but I would recommend reviewing the Ansible [snmp_facts](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py) module and its decode_hex() and to_text() functions.
+{: .notice--info}
 
 ## Querying an SNMP table using nextCmd()
 
