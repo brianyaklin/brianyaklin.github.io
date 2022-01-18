@@ -109,8 +109,8 @@ kramdown:
   enable_coderay: false
 
 # Outputting
-# permalink: /:categories/:title/
-permalink: /:year/:month/:day/:title/
+output_ext: .html
+permalink: /:year/:month/:day/:title:output_ext
 paginate: 10
 paginate_path: /page:num/
 timezone: Canada/Mountain # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
