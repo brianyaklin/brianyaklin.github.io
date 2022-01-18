@@ -1,8 +1,8 @@
 ---
-title: Privacy Policy
-layout: page
+layout: single
 permalink: /privacypolicy/
 ---
+
 <h2>Privacy Policy</h2>
 <p>Your privacy is important to us. It is Yaklin.ca's policy to respect your privacy regarding any information we may collect from you across our website, <a href="http://www.yaklin.ca">http://www.yaklin.ca</a>, and other sites we own and operate.</p>
 <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will be used.</p>
