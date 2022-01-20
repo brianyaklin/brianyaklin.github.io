@@ -41,6 +41,9 @@ tag_archive:
 atom_feed:
   hide: true
 
+# SEO
+bing_site_verification: "9EB6A2509D67F58E3513A614006C3CAF"
+
 # Social sharing
 twitter_username: byaklin6
 github_username: brianyaklin
