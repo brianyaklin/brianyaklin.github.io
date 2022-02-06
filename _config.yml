@@ -41,6 +41,13 @@ tag_archive:
 atom_feed:
   hide: true
 
+# Analytics
+analytics:
+  provider: "google-gtag"
+  google:
+    tracking_id: "G-Q1WGH30J2R"
+    anonymize_ip: false
+
 # SEO
 bing_site_verification: "9EB6A2509D67F58E3513A614006C3CAF"
 
