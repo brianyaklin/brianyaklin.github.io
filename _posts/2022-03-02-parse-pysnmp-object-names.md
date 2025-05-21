@@ -5,8 +5,6 @@ tags:
   - Automation
   - SNMP
 description: Inspect PySNMP Object Identities using a MIB browser to get a list of the names of the MIB variable hierarchy.
-teaser: /assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpg
-og_image: /assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpg
 ---
 
 After using SNMP [to query]({% post_url 2022-01-11-pysnmp-hlapi-overview %}) a remote device for a particular [ObjectType](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType) and getting the response ObjectType (which includes the MIB identity and the corresponding value), it is useful to be able to programmatically parse the [PySNMP ObjectIdentity](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectIdentity). This allows you to read the OID hierarchy and get a list human-readable MIB variable names for each node in the list.
