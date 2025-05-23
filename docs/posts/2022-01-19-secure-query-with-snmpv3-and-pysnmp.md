@@ -116,8 +116,8 @@ iterator = getCmd(
 errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 ```
 
-For additional information on what the above statements are doing, please reference my post on using [Python and PySNMP's HLAPI](2022-01-11-pysnmp-hlapi-overview.md) to send SNMP queries.
-{: .notice--info}
+!!! note
+    For additional information on what the above statements are doing, please reference my post on using [Python and PySNMP's HLAPI](2022-01-11-pysnmp-hlapi-overview.md) to send SNMP queries.
 
 In the above example, the `auth` variable is passed as the second argument to getCmd. The outcome that we expect is that the remote device 192.168.11.201 (my Cisco IOSv lab router) accepted the authentication and privacy protocols and passphrases as well as the username. The contents of varBinds should be the router name:
 

@@ -6,7 +6,6 @@ categories:
 tags:
   - Python
   - Automation
-  - SNMP
 ---
 
 # Parse PySNMP Object Identities for MIB Variable Names
