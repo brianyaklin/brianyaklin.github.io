@@ -1,13 +1,21 @@
 ---
 date:
   created: 2022-01-14
-  updated: 2022-01-17
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
   - SNMP
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # Compiling SNMP MIB's for PySNMP
@@ -15,6 +23,9 @@ tags:
 The ability to refer to a SNMP MIB variable by name is an important aspect for increasing readability and understanding of your Python scripts. [PySNMP](https://pysnmp.readthedocs.io/en/latest/) comes with several common pre-compiled MIB's in a format that its capable of using, but if you need to query a MIB variable it doesn't ship with, you're left refering to the variable as an SNMP OID. Having to remember what a particular OID is for, or creating a mapping table between a MIB variable name and its OID (such as a Python dictionary), can become tedious. Additionally, parsing a [PySNMP ObjectType](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType) class instance that isn't fully translated to the MIB variable name can make things more complicated.
 
 <!-- more -->
+
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
 
 When you install PySNMP with PIP you also get [PySMI](https://github.com/etingof/pysmi) with it. PySMI was created by the same creator as PySNMP, and it allows you to compile other SNMP MIB's for your projects. This article will cover how to compile additional MIB's for your Python SNMP projects so that you can extend their capabilities!
 

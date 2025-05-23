@@ -1,13 +1,21 @@
 ---
 date:
   created: 2022-01-16
-  updated: 2022-01-17
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
   - SNMP
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # Bulk Data Gathering with PySNMP nextCmd and bulkCmd
@@ -15,6 +23,9 @@ tags:
 Up until now my articles ([PySNMP HLAPI](2022-01-11-pysnmp-hlapi-overview.md), [Compiling MIB's for PySNMP](2022-01-14-compiling-mibs-for-pysnmp.md)) have focused on using simple SNMP GET requests with PySNMP's [getCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/getcmd.html). This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP's implementation of SNMP GET NEXT and GET BULK using the [nextCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/nextcmd.html) and [bulkCmd](https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/bulkcmd.html) command generators and how to retrieve the ifTable table of data from an SNMP agent.
 
 <!-- more -->
+
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
 
 ## What is ifTable?
 

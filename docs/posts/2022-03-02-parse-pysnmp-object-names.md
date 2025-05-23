@@ -1,11 +1,20 @@
 ---
 date:
   created: 2022-03-02
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # Parse PySNMP Object Identities for MIB Variable Names
@@ -13,6 +22,9 @@ tags:
 After using SNMP [to query](2022-01-11-pysnmp-hlapi-overview.md) a remote device for a particular [ObjectType](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType) and getting the response ObjectType (which includes the MIB identity and the corresponding value), it is useful to be able to programmatically parse the [PySNMP ObjectIdentity](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectIdentity). This allows you to read the OID hierarchy and get a list human-readable MIB variable names for each node in the list.
 
 <!-- more -->
+
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
 
 For example when querying for the contents of an SNMP table using the [PySNMP bulkCmd](2022-01-16-bulk-data-gathering-with-pysnmp.md) you will get a large number of ObjectType responses correlating with each variable in the table that you queried. You're most likely going to need to translate these responses into a different data structure; perhaps writing them to different columns in a database table, outputing to CSV file, or some other type of report. It is useful to understand which ObjectIdentity corresponds to which MIB variable name (which might represent your column in a CSV file, such as entPhysicalDescr) and perhaps an index value associated with that ObjectIdentity (e.g. entPhysicalIndex in the [entPhysicalTable](https://oidref.com/1.3.6.1.2.1.47.1.1.1)) as well as the response value. In this article I will be covering PySNMP's ObjectType [resolveWithMib()](https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectIdentity.resolveWithMib) function so that we can read the full hierarchy of the MIB variable.
 

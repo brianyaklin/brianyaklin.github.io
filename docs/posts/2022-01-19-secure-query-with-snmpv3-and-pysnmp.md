@@ -1,12 +1,21 @@
 ---
 date:
   created: 2022-01-19
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
   - SNMP
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # Secure Queries with SNMPv3 and PySNMP
@@ -14,6 +23,9 @@ tags:
 The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status information about the features and protocols that the device is running. It is critical to protect this information when in transit between an SNMP agent and manager by utilizing SNMPv3. Sensitive data from network devices being sent in SNMP responses can be used by malicious parties to perform reconnaissance about your environment, learn which protocols and features you utilize, and prepare for a more specific attack based on the information that is learned.
 
 <!-- more -->
+
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
 
 The transit network between a network device that is being queried and the management stations performing the queries (where our Python code is located) often times runs over networks outside of an organizations control. MPLS networks, point-to-point circuits, etc. all are controlled by carriers and vendors and _you_ cannot guarantee the security of their environment. There are many ways in which you can protect the data that flows over these transits (e.g. IPSec), but often times may require complex design changes. While these types of design changes should be considered in the long-run, a quicker way of securing your SNMP queries is by utilizing SNMPv3.
 

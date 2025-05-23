@@ -1,13 +1,21 @@
 ---
 date:
   created: 2021-08-25
-  updated: 2022-01-17
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
   - SNMP
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # Simple SNMP Queries with Python
@@ -16,8 +24,11 @@ The need to query network devices for information on a repeated and consistent b
 
 <!-- more -->
 
-This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to the following posts for more up-to-date articles on PySNMP: [PySNMP's HLAPI for SNMP GET Requests](2022-01-11-pysnmp-hlapi-overview.md), [Compiling MIB's for PySNMP with PySMI](2022-01-14-compiling-mibs-for-pysnmp.md), [Bulk Data Gathering with PySNMP's nextCmd and bulkCMD](2022-01-16-bulk-data-gathering-with-pysnmp.md).
-{: .notice--warning}
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
+
+!!! note
+    This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to the following posts for more up-to-date articles on PySNMP: [PySNMP's HLAPI for SNMP GET Requests](2022-01-11-pysnmp-hlapi-overview.md), [Compiling MIB's for PySNMP with PySMI](2022-01-14-compiling-mibs-for-pysnmp.md), [Bulk Data Gathering with PySNMP's nextCmd and bulkCMD](2022-01-16-bulk-data-gathering-with-pysnmp.md).
 
 Because of SNMP's common use, this article covers how you can use [PySNMP](https://pysnmp.readthedocs.io/en/latest/) and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you're looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP [history](https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html) and [design](https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html) page you may find useful.
 
@@ -25,10 +36,7 @@ Because of SNMP's common use, this article covers how you can use [PySNMP](https
 
 [PySNMP](https://pysnmp.readthedocs.io/en/latest/) is a Python package used for all manners of SNMP related functions. You can use the package to send SNMP GET or GETNEXT requests, send SNMP traps, or act as an SNMP agent which will respond to SNMP requests. I will be focusing on the GET and GETNEXT requests. PySNMP also supports all versions of SNMP, most of my examples below will be SNMP version 2c followed by a brief section covering how to use SNMP v3. There are a lot of features with this package, such as methods for performing asynchronous SNMP queries, but I will just be touching on the high-level API.
 
-It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on [Github](https://github.com/etingof/pysnmp). The [PySNMP](https://pysnmp.readthedocs.io/en/latest/) site itself has a disclaimer right at the top that the documentation is an inofficial copy. Although it has not been updated in quite some time, it still appears to be effective for performing SNMP queries with Python.
-{: .notice--warning}
-
-I'm not entirely sure what has happened with the development of the PySNMP package, but it still seems to be commonly used. In my research of finding SNMP packages for use with Python, PySNMP is by far the most complete and feature-rich package. In fact, Ansible's [general community role](https://galaxy.ansible.com/community/general) still uses PySNMP for the [snmp_facts module](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py).
+In my research of finding SNMP packages for use with Python, PySNMP is by far the most complete and feature-rich package. In fact, Ansible's [general community role](https://galaxy.ansible.com/community/general) still uses PySNMP for the [snmp_facts module](https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py).
 
 
 !!! warning

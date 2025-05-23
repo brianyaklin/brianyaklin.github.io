@@ -1,13 +1,21 @@
 ---
 date:
   created: 2022-01-11
-  updated: 2022-01-17
+  updated: 2025-05-23
 categories:
   - Automation
 tags:
   - Python
   - Automation
   - SNMP
+links:
+  - PySNMP Project: https://github.com/lextudio/pysnmp
+  - posts/2021-08-25-snmp-queries-with-python.md
+  - posts/2022-01-11-pysnmp-hlapi-overview.md
+  - posts/2022-01-14-compiling-mibs-for-pysnmp.md
+  - posts/2022-01-16-bulk-data-gathering-with-pysnmp.md
+  - posts/2022-01-19-secure-query-with-snmpv3-and-pysnmp.md
+  - posts/2022-03-02-parse-pysnmp-object-names.md
 ---
 
 # SNMP Queries with PySNMP High-Level API
@@ -17,6 +25,9 @@ I've [previously written](2021-08-25-snmp-queries-with-python.md) about [PySNMP'
 Within this article I will explore PySNMP's hlapi by breaking down it's own [quick start 'fetch SNMP variable](https://pysnmp.readthedocs.io/en/latest/quick-start.html) example. The hlapi was designed to be an easy to use API for as close to a 'one-liner' SNMP query as you can get. The examples in this guide will focus on the synchronous implementation (performing one SNMP task at a time), but there is the capability to implement PySNMP asynchronously if you are looking for increased speed and scalability.
 
 <!-- more -->
+
+!!! note
+    The historical [pysnmp](https://github.com/etingof/pysnmp) project, which has not been maintained due the the unfortunate passing of the maintainer, has since been [forked](https://github.com/lextudio/pysnmp) and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.
 
 ## Getting Started - A Simple SNMP Query
 
