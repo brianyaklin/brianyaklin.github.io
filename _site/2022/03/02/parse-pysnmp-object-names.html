@@ -1,0 +1,754 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Parse PySNMP Object Identities for MIB Variable Names - def brian(automate)</title>
+<meta name="description" content="Inspect PySNMP Object Identities using a MIB browser to get a list of the names of the MIB variable hierarchy.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Parse PySNMP Object Identities for MIB Variable Names">
+<meta property="og:url" content="http://localhost:4000/2022/03/02/parse-pysnmp-object-names.html">
+
+
+  <meta property="og:description" content="Inspect PySNMP Object Identities using a MIB browser to get a list of the names of the MIB variable hierarchy.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-03-02T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2022/03/02/parse-pysnmp-object-names.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Parse PySNMP Object Identities for MIB Variable Names">
+    <meta itemprop="description" content="After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the corresponding value), it is useful to be able to programmatically parse the PySNMP ObjectIdentity. This allows you to read the OID hierarchy and get a list human-readable MIB variable names for each node in the list.">
+    <meta itemprop="datePublished" content="2022-03-02T00:00:00-07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Parse PySNMP Object Identities for MIB Variable Names
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#getting-started">Getting Started</a></li><li><a href="#building-a-mib-browser">Building a MIB Browser</a></li><li><a href="#querying-the-entphysicaltable-snmp-table">Querying the entPhysicalTable SNMP table</a></li><li><a href="#inspecting-objectidentitys-with-a-pysnmp-mib-view">Inspecting ObjectIdentity’s with a PySNMP MIB View</a></li><li><a href="#a-complete-example">A Complete Example</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>After using SNMP <a href="/2022/01/11/pysnmp-hlapi-overview.html">to query</a> a remote device for a particular <a href="https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType">ObjectType</a> and getting the response ObjectType (which includes the MIB identity and the corresponding value), it is useful to be able to programmatically parse the <a href="https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectIdentity">PySNMP ObjectIdentity</a>. This allows you to read the OID hierarchy and get a list human-readable MIB variable names for each node in the list.</p>
+
+<p>For example when querying for the contents of an SNMP table using the <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html">PySNMP bulkCmd</a> you will get a large number of ObjectType responses correlating with each variable in the table that you queried. You’re most likely going to need to translate these responses into a different data structure; perhaps writing them to different columns in a database table, outputing to CSV file, or some other type of report. It is useful to understand which ObjectIdentity corresponds to which MIB variable name (which might represent your column in a CSV file, such as entPhysicalDescr) and perhaps an index value associated with that ObjectIdentity (e.g. entPhysicalIndex in the <a href="https://oidref.com/1.3.6.1.2.1.47.1.1.1">entPhysicalTable</a>) as well as the response value. In this article I will be covering PySNMP’s ObjectType <a href="https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectIdentity.resolveWithMib">resolveWithMib()</a> function so that we can read the full hierarchy of the MIB variable.</p>
+
+<p class="notice--info">If you’re not already familiar with PySNMP’s bulkCmd for sending SNMP GETBULK requests check out my <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html">previous post</a> to get familiar with querying SNMP tables!</p>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>We’re going to focus on using <a href="https://oidref.com/1.3.6.1.2.1.47.1.1.1">entPhysicalTable</a> in this example. This table contains details on all of the physical components of a particular network device such as the power supplies, fans, modules and their descriptions, serial numbers and other aspects that might be useful. Each hardware component is assigned a unique index value that is called entPhysicalIndex. You’ll need a copy of the <a href="https://github.com/brianyaklin/net-hw-inventory/blob/main/mib/ENTITY-MIB.my">ENTITY-MIB.my</a> file and we will be following the PySNMP example for the <a href="https://pysnmp.readthedocs.io/en/latest/examples/smi/manager/browsing-mib-tree.html#snmp-mib-browser">SNMP MIB Browser</a> pretty closely.</p>
+
+<h2 id="building-a-mib-browser">Building a MIB Browser</h2>
+
+<p>To build our MIB browser we need to import the builder, view, and compiler modules from pysnmp.smi and use them as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pysnmp.smi</span> <span class="kn">import</span> <span class="n">builder</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">compiler</span>
+
+<span class="n">MIB_FILE_SOURCE</span> <span class="o">=</span> <span class="s">'file://.'</span>
+
+<span class="n">mib_builder</span> <span class="o">=</span> <span class="n">builder</span><span class="p">.</span><span class="n">MibBuilder</span><span class="p">()</span>
+<span class="n">compiler</span><span class="p">.</span><span class="n">addMibCompiler</span><span class="p">(</span><span class="n">mib_builder</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">MIB_FILE_SOURCE</span><span class="p">,</span> <span class="p">])</span>
+<span class="n">mib_builder</span><span class="p">.</span><span class="n">loadModules</span><span class="p">(</span><span class="s">'ENTITY-MIB'</span><span class="p">,)</span>
+<span class="n">mib_view</span> <span class="o">=</span> <span class="n">view</span><span class="p">.</span><span class="n">MibViewController</span><span class="p">(</span><span class="n">mib_builder</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>In the above code we do a few different things:</p>
+
+<ul>
+  <li>We import the necessary modules from pysnmp.smi</li>
+  <li>We create a mib_builder class instance</li>
+  <li>With the compiler module we tell PySNMP where to find our ENTITY-MIB.my file (which based on <code class="language-plaintext highlighter-rouge">file://.</code> is located in the same folder as where we’re running the Python interpreter or our script, but you can specify a different path if your MIB file is located elsewhere). Note that the sources parameter allows you to provide multiple locations for MIB files</li>
+  <li>We then load the ENTITY-MIB.my file into our mib_builder class instance, followed by building a view of that MIB in the mib_view class instance</li>
+</ul>
+
+<p class="notice--info">With PySNMP’s MIB builder module we don’t need to <a href="/2022/01/14/compiling-mibs-for-pysnmp.html">pre-compile the MIB</a> file into PySNMP format, we can leave it as the plain-text file.</p>
+
+<p>You’ll see in a later section how we’ll use the mib_view class instance, which contains a reference to the ENTITY-MIB, to parse response objects of the entPhysicalTable SNMP table.</p>
+
+<h2 id="querying-the-entphysicaltable-snmp-table">Querying the entPhysicalTable SNMP table</h2>
+
+<p>I have covered in other articles how to query <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html">SNMP tables</a>, so this will just be a quick bit of code to get us started. We are going to query a device at IP address 192.168.11.201 which is a virtual router in my home lab. Unfortunately it doesn’t have much in terms of a values in the entPhysicalTablel but will work for this example anyways.</p>
+
+<p>The code is as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pysnmp.hlapi</span> <span class="kn">import</span> <span class="n">SnmpEngine</span><span class="p">,</span> <span class="n">UdpTransportTarget</span><span class="p">,</span>\
+    <span class="n">ContextData</span><span class="p">,</span> <span class="n">ObjectType</span><span class="p">,</span> <span class="n">ObjectIdentity</span><span class="p">,</span> <span class="n">bulkCmd</span>
+<span class="kn">from</span> <span class="nn">pysnmp.hlapi</span> <span class="kn">import</span> <span class="n">CommunityData</span>
+<span class="kn">from</span> <span class="nn">pysnmp.smi</span> <span class="kn">import</span> <span class="n">builder</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">compiler</span>
+
+<span class="n">auth</span> <span class="o">=</span> <span class="n">CommunityData</span><span class="p">(</span><span class="s">'rostring'</span><span class="p">,</span> <span class="n">mpModel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">object_type</span> <span class="o">=</span> <span class="n">ObjectType</span><span class="p">(</span><span class="n">ObjectIdentity</span><span class="p">(</span>
+    <span class="s">'ENTITY-MIB'</span><span class="p">,</span> <span class="s">'entPhysicalTable'</span>
+<span class="p">).</span><span class="n">addAsn1MibSource</span><span class="p">(</span><span class="s">'file://.'</span><span class="p">))</span>
+
+<span class="n">iterator</span> <span class="o">=</span> <span class="n">bulkCmd</span><span class="p">(</span>
+    <span class="n">SnmpEngine</span><span class="p">(),</span>
+    <span class="n">auth</span><span class="p">,</span>
+    <span class="n">UdpTransportTarget</span><span class="p">((</span><span class="s">'192.168.11.201'</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">ContextData</span><span class="p">(),</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">object_type</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">error_indication</span><span class="p">,</span> <span class="n">error_status</span><span class="p">,</span> <span class="n">error_index</span><span class="p">,</span> <span class="n">var_binds</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>If we take a look at the returned var_binds you can see that there is a single entry. Depending on the network device that you are querying for entPhysicalTable there can be a few values (such as a single value for my virtual router) or hundreds of values (in the case of larger network devices like modular switches):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_binds</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">var_binds</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">prettyPrint</span><span class="p">()</span>
+<span class="s">'ENTITY-MIB::entPhysicalDescr.1 = IOSv chassis, Hw Serial#: 9ZEB8BXGIB6LD28LWUY1O, Hw Revision: 1.0'</span>
+</code></pre></div></div>
+
+<h2 id="inspecting-objectidentitys-with-a-pysnmp-mib-view">Inspecting ObjectIdentity’s with a PySNMP MIB View</h2>
+
+<p>In the previous section we were returned a single value for the entPhysicalTable, but lets just assume that we were returned multiple values. What we need to do is be able to parse the <code class="language-plaintext highlighter-rouge">ENTITY-MIB::entPhysicalDescr.1</code> ObjectIdentity so that we can identify which particular MIB variable (entPhysicalDescr) and index value the var_bind was for. If you were just to use <code class="language-plaintext highlighter-rouge">var_bind[0][0]</code> you would get a string value of the entire OID chain of the variable name:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">var_binds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">47.1</span><span class="p">.</span><span class="mf">1.1</span><span class="p">.</span><span class="mf">1.2</span><span class="p">.</span><span class="mi">1</span>
+</code></pre></div></div>
+
+<p>You could use PySNMP’s prettyPrint() function on the ObjectIdentity, but that just gives us the human-readable name of the fully qualified path for the MIB variable:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">var_binds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="n">prettyPrint</span><span class="p">())</span>
+<span class="n">ENTITY</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">entPhysicalDescr</span><span class="p">.</span><span class="mi">1</span>
+</code></pre></div></div>
+
+<p>What we can do is use the mib_view class instance that we previously created. Lets first take a look at what this mib_view is. We can see that it is a MIB View controller:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">mib_view</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">pysnmp</span><span class="p">.</span><span class="n">smi</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">MibViewController</span><span class="s">'&gt;
+</span></code></pre></div></div>
+
+<p>If you want to see the various class functions that it has, try using Python’s built-in help function like so: <code class="language-plaintext highlighter-rouge">help(mib_view)</code>. You can see that there is a class function called getNodeName(), which actually takes in an ObjectIdentity class and will return the oid, an ordered label tuple with human-readable entries, and the suffix which in our case is the entPhysicalIndex value. We use getNodeName() as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">oid</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">mib_view</span><span class="p">.</span><span class="n">getNodeName</span><span class="p">((</span><span class="n">var_binds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">()</span>
+<span class="s">'1.3.6.1.2.1.47.1.1.1.1.2'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">label</span>
+<span class="p">(</span><span class="s">'iso'</span><span class="p">,</span> <span class="s">'org'</span><span class="p">,</span> <span class="s">'dod'</span><span class="p">,</span> <span class="s">'internet'</span><span class="p">,</span> <span class="s">'mgmt'</span><span class="p">,</span> <span class="s">'mib-2'</span><span class="p">,</span> <span class="s">'entityMIB'</span><span class="p">,</span> <span class="s">'entityMIBObjects'</span><span class="p">,</span> <span class="s">'entityPhysical'</span><span class="p">,</span> <span class="s">'entPhysicalTable'</span><span class="p">,</span> <span class="s">'entPhysicalEntry'</span><span class="p">,</span> <span class="s">'entPhysicalDescr'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">suffix</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">()</span>
+<span class="s">'1'</span>
+</code></pre></div></div>
+
+<p>With the label we can extract that the response MIB variable binding was for entPhysicalDescr and it was for entPhysicalIndex number 1. In instances where you have many variables in the entPhysicalTable you will need to iterate over the var_binds response object that we queried using the bulkCmd and extract the last value of the label for each as well as the suffix by using the mib_view’s getNodeName() class function. The results can then be stored in a Python Dict or List so that you can later write the results where you are storing or reporting on them (e.g. a database, CSV file, etc.)</p>
+
+<h2 id="a-complete-example">A Complete Example</h2>
+
+<p>To see a complete example of using PySNMP’s bulkCmd, querying entPhysicalTable, parsing
+the returned ObjectIdentities and building a hardware inventory report, check out my <a href="https://github.com/brianyaklin/net-hw-inventory">network hardware inventory</a> project on Github!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a><span class="sep">, </span>
+    
+      <a href="/tags/#snmp" class="page__taxonomy-item" rel="tag">SNMP</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Parse+PySNMP+Object+Identities+for+MIB+Variable+Names%20http%3A%2F%2Flocalhost%3A4000%2F2022%2F03%2F02%2Fparse-pysnmp-object-names.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2022%2F03%2F02%2Fparse-pysnmp-object-names.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2022%2F03%2F02%2Fparse-pysnmp-object-names.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" class="pagination--pager" title="Secure Queries with SNMPv3 and PySNMP
+">Previous</a>
+    
+    
+      <a href="/2022/03/10/network-apis-part-1-overview.html" class="pagination--pager" title="Network API’s Part 1 - Overview
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          11 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/14/compiling-mibs-for-pysnmp.html" rel="permalink">Compiling SNMP MIB’s for PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-14T00:00:00-07:00">January 14, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The ability to refer to a SNMP MIB variable by name is an important aspect for increasing readability and understanding of your Python scripts. PySNMP comes ...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

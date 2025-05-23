@@ -1,0 +1,905 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Simple SNMP Queries with Python - def brian(automate)</title>
+<meta name="description" content="The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Simple SNMP Queries with Python">
+<meta property="og:url" content="http://localhost:4000/2021/08/25/snmp-queries-with-python.html">
+
+
+  <meta property="og:description" content="The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-08-25T00:00:00-06:00">
+
+
+
+  <meta property="article:modified_time" content="2022-01-17T20:34:00-07:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/08/25/snmp-queries-with-python.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Simple SNMP Queries with Python">
+    <meta itemprop="description" content="The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.">
+    <meta itemprop="datePublished" content="2021-08-25T00:00:00-06:00">
+    <meta itemprop="dateModified" content="2022-01-17T20:34:00-07:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Simple SNMP Queries with Python
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-08-25T00:00:00-06:00">August 25, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          11 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#what-is-pysnmp">What is PySNMP?</a></li><li><a href="#a-note-on-secrets">A Note on Secrets</a></li><li><a href="#querying-multiple-oids-at-once">Querying Multiple OID’s at Once</a></li><li><a href="#querying-an-snmp-table-using-nextcmd">Querying an SNMP table using nextCmd()</a></li><li><a href="#querying-using-snmp-v3">Querying using SNMP v3</a></li><li><a href="#wrapping-up">Wrapping Up</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.</p>
+
+<p class="notice--warning">This article explains a simple method of querying devices without needing pre-complied MIB’s, but this method isn’t the standard way of using PySNMP. Refer to the following posts for more up-to-date articles on PySNMP: <a href="/2022/01/11/pysnmp-hlapi-overview.html">PySNMP’s HLAPI for SNMP GET Requests</a>, <a href="/2022/01/14/compiling-mibs-for-pysnmp.html">Compiling MIB’s for PySNMP with PySMI</a>, <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html">Bulk Data Gathering with PySNMP’s nextCmd and bulkCMD</a>.</p>
+
+<p>Because of SNMP’s common use, this article covers how you can use <a href="https://pysnmp.readthedocs.io/en/latest/">PySNMP</a> and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you’re looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP <a href="https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html">history</a> and <a href="https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html">design</a> page you may find useful.</p>
+
+<h2 id="what-is-pysnmp">What is PySNMP?</h2>
+
+<p><a href="https://pysnmp.readthedocs.io/en/latest/">PySNMP</a> is a Python package used for all manners of SNMP related functions. You can use the package to send SNMP GET or GETNEXT requests, send SNMP traps, or act as an SNMP agent which will respond to SNMP requests. I will be focusing on the GET and GETNEXT requests. PySNMP also supports all versions of SNMP, most of my examples below will be SNMP version 2c followed by a brief section covering how to use SNMP v3. There are a lot of features with this package, such as methods for performing asynchronous SNMP queries, but I will just be touching on the high-level API.</p>
+
+<p class="notice--warning">It should be pointed out that the PySNMP packages latest release of 4.4.12 was last released on Sept 24, 2019 as seen on <a href="https://github.com/etingof/pysnmp">Github</a>. The <a href="https://pysnmp.readthedocs.io/en/latest/">PySNMP</a> site itself has a disclaimer right at the top that the documentation is an inofficial copy. Although it has not been updated in quite some time, it still appears to be effective for performing SNMP queries with Python.</p>
+
+<p>I’m not entirely sure what has happened with the development of the PySNMP package, but it still seems to be commonly used. In my research of finding SNMP packages for use with Python, PySNMP is by far the most complete and feature-rich package. In fact, Ansible’s <a href="https://galaxy.ansible.com/community/general">general community role</a> still uses PySNMP for the <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts module</a>.</p>
+
+<h2 id="a-note-on-secrets">A Note on Secrets</h2>
+
+<p>The code examples within this document hard code SNMP community values and SNMP v3 USM auth/priv information. DO NOT do this in production. Instead, use a secrets manager that you can programmatically query and/or environment variables. Always ensure that you are not hard coding secrets and commiting them to source control.</p>
+
+<h1 id="getting-started-with-pysnmp">Getting Started with PySNMP</h1>
+
+<p>In the examples I present in this post I have chosen to use the Ansible <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts</a> method of SNMP queries with PySNMP instead of the method presented in the <a href="https://pysnmp.readthedocs.io/en/latest/quick-start.html">PySNMP quick start</a> documentation. I have found Ansible’s method far easier to use for any queries to network devices for OID’s not already in the standard MIB’s that PySNMP can reference. PySNMP appears to be unable to take in standard MIB files and instead requires that they be converted to a specific <a href="https://github.com/etingof/pysnmp-mibs">PySNMP format</a> using <a href="https://github.com/etingof/pysmi/blob/master/scripts/mibdump.py">PySMI mibdump tool</a>. I have found this tool difficult to use, so for simplicity I will use the Ansible method of performing SNMP queries which uses OID’s directly.</p>
+
+<p class="notice--success">UPDATE: I’ve become more acquainted with PySMI’s capabilities of compiling MIB’s. Check out my <a href="/2022/01/14/compiling-mibs-for-pysnmp.html">latest post</a> on how to use PySMI and mibdump.py to compile text MIB files into a format that PySNMP can read!</p>
+
+<p>Lets start with a simple example of using SNMP v2c to send a query to a network device for sysName.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pysnmp.entity.rfc3413.oneliner</span> <span class="kn">import</span> <span class="n">cmdgen</span>
+
+<span class="n">SYSNAME</span> <span class="o">=</span> <span class="s">'1.3.6.1.2.1.1.5.0'</span>
+
+<span class="n">host</span> <span class="o">=</span> <span class="s">'10.1.1.1'</span>
+<span class="n">snmp_ro_comm</span> <span class="o">=</span> <span class="s">'mysnmprocomm'</span>
+
+<span class="c1"># Define a PySNMP CommunityData object named auth, by providing the SNMP community string
+</span><span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">CommunityData</span><span class="p">(</span><span class="n">snmp_ro_comm</span><span class="p">)</span>
+
+<span class="c1"># Define the CommandGenerator, which will be used to send SNMP queries
+</span><span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+
+<span class="c1"># Query a network device using the getCmd() function, providing the auth object, a UDP transport
+# our OID for SYSNAME, and don't lookup the OID in PySNMP's MIB's
+</span><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">getCmd</span><span class="p">(</span>
+    <span class="n">auth</span><span class="p">,</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+    <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Check if there was an error querying the device
+</span><span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">()</span>
+
+<span class="c1"># We only expect a single response from the host for sysName, but varBinds is an object
+# that we need to iterate over. It provides the OID and the value, both of which have a
+# prettyPrint() method so that you can get the actual string data
+</span><span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>To break down the above code a bit more, we query a host at IP address 10.1.1.1 with an SNMP v2c community string of mysnmprocomm for the sysName OID 1.3.6.1.2.1.1.5.0. This is performed by first importing PySNMP’s oneliner cmdgen module which is a simplified method for performing SNMP queries versus the PySNMP high-level API (HLAPI). To use this module we first create a cmdgen CommandGenerator object which allows you to perform SNMP operations such as bulkCmd, getCmd, nextCmd and setCmd. In our example, we are using getCmd() which takes a few arguments:</p>
+
+<ul>
+  <li>authData which we provide as an auth object created using cmdgen.CommunityData()</li>
+  <li>A UDP transport which is where we provide the host IP address and common SNMP UDP port of 161</li>
+  <li>A MIB variable which we have associated with our SYSNAME variables OID value</li>
+  <li>An indication to not look the OID up in PySNMP’s provided MIB references</li>
+</ul>
+
+<p>When issuing the getCmd() command it will return four variables</p>
+
+<ul>
+  <li>errorIndication - A string that when present indicates an SNMP error, along with the provided text of the error</li>
+  <li>errorStatus - A string that when present indicates an SNMP PDU error</li>
+  <li>errorIndex - The index in varBinds that generated the error</li>
+  <li>varBinds - A sequence of MIB variable values returned via SNMP. These are <a href="https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType">PySNMP ObjectType</a> class instances</li>
+</ul>
+
+<p>To explore the errorIndication variable further, lets say that the host is not responding to SNMP. After calling the cmdgen.getCmd() function and getting the four returned values, a host thats non-responsive would look as follows (below):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">getCmd</span><span class="p">(</span>
+<span class="p">...</span>     <span class="n">auth</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+<span class="p">...</span>     <span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+<span class="p">...</span>     <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span>
+<span class="n">RequestTimedOut</span><span class="p">(</span><span class="s">'No SNMP response received before timeout'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">varBinds</span>
+<span class="p">()</span>
+</code></pre></div></div>
+
+<p>So errorIndication has an actual string value associated with it indicating that the request timed out, and varBinds is an empty Tuple. Lets look at what happens when the host is reachable and responds to sysName:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">getCmd</span><span class="p">(</span>
+<span class="p">...</span>     <span class="n">auth</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+<span class="p">...</span>     <span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+<span class="p">...</span>     <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">varBinds</span><span class="p">)</span>
+<span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">varBinds</span>
+<span class="p">[(</span><span class="o">&lt;</span><span class="n">ObjectName</span> <span class="n">value</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tagSet</span> <span class="o">&lt;</span><span class="n">TagSet</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tags</span> <span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">payload</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">1.5</span><span class="p">.</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">OctetString</span> <span class="n">value</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tagSet</span> <span class="o">&lt;</span><span class="n">TagSet</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tags</span> <span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">subtypeSpec</span> <span class="o">&lt;</span><span class="n">ConstraintsIntersection</span> <span class="nb">object</span><span class="p">,</span> <span class="n">consts</span> <span class="o">&lt;</span><span class="n">ValueSizeConstraint</span> <span class="nb">object</span><span class="p">,</span> <span class="n">consts</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">65535</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="n">encoding</span> <span class="n">iso</span><span class="o">-</span><span class="mi">8859</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">payload</span> <span class="p">[</span><span class="n">myrouter</span><span class="p">.</span><span class="n">yaklin</span><span class="p">.</span><span class="n">ca</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+<span class="p">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+<span class="p">...</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">1.5</span><span class="p">.</span><span class="mi">0</span> <span class="n">myrouter</span><span class="p">.</span><span class="n">yaklin</span><span class="p">.</span><span class="n">ca</span>
+</code></pre></div></div>
+
+<p>You can see that the actual varBinds Tuple contains a single entry witih multiple parameters. If we iterate over that entry we can get the OID which was returned, along with the value.</p>
+
+<p>Why would the returned OID be needed? Shouldn’t we already know which OID we queried? You’ll see that when querying using the nextCmd() method for a table of OID’s, such as when querying the status of each interface on a device, you will need the returned OID as it will contain the high-level OID (e.g. 1.3.6.1.2.1.2.2.1.8 for ifOperStatus), concatenated with the ifIndex value for the interface</p>
+
+<h2 id="querying-multiple-oids-at-once">Querying Multiple OID’s at Once</h2>
+
+<p>It turns out that you can actually provide multiple OID’s to PySNMP’s getCmd() method. If we wanted to query for both sysName and sysDescr, we could do so as follows (below I am only showing a subset of the code instead of repeating what was shown in the first example above):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SYSDESCR</span> <span class="o">=</span> <span class="s">'1.3.6.1.2.1.1.1.0'</span>
+<span class="n">SYSNAME</span> <span class="o">=</span> <span class="s">'1.3.6.1.2.1.1.5.0'</span>
+
+<span class="c1"># Create a Tuple of the OID's that you want to query
+</span><span class="n">oids</span> <span class="o">=</span> <span class="p">(</span><span class="n">SYSNAME</span><span class="p">,</span> <span class="n">SYSDESCR</span><span class="p">)</span>
+
+<span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">getCmd</span><span class="p">(</span>
+    <span class="n">auth</span><span class="p">,</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="o">*</span><span class="p">[</span><span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">oid</span><span class="p">)</span> <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">oids</span><span class="p">],</span>
+    <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now when we inspect varBinds we see we have two variable responses. One for sysName and the other for sysDescr:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">varBinds</span><span class="p">)</span>
+<span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+<span class="p">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+<span class="p">...</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">1.5</span><span class="p">.</span><span class="mi">0</span> <span class="n">myrouter</span><span class="p">.</span><span class="n">yaklin</span><span class="p">.</span><span class="n">ca</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">1.1</span><span class="p">.</span><span class="mi">0</span> <span class="mh">0x436973636f20494f5320536f6674776172652c203238303020536f667477617265202843323830304e4d2d414456454e54455250524953454b392d4d292c2056657273696f6e2031322e3428313363292c2052454c4541534520534f4654574152452028666332290d0a546563686e6963616c20537570706f72743a20687474703a2f2f7777772e636973636f2e636f6d2f74656368737570706f72740d0a436f707972696768742028632920313938362d3230303720627920436973636f2053797374656d732c20496e632e0d0a436f6d70696c6564205468752031342d4a756e2d30372031383a35312062792070726f645f72656c5f7465616d</span>
+</code></pre></div></div>
+
+<p class="notice--info">The sysDescr response is actually a hex representation that needs to be decoded. Using <a href="/2022/01/11/pysnmp-hlapi-overview.html">PySNMP’s HLAPI</a> will automatically decode this for us. However, if you wish to continue using cmdGen, decoding this is outside the scope of this post, but I would recommend reviewing the Ansible <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts</a> module and its decode_hex() and to_text() functions.</p>
+
+<h2 id="querying-an-snmp-table-using-nextcmd">Querying an SNMP table using nextCmd()</h2>
+
+<p>To query an SNMP table for details you need to use the nextCmd() function. This is very similar to the getCmd() function, with only some minor adjustments. SNMP tables are used for data such as interface details (admin or operational up/down status, duplex, speed, etc) and metrics (bytes in/out, errors, discards, etc), the physical inventory of a device (such as entPhysicalModelName for querying Cisco’s EoX API - Check out my posts on the API’s in <a href="/2021/02/01/guide-to-cisco-support-apis-part-1.html">part 1</a> and <a href="/2021/02/07/guide-to-cisco-support-apis-part-2.html">part 2</a>).</p>
+
+<p>Below I present a complete code snippet highlighting its use. I have adjusted the comments specific to the changes from the previous snippet.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pysnmp.entity.rfc3413.oneliner</span> <span class="kn">import</span> <span class="n">cmdgen</span>
+
+<span class="n">IFOPERSTATUS</span> <span class="o">=</span> <span class="s">'1.3.6.1.2.1.2.2.1.8'</span>
+
+<span class="n">host</span> <span class="o">=</span> <span class="s">'10.1.1.1'</span>
+<span class="n">snmp_ro_comm</span> <span class="o">=</span> <span class="s">'mysnmprocomm'</span>
+
+<span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">CommunityData</span><span class="p">(</span><span class="n">snmp_ro_comm</span><span class="p">)</span>
+<span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+
+<span class="c1"># Query a network device using the nextCmd() function. We're providing the ifOperStatus
+# OID and expect an SNMP table response, which we will call varTable
+</span><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varTable</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">nextCmd</span><span class="p">(</span>
+    <span class="n">auth</span><span class="p">,</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">IFOPERSTATUS</span><span class="p">),</span>
+    <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">()</span>
+
+<span class="c1"># We can now iterate over each interface to get its operational status
+</span><span class="k">for</span> <span class="n">varBinds</span> <span class="ow">in</span> <span class="n">varTable</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="s">'Operational Status'</span><span class="p">,</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>When using nextCmd() it will return a table of varBinds, so we need to iterate first over the table and then over the varBinds. The results of this query to my test router show four interfaces with their operational status. The values for ifOperStatus are numeric values representing the <a href="http://www.net-snmp.org/docs/mibs/interfaces.html">operational status</a> where a response value of 1 means the interface is operationally up and 2 means it is down.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">varBinds</span> <span class="ow">in</span> <span class="n">varTable</span><span class="p">:</span>
+<span class="p">...</span>     <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+<span class="p">...</span>         <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="s">'Operational Status'</span><span class="p">,</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+<span class="p">...</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">2.2</span><span class="p">.</span><span class="mf">1.8</span><span class="p">.</span><span class="mi">1</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">2</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">2.2</span><span class="p">.</span><span class="mf">1.8</span><span class="p">.</span><span class="mi">2</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">1</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">2.2</span><span class="p">.</span><span class="mf">1.8</span><span class="p">.</span><span class="mi">3</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">2</span>
+<span class="mf">1.3</span><span class="p">.</span><span class="mf">6.1</span><span class="p">.</span><span class="mf">2.1</span><span class="p">.</span><span class="mf">2.2</span><span class="p">.</span><span class="mf">1.8</span><span class="p">.</span><span class="mi">5</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>You’ll also see in the above output that although we queries for the OID of 1.3.6.1.2.1.2.2.1.8, we now see each response OID has the ifIndex value (1, 2, 3, and 5 in the above example) appended to the end. This can allow you to query for ifName and ifDescr so that you can provide more human readable details around which interfaces are up and down.</p>
+
+<h2 id="querying-using-snmp-v3">Querying using SNMP v3</h2>
+
+<p>Many SNMP deployements that I come across are still using SNMP v1 or v2c versions which are insecure as the queries and responses are not encrypted. If you’re fortunate enough to work in an SNMP v3 environment, you need to adjust how you create the auth credentials provided to getCmd() and nextCmd(). If you’re still using SNMP v1 or v2c, there’s never a better time than now to advocate for SNMP v3, or another method of obtaining telemetry through a protocol that uses strong authentication and encryption.</p>
+
+<p>There are multiple parameters that need to be provided to create an SNMP v3 auth credential to provide to getCmd() and nextCmd(). The following shows a common example using SHA512 and AES256 with SNMP v3, and how to create the auth object for further use by these functions:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pysnmp.entity.rfc3413.oneliner</span> <span class="kn">import</span> <span class="n">cmdgen</span>
+
+<span class="n">SYSNAME</span> <span class="o">=</span> <span class="s">'1.3.6.1.2.1.1.5.0'</span>
+
+<span class="n">host</span> <span class="o">=</span> <span class="s">'10.1.1.1'</span>
+
+<span class="c1"># Define a PySNMP UsmUserData object named auth, by providing the SNMP v3 username,
+# auth key and protocol, and priv key and protocol
+</span><span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">UsmUserData</span><span class="p">(</span><span class="n">userName</span><span class="o">=</span><span class="s">'mysnmpuser'</span><span class="p">,</span>
+                          <span class="n">authKey</span><span class="o">=</span><span class="s">'myauthpassphrase'</span><span class="p">,</span>
+                          <span class="n">authProtocol</span><span class="o">=</span><span class="n">cmdgen</span><span class="p">.</span><span class="n">usmHMAC384SHA512AuthProtocol</span><span class="p">,</span>
+                          <span class="n">privKey</span><span class="o">=</span><span class="s">'myprivpassphrase'</span><span class="p">,</span>
+                          <span class="n">privProtocol</span><span class="o">=</span><span class="n">cmdgen</span><span class="p">.</span><span class="n">usmAesCfb256Protocol</span><span class="p">)</span>
+
+<span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="p">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+<span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="p">.</span><span class="n">getCmd</span><span class="p">(</span>
+    <span class="n">auth</span><span class="p">,</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">cmdgen</span><span class="p">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+    <span class="n">lookupMib</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+    <span class="n">sys</span><span class="p">.</span><span class="nb">exit</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">oid</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="p">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>PySNMP has classes that you can use for the auth and priv protocols in use by SNMP v3. The following are their class names:</p>
+
+<ul>
+  <li>Auth Protocol Classes
+    <ul>
+      <li>cmdgen.usmHMACMD5AuthProtocol</li>
+      <li>cmdgen.usmHMACSHAAuthProtocol</li>
+      <li>cmdgen.usmHMAC128SHA224AuthProtocol</li>
+      <li>cmdgen.usmHMAC192SHA256AuthProtocol</li>
+      <li>cmdgen.usmHMAC256SHA384AuthProtocol</li>
+      <li>cmdgen.usmHMAC384SHA512AuthProtocol</li>
+      <li>cmdgen.usmNoAuthProtocol (the default, if authProtocol is not provided)</li>
+    </ul>
+  </li>
+  <li>Priv Protocol Classes
+    <ul>
+      <li>cmdgen.usmDESPrivProtocol</li>
+      <li>cmdgen.usm3DESEDEPrivProtocol</li>
+      <li>cmdgen.usmAesCfb128Protocol</li>
+      <li>cmdgen.usmAesCfb192Protocol</li>
+      <li>cmdgen.usmAesCfb256Protocol</li>
+      <li>cmdgen.usmNoPrivProtocol (the default, if no privProtocol is provided)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="wrapping-up">Wrapping Up</h2>
+
+<p>Using SNMP within Python doesn’t have to be hard, and it offers an easier approach to obtaining device details and metrics without having to scrape CLI output with regular expressions. The data that you obtain can be used for all sorts of things including monitoring, reporting and troubleshooting. I have previously presented using the <a href="/2021/02/07/guide-to-cisco-support-apis-part-2.html">Cisco EoX Support API</a>) to query Cisco’s site for end-of-life information, but I didn’t provide a method to gather the list of product ID’s programmatically from your network inventory. SNMP would be a great tool to get this information by querying entPhysicalModelName to get your list of product ID’s. I’m hoping to write a post specifically about this in the near future!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a><span class="sep">, </span>
+    
+      <a href="/tags/#snmp" class="page__taxonomy-item" rel="tag">SNMP</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-01-17">January 17, 2022</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Simple+SNMP+Queries+with+Python%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F08%2F25%2Fsnmp-queries-with-python.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F08%2F25%2Fsnmp-queries-with-python.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F08%2F25%2Fsnmp-queries-with-python.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/08/05/ansible-inventory-in-python.html" class="pagination--pager" title="Using Ansible Inventory Files in Python Scripts
+">Previous</a>
+    
+    
+      <a href="/2021/08/27/guide-to-deploy-saml-anyconnect.html" class="pagination--pager" title="A Practical Guide to Deploying SAML for AnyConnect (External)
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

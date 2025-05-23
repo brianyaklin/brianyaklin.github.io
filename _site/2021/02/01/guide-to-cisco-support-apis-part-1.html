@@ -1,0 +1,801 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>A Guide to Cisco Support API’s - Part 1 - def brian(automate)</title>
+<meta name="description" content="Managing your network infrastructure hardware, software and maintenance lifecycle workflow tends to be a painful process. It means gathering large amounts of telemetry from your network devices, transforming that data into a format (excel, csv, etc) that you can use to compare, update, and track and then determine the actions you need to take. A year later you get to wash-rinse-repeate the whole process over again. If you are fortunate enough to have a configuration management database (CMDB), this becomes easier, but often these applications require some level of manual effort to keep up-to-date. They can also cost you financially, sometimes more than you are willing or able to pay.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="A Guide to Cisco Support API’s - Part 1">
+<meta property="og:url" content="http://localhost:4000/2021/02/01/guide-to-cisco-support-apis-part-1.html">
+
+
+  <meta property="og:description" content="Managing your network infrastructure hardware, software and maintenance lifecycle workflow tends to be a painful process. It means gathering large amounts of telemetry from your network devices, transforming that data into a format (excel, csv, etc) that you can use to compare, update, and track and then determine the actions you need to take. A year later you get to wash-rinse-repeate the whole process over again. If you are fortunate enough to have a configuration management database (CMDB), this becomes easier, but often these applications require some level of manual effort to keep up-to-date. They can also cost you financially, sometimes more than you are willing or able to pay.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-02-01T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/02/01/guide-to-cisco-support-apis-part-1.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="A Guide to Cisco Support API’s - Part 1">
+    <meta itemprop="description" content="Managing your network infrastructure hardware, software and maintenancelifecycle workflow tends to be a painful process. It means gathering largeamounts of telemetry from your network devices, transforming that data intoa format (excel, csv, etc) that you can use to compare, update, and trackand then determine the actions you need to take. A year later you get towash-rinse-repeate the whole process over again. If you are fortunateenough to have a configuration management database (CMDB), this becomeseasier, but often these applications require some level of manual effortto keep up-to-date. They can also cost you financially, sometimes more thanyou are willing or able to pay.">
+    <meta itemprop="datePublished" content="2021-02-01T00:00:00-07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">A Guide to Cisco Support API’s - Part 1
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-02-01T00:00:00-07:00">February 1, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#cisco-support-api-use-cases">Cisco Support API Use-Cases</a></li><li><a href="#cisco-support-api-introduction">Cisco Support API Introduction</a></li><li><a href="#cisco-support-api-end-point-best-practices">Cisco Support API End-point Best Practices</a></li><li><a href="#cisco-psirt-openvuln-api">Cisco PSIRT openVuln API</a></li><li><a href="#next-steps">Next Steps</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>Managing your network infrastructure hardware, software and maintenance
+lifecycle workflow tends to be a painful process. It means gathering large
+amounts of telemetry from your network devices, transforming that data into
+a format (excel, csv, etc) that you can use to compare, update, and track
+and then determine the actions you need to take. A year later you get to
+wash-rinse-repeate the whole process over again. If you are fortunate
+enough to have a configuration management database (CMDB), this becomes
+easier, but often these applications require some level of manual effort
+to keep up-to-date. They can also cost you financially, sometimes more than
+you are willing or able to pay.</p>
+
+<p>In come <a href="https://developer.cisco.com/site/support-apis/">Cisco’s Support API’s</a>,
+enabling you to take over the reins and have a little more flexibility in how
+you manage your Cisco inventory. In part 1 of this series of posts I provide an
+overview of how you can use these API’s on your own or your customers networks.
+Part 2 of this series looks to provide a few Python snippets showing how to
+interact with the API’s. For a detailed guide, refer to
+<a href="https://developer.cisco.com/docs/support-apis/#!introduction-to-cisco-support-apis">Cisco’s Support API Docs</a>.</p>
+
+<blockquote>
+  <p>Cisco Support API’s enable you to be flexible and agile on what you want to report
+while also considering <strong>your</strong> business context that other off-the-shelf
+applications are unable to comprehend</p>
+</blockquote>
+
+<h2 id="cisco-support-api-use-cases">Cisco Support API Use-Cases</h2>
+
+<p>Before going into detail on the API’s, its useful to understand why you might want
+to use them in the first place. I have been using these API’s for a number of reasons
+including:</p>
+
+<ul>
+  <li>Hardware life-cycle planning</li>
+  <li>Reporting for Cisco maintenance renewals</li>
+  <li>Bug scrubs on existing and future software versions</li>
+  <li>Identifying recommended software versions</li>
+</ul>
+
+<blockquote>
+  <p>Automating reporting and analysis tasks allows you to provide
+low level-of-effort (LoE) high-value services to your customers on
+a more frequent and recurring basis</p>
+</blockquote>
+
+<p>Yes, all of these tasks can be done manually but when you need to do this at scale
+across multiple large environments with a wide variety of hardware models and
+software versions in use, doing so manually becomes very time consuming. These API’s
+have allowed me to provide low LoE value-add services to my customers
+by decreasing the amount of time spent preparing a recommendation which a customer may
+or may not be able to move foward with. The customer gets a nice detailed report that
+they can use in the future and there is a chance that I may get a rewarding project
+from them to perform a hardware or software life-cycle across their environment. No
+matter the outcome, your relationship with your customers will be enhanced by
+providing them with this information.</p>
+
+<h2 id="cisco-support-api-introduction">Cisco Support API Introduction</h2>
+
+<p>For Cisco customers with Smart Net Total Care (SNTC) or partners with Partner
+Support Services (PSS), gaining access to Cisco’s Support API’s is as simple as
+registering your application/script on <a href="https://apiconsole.cisco.com/">Cisco’s API console</a>.
+There are currently eight API end-points that you are able to interface with:</p>
+
+<ul>
+  <li>Automated Software Distribution</li>
+  <li>Bug</li>
+  <li>Case</li>
+  <li>EoX</li>
+  <li>Product Information</li>
+  <li>Serial Number to Information</li>
+  <li>Service Order Return (RMA)</li>
+  <li>Software Suggestion</li>
+</ul>
+
+<p>When you register an application you pick which of the above API end-points you would
+like to associate with the application. If you have multiple applications or
+scripts you are developing it might be beneficial to create an unique
+application in the API console for each. Each application you register will
+have rate limits applied to each (ex. 10 calls per second, 5000 calls per day)
+Creating multiple applications in the API console for each application you
+are developing helps ensure you have the necessary resources for each.</p>
+
+<p>You will also need to pick an authentication credential type that your
+application will use to login to the API console. Cisco uses OAuth2.0
+credentials and has four grant types available. I personally use the
+<code class="language-plaintext highlighter-rouge">Client Credentials</code> grant type which provides you with a Client ID and Client Secret.
+Think of these as your username and password. These will be used to authenticate
+you against the API console and will provide back an access token for you to
+query each API end-point. More detail on the authentication workflow will be found
+in Part 2 of this series.</p>
+
+<blockquote>
+  <p><strong>Keep your keys in a secure location</strong> just like you would any other
+username/password you use. These keys are associated with <strong>your</strong> Cisco
+CCO account. You should not expose your keys to your applications
+end users, you should not store these directly in your source code or
+version control, and instead should use environment variables or some
+other secure mechanism for storing and consuming your API keys (ex. AWS KMS)</p>
+</blockquote>
+
+<p>After registering your application you will be sent an email with your client ID, or
+you can get your client ID and secret right from the API console by clicking on your
+application.</p>
+
+<h2 id="cisco-support-api-end-point-best-practices">Cisco Support API End-point Best Practices</h2>
+
+<p>Okay so at this point you have registered your application, have your client ID and
+secret, and are now exploring the available API end-points to see what data you can
+report on. This section won’t cover the details about each API end-point (examples
+will be provided in part 2), but instead will highlight a few things to keep in mind
+when interacting with the API’s.</p>
+
+<p>Most of the API’s will support returning data in JSON format, but a few also provide
+XML responses. I personally prefer JSON as Python has a few packages that will easily
+convert JSON into a dictionary, and JavaScript can easily convert it into an object.</p>
+
+<blockquote>
+  <p>Play nice with Cisco’s API’s by rate limiting and reducing unecessary queries.</p>
+</blockquote>
+
+<p>Because you are rate limited on the number of calls per second you can make, I often
+include a sleep timer of 0.5s between API calls. If you let your application run wide open
+you will start receiving error responses and timeouts. Play nice with Cisco’s API’s -
+rate limit directly within your applications so you don’t abuse this great service.</p>
+
+<p>On the same front around rate limiting, you are limited to the number of requests you
+can place per day. Most API end-points allow you to include multiple items in each
+request. As an example the EoX by Product ID’s (PID’s) API allows you to include up to 20
+PID’s per request. Remember, each router can have multiple pieces of hardware installed
+in it (check with a <code class="language-plaintext highlighter-rouge">show inventory</code>). A chassis PID of ISR4451/K9, a module PID of
+NIM-4MFT-T1/E1, another module of PID ISR4451-X-4x1GE, and possibly more. Instead of sending
+three API calls (one for each PID), you can group these together in a comma seperated
+string so that you only have a single API call. Additionally, I usually deduplicate
+things like the hardware PID’s discovered across the entire environment I am reporting on.
+If you have a dozen Cisco ISR4451/K9’s in your environment, you are using you your API
+call quota and Cisco’s resources by querying for the same PID multiple times. Part 2
+will show you an example on how to do this deduplication.</p>
+
+<h2 id="cisco-psirt-openvuln-api">Cisco PSIRT openVuln API</h2>
+
+<p>While not a Support API, Cisco does offer access to their <a href="https://developer.cisco.com/psirt/">PSIRT openVuln API</a>. I find this
+worth mentioning because this can be a valuable tool for you to include in automations
+you may be creating. If you are already reporting on bugs associated with current
+software images that are in-use in an environment, including security advisory reviews
+as part of your software analysis can siginificantly help drive value for your customers.</p>
+
+<p>I won’t be expanding on this API in this post, but may create a post in the future.</p>
+
+<h2 id="next-steps">Next Steps</h2>
+
+<p>I hope that this post has been informative for you. I have found Cisco’s Support API’s
+to be helpful in driving value for my customers and I’m exciting to create a more
+technical post with some Python examples. Part 2 of this series should be live in
+a few days.</p>
+
+<p>I am a strong believer in learning from others experiences. If you have been using Cisco’s
+API’s, I would really like to hear how you have used them and what value the provided you. Feel
+free to discuss on the social media links above!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#api" class="page__taxonomy-item" rel="tag">API</a><span class="sep">, </span>
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a><span class="sep">, </span>
+    
+      <a href="/tags/#cisco" class="page__taxonomy-item" rel="tag">Cisco</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-02-01T00:00:00-07:00">February 1, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=A+Guide+to+Cisco+Support+API%27s+-+Part+1%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F01%2Fguide-to-cisco-support-apis-part-1.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F01%2Fguide-to-cisco-support-apis-part-1.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F01%2Fguide-to-cisco-support-apis-part-1.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/01/31/welcome.html" class="pagination--pager" title="Welcome!
+">Previous</a>
+    
+    
+      <a href="/2021/02/07/guide-to-cisco-support-apis-part-2.html" class="pagination--pager" title="A Guide to Cisco Support API’s - Part 2 - EoX
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

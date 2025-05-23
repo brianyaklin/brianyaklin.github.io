@@ -1,0 +1,907 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Bulk Data Gathering with PySNMP nextCmd and bulkCmd - def brian(automate)</title>
+<meta name="description" content="Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP’s implementation of SNMP GET NEXT and GET BULK using the nextCmd and bulkCmd command generators and how to retrieve the ifTable table of data from an SNMP agent.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Bulk Data Gathering with PySNMP nextCmd and bulkCmd">
+<meta property="og:url" content="http://localhost:4000/2022/01/16/bulk-data-gathering-with-pysnmp.html">
+
+
+  <meta property="og:description" content="Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP’s implementation of SNMP GET NEXT and GET BULK using the nextCmd and bulkCmd command generators and how to retrieve the ifTable table of data from an SNMP agent.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-01-16T00:00:00-07:00">
+
+
+
+  <meta property="article:modified_time" content="2022-01-17T21:13:00-07:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2022/01/16/bulk-data-gathering-with-pysnmp.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Bulk Data Gathering with PySNMP nextCmd and bulkCmd">
+    <meta itemprop="description" content="Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP’s implementation of SNMP GET NEXT and GET BULK using the nextCmd and bulkCmd command generators and how to retrieve the ifTable table of data from an SNMP agent.">
+    <meta itemprop="datePublished" content="2022-01-16T00:00:00-07:00">
+    <meta itemprop="dateModified" content="2022-01-17T21:13:00-07:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          11 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#what-is-iftable">What is ifTable?</a></li><li><a href="#snmp-getnext-requests-with-pysnmp-nextcmd">SNMP GETNEXT Requests with PySNMP nextCmd()</a></li><li><a href="#snmp-getbulk-requests-with-pysnmp-bulkcmd">SNMP GETBULK Requests with PySNMP bulkCmd()</a></li><li><a href="#where-to-go-next">Where to go next?</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>Up until now my articles (<a href="/2022/01/11/pysnmp-hlapi-overview.html">PySNMP HLAPI</a>, <a href="/2022/01/14/compiling-mibs-for-pysnmp.html">Compiling MIB’s for PySNMP</a>) have focused on using simple SNMP GET requests with PySNMP’s <a href="https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/getcmd.html">getCmd</a>. This works great for simple SNMP queries where you only need one piece of information. When performing gathering of larger data sets with SNMP, issuing single SNMP GET requests for each data point can be very inefficient. Often times you are limited by the latency that exists between the SNMP manager (your script/code) and the SNMP agent running on a network device. In this article we will explore PySNMP’s implementation of SNMP GET NEXT and GET BULK using the <a href="https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/nextcmd.html">nextCmd</a> and <a href="https://pysnmp.readthedocs.io/en/latest/docs/hlapi/v3arch/asyncore/sync/manager/cmdgen/bulkcmd.html">bulkCmd</a> command generators and how to retrieve the ifTable table of data from an SNMP agent.</p>
+
+<h2 id="what-is-iftable">What is ifTable?</h2>
+
+<p><a href="http://www.net-snmp.org/docs/mibs/interfaces.html">ifTable</a> is an SNMP table that represents the interfaces on a remote device (a Cisco router in this article) and meta-data associated with the interfaces. Each column of the table represents meta-data such as:</p>
+
+<ul>
+  <li>ifDescr - the description of the interface</li>
+  <li>ifType - the type of interface</li>
+  <li>ifMtu - the MTU of the interface</li>
+  <li>ifSpeed - the speed of the interface</li>
+  <li>ifPhysAddress - the MAC address of the interface (in the case of ethernet)</li>
+  <li>ifAdminStatus - the administrative status (e.g. up/down) of the interface</li>
+  <li>ifOperStatus - the operational status (e.g up/down/testing/unknown/notPresent, etc) of the interface</li>
+  <li>ifInOctets/ifOutOctets - the input and output octets on the interface</li>
+  <li>ifInErrors/ifOutErrors - the input and output errors on the interface</li>
+  <li>Many more! (refer to the ifTable link above for a complete list)</li>
+</ul>
+
+<p>Each row of the table represents an interface on the device and is represented by an ifIndex integer value per interface. For example, ifIndex value of 1 is used for the interface with a description of GigabitEthernet0/0, a value of 2 for GigabitEthernet0/1, and so on.</p>
+
+<p>For devices with many interfaces (e.g. a modular or stacked switch), there can be several hundred interfaces with corresponding ifIndex values. You can imagine that querying each one of these interfaces with a SNMP GET request you will be issuing one request per interface per type of meta-data you wish to collect.</p>
+
+<h2 id="snmp-getnext-requests-with-pysnmp-nextcmd">SNMP GETNEXT Requests with PySNMP nextCmd()</h2>
+
+<p>When we used PySNMP’s getCmd() function in a (<a href="/2022/01/11/pysnmp-hlapi-overview.html">previous article</a> you were expected to provide a MIB name, variable name, and an integer value representing an instance (<code class="language-plaintext highlighter-rouge">ObjectIdentity('SNMPv2-MIB', 'sysName', 0)</code>). In some cases this works fine, but in the case of our ifTable example, how are we to know the instance number representing each case? This would mean establishing ObjectIdentity instances for each ifIndex value thats available, but often times we won’t know about these ahead of time. We can instead send an SNMP GETNEXT request which allows us to query for data where we may not know this index value, as well as get related sequential data.</p>
+
+<p>An SNMP GETNEXT command means that we query for a particular MIB variable instance and the SNMP agent on the remote device will respond not an answer for the OID in the request, but with the OID and value for the <em>next</em> variable in the MIB tree. This works well when querying a table where we may not know what the starting instance index is, because we can start with the MIB variable of the table itself (e.g. ifTable by specifying a PySNMP ObjectType of <code class="language-plaintext highlighter-rouge">ObjectType(ObjectIdentity('IF-MIB', 'ifTable'))</code>) and the SNMP avent on the remote device responds with the next available variable in the MIB tree.</p>
+
+<p>To explain this behavior further refer to the below image.</p>
+
+<figure class="align-center">
+  <img src="http://localhost:4000/assets/images/wshark-snmp-packet-1.png" alt="wireshark-captured-snmp-next-packets" />
+  <figcaption>SNMP GETNEXT packet behavior.</figcaption>
+</figure>
+
+<p>In the above example we can see the following:</p>
+
+<ul>
+  <li>In packet 1 an SNMP GETNEXT query was issued for OID 1.3.6.1.2.1.2.2 which was sent using <code class="language-plaintext highlighter-rouge">ObjectType(ObjectIdentity('IF-MIB', 'ifTable'))</code></li>
+  <li>In packet 2 an SNMP get-response of 1.3.6.1.2.1.2.2.1.1.1 was returned which when reviewing the response PySNMP ObjectType instance it is for <code class="language-plaintext highlighter-rouge">IF-MIB::ifIndex.1 = 1</code>. This is the first entry underneath ifTable which indicates that there is an index instance of 1 for ifIndex.1</li>
+  <li>In packet 3 an SNMP GETNEXT query was issued for OID 1.3.6.1.2.1.2.2.1.1.1. This at first might seem odd, because its actually the OID that was returned in packet 2. But this is the behavior of SNMP GETNEXT requests; a response packet tells the SNMP manager (your code) what to query next</li>
+  <li>In packet 4, instead of returning the value of OID 1.3.6.1.2.1.2.2.1.1.1 it is returning the <strong>next</strong> value of 1.3.6.1.2.1.2.2.1.1.2 which when translated is <code class="language-plaintext highlighter-rouge">IF-MIB::ifIndex.2 = 2</code></li>
+</ul>
+
+<p>Details of packet 2, the first SNMP GETNEXT response, can be seen in the below screenshot. Looking at the variable-bindings, you can see that there is no binding for the OID of 1.3.6.1.2.1.2.2 (ifTable), but instead a single binding of the next variable in the MIB tree; 1.3.6.1.2.1.2.2.1.1.1 (ifIndex.1).</p>
+
+<figure class="align-center">
+  <img src="http://localhost:4000/assets/images/wshark-snmp-resp-detail-1.png" alt="wireshark-captured-snmp-next-packet-details" />
+  <figcaption>SNMP GETNEXT response packet details.</figcaption>
+</figure>
+
+<p>To perform an SNMP GETNEXT query with PySNMP and walk an the ifTable, we build our command generator using nextCmd() as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">iterator</span> <span class="o">=</span> <span class="n">nextCmd</span><span class="p">(</span>
+    <span class="n">SnmpEngine</span><span class="p">(),</span>
+    <span class="n">CommunityData</span><span class="p">(</span><span class="s">'rostring'</span><span class="p">,</span> <span class="n">mpModel</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">UdpTransportTarget</span><span class="p">((</span><span class="s">'192.168.11.201'</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">ContextData</span><span class="p">(),</span>
+    <span class="n">ObjectType</span><span class="p">(</span><span class="n">ObjectIdentity</span><span class="p">(</span><span class="s">'IF-MIB'</span><span class="p">,</span> <span class="s">'ifTable'</span><span class="p">)),</span>
+    <span class="n">lexicographicMode</span><span class="o">=</span><span class="bp">False</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>The majority of the code above has been well explained in my <a href="/2022/01/11/pysnmp-hlapi-overview.html">PySNMP HLAPI</a> post and are very similar to that of the getCmd() command. The two differences are:</p>
+
+<ul>
+  <li>We’re now using nextCmd() instead of getCmd()</li>
+  <li>An option of <code class="language-plaintext highlighter-rouge">lexicographicMod=False</code> is included</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">lexicographicMode=False</code> is an option that by default is True. What this means is that by default (value=True) we can use the command generator with next() to query from the particular ObjectIdentity that we provided all the way until the end of the MIB. When the end of the MIB is reached a PySNMP StopIteration exception is thrown which we can catch with a try/except clause. When we provide a value of False, this means that PySNMP will return values only within the current heirarchy of what we initially requested. In the example code above, with <code class="language-plaintext highlighter-rouge">lexicographicMode=False</code>, we only want to query descendants of ifTable and nothing outside of that tree thats further below in the MIB.</p>
+
+<p>To walk the entire ifTable using the nextCmd() command generator shown above, we can loop over the command generator until the StopIteration exception is thrown:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MAX_REPS</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">MAX_REPS</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">varBinds</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">prettyPrint</span><span class="p">())</span>
+    <span class="k">except</span> <span class="nb">StopIteration</span><span class="p">:</span>
+        <span class="k">break</span>
+
+    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p class="notice--warning">I previously wrote the above while() look at a while(True) loop, which probably isn’t great. This can result in an infinite loop if the logic within the loop doesn’t have a guaranteed break-away. This would normally be the StopIteration exception being seen, but I have now written a fail-safe with an arbitrarily set MAX_REPS value of 500 and a count variable that increments after each loop.</p>
+
+<p>Running the above code will result in all varBind variables being printed to screen. It is within this while() loop that you would perform additional handling of the SNMP responses such as storing them in a database, writing them to file, taking action based a response, etc. Running the code above will generate a large number of printed statements showing the entire ifTable contents:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IF-MIB::ifIndex.1 = 1
+IF-MIB::ifIndex.2 = 2
+IF-MIB::ifIndex.3 = 3
+IF-MIB::ifIndex.4 = 4
+IF-MIB::ifIndex.5 = 5
+IF-MIB::ifDescr.1 = GigabitEthernet0/0
+IF-MIB::ifDescr.2 = GigabitEthernet0/1
+IF-MIB::ifDescr.3 = GigabitEthernet0/2
+IF-MIB::ifDescr.4 = GigabitEthernet0/3
+IF-MIB::ifDescr.5 = Null0
+IF-MIB::ifType.1 = ethernetCsmacd
+IF-MIB::ifType.2 = ethernetCsmacd
+IF-MIB::ifType.3 = ethernetCsmacd
+IF-MIB::ifType.4 = ethernetCsmacd
+IF-MIB::ifType.5 = other
+IF-MIB::ifMtu.1 = 1500
+IF-MIB::ifMtu.2 = 1500
+IF-MIB::ifMtu.3 = 1500
+IF-MIB::ifMtu.4 = 1500
+IF-MIB::ifMtu.5 = 1500
+IF-MIB::ifSpeed.1 = 1000000000
+IF-MIB::ifSpeed.2 = 1000000000
+IF-MIB::ifSpeed.3 = 1000000000
+IF-MIB::ifSpeed.4 = 1000000000
+IF-MIB::ifSpeed.5 = 4294967295
+IF-MIB::ifPhysAddress.1 = 52:54:00:17:10:3e
+IF-MIB::ifPhysAddress.2 = 52:54:00:17:0b:b4
+IF-MIB::ifPhysAddress.3 = 52:54:00:09:5f:73
+IF-MIB::ifPhysAddress.4 = 52:54:00:04:4d:73
+IF-MIB::ifPhysAddress.5 =
+IF-MIB::ifAdminStatus.1 = up
+IF-MIB::ifAdminStatus.2 = down
+IF-MIB::ifAdminStatus.3 = down
+IF-MIB::ifAdminStatus.4 = down
+IF-MIB::ifAdminStatus.5 = up
+IF-MIB::ifOperStatus.1 = up
+IF-MIB::ifOperStatus.2 = down
+IF-MIB::ifOperStatus.3 = down
+IF-MIB::ifOperStatus.4 = down
+IF-MIB::ifOperStatus.5 = up
+IF-MIB::ifLastChange.1 = 2633
+IF-MIB::ifLastChange.2 = 3010
+IF-MIB::ifLastChange.3 = 3032
+IF-MIB::ifLastChange.4 = 3032
+IF-MIB::ifLastChange.5 = 0
+IF-MIB::ifInOctets.1 = 114294
+IF-MIB::ifInOctets.2 = 0
+IF-MIB::ifInOctets.3 = 0
+IF-MIB::ifInOctets.4 = 0
+IF-MIB::ifInOctets.5 = 0
+IF-MIB::ifInUcastPkts.1 = 1266
+IF-MIB::ifInUcastPkts.2 = 0
+IF-MIB::ifInUcastPkts.3 = 0
+IF-MIB::ifInUcastPkts.4 = 0
+IF-MIB::ifInUcastPkts.5 = 0
+IF-MIB::ifInDiscards.1 = 0
+IF-MIB::ifInDiscards.2 = 0
+IF-MIB::ifInDiscards.3 = 0
+IF-MIB::ifInDiscards.4 = 0
+IF-MIB::ifInDiscards.5 = 0
+IF-MIB::ifInErrors.1 = 0
+IF-MIB::ifInErrors.2 = 0
+IF-MIB::ifInErrors.3 = 0
+IF-MIB::ifInErrors.4 = 0
+IF-MIB::ifInErrors.5 = 0
+IF-MIB::ifInUnknownProtos.1 = 0
+IF-MIB::ifInUnknownProtos.2 = 0
+IF-MIB::ifInUnknownProtos.3 = 0
+IF-MIB::ifInUnknownProtos.4 = 0
+IF-MIB::ifInUnknownProtos.5 = 0
+IF-MIB::ifOutOctets.1 = 9820093
+IF-MIB::ifOutOctets.2 = 0
+IF-MIB::ifOutOctets.3 = 0
+IF-MIB::ifOutOctets.4 = 0
+IF-MIB::ifOutOctets.5 = 0
+IF-MIB::ifOutUcastPkts.1 = 84803
+IF-MIB::ifOutUcastPkts.2 = 0
+IF-MIB::ifOutUcastPkts.3 = 0
+IF-MIB::ifOutUcastPkts.4 = 0
+IF-MIB::ifOutUcastPkts.5 = 0
+IF-MIB::ifOutDiscards.1 = 0
+IF-MIB::ifOutDiscards.2 = 0
+IF-MIB::ifOutDiscards.3 = 0
+IF-MIB::ifOutDiscards.4 = 0
+IF-MIB::ifOutDiscards.5 = 0
+IF-MIB::ifOutErrors.1 = 0
+IF-MIB::ifOutErrors.2 = 0
+IF-MIB::ifOutErrors.3 = 0
+IF-MIB::ifOutErrors.4 = 0
+IF-MIB::ifOutErrors.5 = 0
+</code></pre></div></div>
+
+<h2 id="snmp-getbulk-requests-with-pysnmp-bulkcmd">SNMP GETBULK Requests with PySNMP bulkCmd()</h2>
+
+<p>A negative factor when sending SNMP GETNEXT requests is that each MIB variable requires both a request and response packet. When there is a moderate amount of network latency between an SNMP manager and SNMP agent, this can result in unecessary latency. In the ifTable example in the above section, this requires 90 request and 90 response packets and in my local area network (LAN) it took 1.29 seconds to retrieve the entire table.</p>
+
+<p>Another SNMP query method is a GETBULK query which is implemnented with PySNMP’s bulkCmd() method. SNMP GETBULK queries allow you to request multiple GETNEXT variable bindings in a response packet. For example, issuing a GETBULK with the appropriate parameters can allow you to return the entire ifTable in only a few packets.</p>
+
+<p>There are two important parameters that are required when issuing a GETBULK request:</p>
+
+<ul>
+  <li>Non-repeaters</li>
+  <li>Max-repetitions</li>
+</ul>
+
+<p>The detailed explanation of how these variables is used in processing an SNMP GETBULK request by an SNMP agent is outlined in <a href="https://datatracker.ietf.org/doc/html/rfc1905.html#section-4.2.3">RFC1905 section 4.2.3</a>. For our example of querying a table of data, such as ifTable, we’re going to keep non-repeaters value as 0 and we will set max-repetitions to the number of variable-bindings we want returned per request. We will be setting max-reptitions to 50. This means that out of the 90 variable-binds we saw in the GETNEXT section above, we should expect two SNMP responses.</p>
+
+<p>The below screenshot shows capturing the entire ifTable in two requests and two responses and that this is accomplished in 0.087 seconds. This is significantly quicker than issuing multiple GETNEXT requests, which took 1.29 seconds for all 90 of them.</p>
+
+<figure class="align-center">
+  <img src="http://localhost:4000/assets/images/wshark-snmp-packet-2.png" alt="wireshark-captured-snmp-bulk-packets" />
+  <figcaption>SNMP GETBULK packet behavior.</figcaption>
+</figure>
+
+<p>Looking at the details of packet 2 in the below screenshot (the first SNMP response packet) you can see that 50 items are included in the variable-bindings section of the packet.</p>
+
+<figure class="align-center">
+  <img src="http://localhost:4000/assets/images/wshark-snmp-getbulk-resp-detail-1.png" alt="wireshark-captured-snmp-bulk-packet-details" />
+  <figcaption>SNMP GETBULK response packet details.</figcaption>
+</figure>
+
+<p>An interesting aspect of setting the max-repetitions value to 50 is that the second SNMP response packet had 50 variable-bindings in it instead of the 40 that we would have expected (50 variable-bindings from the first response packet and 40 additional ones to represent the ifTable that we already know should be 90 variable-bindings in total). The SNMP agent on the remote device doesn’t know that we are only looking for the contents of the ifTable, so instead it grabs the next 10 variable-bindings found after the ifTable within IF-MIB. Thankfully, with PySNMP’s lexicographicMode option set to False, these remaining 10 values are ignored when reading the results of varBind.</p>
+
+<p>To issue an SNMP GETBULK request with PySNMP we use the bulkCmd() command generator. The two integers below the ContextData() parameter are integers representing the non-repeaters (a value of 0) and max-repetitions (avalue of 50). Following these values we can continue providing the ObjectType() variables we want to query:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">iterator</span> <span class="o">=</span> <span class="n">bulkCmd</span><span class="p">(</span>
+    <span class="n">SnmpEngine</span><span class="p">(),</span>
+    <span class="n">CommunityData</span><span class="p">(</span><span class="s">'rostring'</span><span class="p">,</span> <span class="n">mpModel</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">UdpTransportTarget</span><span class="p">((</span><span class="s">'192.168.11.201'</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+    <span class="n">ContextData</span><span class="p">(),</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">ObjectType</span><span class="p">(</span><span class="n">ObjectIdentity</span><span class="p">(</span><span class="s">'IF-MIB'</span><span class="p">,</span> <span class="s">'ifTable'</span><span class="p">)),</span>
+    <span class="n">lexicographicMode</span><span class="o">=</span><span class="bp">False</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Although all variable-bindings were returned in only two packets, we must still parse over all 90 of these using the command generator <code class="language-plaintext highlighter-rouge">next(iterator)</code>. How this works is that the first iteration sends the first GETBULK command and the resulting response packet with 50 variable-bindings. The 51st iteration sends the second GETBULK command and the response packet contains the remainder of the variable-bindings (and the 10 discarded variable-bindings at the end we don’t care about). This can be accomplished using the same method we saw in the nextCmd() section:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MAX_REPS</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span><span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">MAX_REPS</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">varBinds</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">prettyPrint</span><span class="p">())</span>
+    <span class="k">except</span> <span class="nb">StopIteration</span><span class="p">:</span>
+        <span class="k">break</span>
+
+    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>When viewing the printed data you can see that the count variable only incremented to 90. So although there were a total of 100 variable-bindings across the two packets, the 10 which we didn’t care about we don’t iterate over. This is a direct result of setting lexicographicMode to False and exception StopIteration being raised, which stops the while loop:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifIndex</span><span class="p">.</span><span class="mi">1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifIndex</span><span class="p">.</span><span class="mi">2</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifIndex</span><span class="p">.</span><span class="mi">3</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifIndex</span><span class="p">.</span><span class="mi">4</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifIndex</span><span class="p">.</span><span class="mi">5</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">...</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifOutErrors</span><span class="p">.</span><span class="mi">1</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifOutErrors</span><span class="p">.</span><span class="mi">2</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifOutErrors</span><span class="p">.</span><span class="mi">3</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifOutErrors</span><span class="p">.</span><span class="mi">4</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IF</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">ifOutErrors</span><span class="p">.</span><span class="mi">5</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">count</span>
+<span class="mi">90</span>
+</code></pre></div></div>
+
+<h2 id="where-to-go-next">Where to go next?</h2>
+
+<p>This article has covered how to walk SNMP tables and the performance benefit of using PySNMP’s getBulk() method to reduce query latency. In this particular case going from 1.29 seconds when using GETNEXT requests to 0.087 seconds with GETBULK requests may not seem like much when querying a single device, but when doing this at across hundreds of devices there is a huge benefit. SNMP tables are found across many different MIB’s. Exploring which platform types are in use in your network, what standard or vendor/proprietary MIB’s are available should help point you in the right direction for when to use an SNMP GET, GETNEXT, or GETBULK command!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a><span class="sep">, </span>
+    
+      <a href="/tags/#snmp" class="page__taxonomy-item" rel="tag">SNMP</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-01-17">January 17, 2022</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Bulk+Data+Gathering+with+PySNMP+nextCmd+and+bulkCmd%20http%3A%2F%2Flocalhost%3A4000%2F2022%2F01%2F16%2Fbulk-data-gathering-with-pysnmp.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2022%2F01%2F16%2Fbulk-data-gathering-with-pysnmp.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2022%2F01%2F16%2Fbulk-data-gathering-with-pysnmp.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2022/01/14/compiling-mibs-for-pysnmp.html" class="pagination--pager" title="Compiling SNMP MIB’s for PySNMP
+">Previous</a>
+    
+    
+      <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" class="pagination--pager" title="Secure Queries with SNMPv3 and PySNMP
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/14/compiling-mibs-for-pysnmp.html" rel="permalink">Compiling SNMP MIB’s for PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-14T00:00:00-07:00">January 14, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The ability to refer to a SNMP MIB variable by name is an important aspect for increasing readability and understanding of your Python scripts. PySNMP comes ...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1089 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>A Guide to Cisco Support API’s - Part 2 - EoX - def brian(automate)</title>
+<meta name="description" content="The Cisco Support API’s provide some very useful end-points that enable you to gain efficiencies on managing your Cisco hardware and software inventory. In this post I present the use of the End of Life (EoX) API that allows you to identify end-of-life equipment within your environment. The code snippets below will be written in in Python and closely follows my Cisco Support API Query Repo on GitHub. Feel free to clone the repo, I intend to include more API end-points in the near future.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="A Guide to Cisco Support API’s - Part 2 - EoX">
+<meta property="og:url" content="http://localhost:4000/2021/02/07/guide-to-cisco-support-apis-part-2.html">
+
+
+  <meta property="og:description" content="The Cisco Support API’s provide some very useful end-points that enable you to gain efficiencies on managing your Cisco hardware and software inventory. In this post I present the use of the End of Life (EoX) API that allows you to identify end-of-life equipment within your environment. The code snippets below will be written in in Python and closely follows my Cisco Support API Query Repo on GitHub. Feel free to clone the repo, I intend to include more API end-points in the near future.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-02-07T00:00:00-07:00">
+
+
+
+  <meta property="article:modified_time" content="2021-02-09T05:56:00-07:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/02/07/guide-to-cisco-support-apis-part-2.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="A Guide to Cisco Support API’s - Part 2 - EoX">
+    <meta itemprop="description" content="The Cisco Support API’s provide some very useful end-points that enable youto gain efficiencies on managing your Cisco hardware and software inventory.In this post I present the use of the End of Life (EoX) API that allows you toidentify end-of-life equipment within your environment. The code snippets below will be written in in Python and closely follows my Cisco Support API Query Repo on GitHub. Feel free to clone the repo, I intend to include more API end-points in the near future.">
+    <meta itemprop="datePublished" content="2021-02-07T00:00:00-07:00">
+    <meta itemprop="dateModified" content="2021-02-09T05:56:00-07:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">A Guide to Cisco Support API’s - Part 2 - EoX
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-02-07T00:00:00-07:00">February 7, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          15 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#what-is-the-eox-api-and-why-use-it">What is the EoX API and why use it?</a></li><li><a href="#example-get-eox-by-product-ids">Example: Get EoX by Product ID’s</a><ul><li><a href="#1-install-required-modules">1. Install Required Modules</a></li><li><a href="#2-authenticate-with-ciscos-api-service">2. Authenticate with Cisco’s API Service</a></li><li><a href="#3-query-the-eox-api">3. Query the EoX API</a></li><li><a href="#4-save-the-eox-records-to-a-csv-file">4. Save the EoX records to a CSV file</a></li></ul></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#a-note-on-the-get-eox-by-software-release-strings-api-end-point">A note on the Get EoX by Software Release Strings API end-point</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>The Cisco Support API’s provide some very useful end-points that enable you
+to gain efficiencies on managing your Cisco hardware and software inventory.
+In this post I present the use of the End of Life (EoX) API that allows you to
+identify end-of-life equipment within your environment. The code snippets below will be written in in Python and closely follows my <a href="https://github.com/brianyaklin/cisco-support-api-query">Cisco Support API Query Repo</a> on GitHub. Feel free to clone the repo, I intend to include more API end-points in the near future.</p>
+
+<p>For a more general overview of the Cisco Support API’s refer to
+<a href="/2021/02/01/guide-to-cisco-support-apis-part-1.html">part 1</a> of this series.</p>
+
+<h2 id="what-is-the-eox-api-and-why-use-it">What is the EoX API and why use it?</h2>
+
+<p>End-of-life hardware and software in an environment can be a risk to any organization. A vendor who has declared a particular model of hardware or version
+of software is no longer going to permit you to RMA that hardware if it fails and
+they may decide to no longer create patches for software versions. This leaves
+you susceptible to hardware failures which you can’t easily replace, or dangerous
+security risks in software that is not getting patched.</p>
+
+<p>The Cisco EoX API allows you to quickly obtain end-of-life information, by passing to the API as URL parameters your Product ID’s (PID’s), serial numbers, or software
+release strings. There are end-points for each of these as well as a more general
+API end-point for querying for EoX information in a specified date range. You can
+reference <a href="https://developer.cisco.com/docs/support-apis/#!eox/features">Cisco’s EoX API</a> documentation for complete details on their use.</p>
+
+<p>Here are a few notes on my experience working with these API end-points so far:</p>
+
+<ul>
+  <li>I find the Get EoX by Product ID’s end-point to be the most useful. It allows you to query up to 20 PID’s at a time which helps reduce the number of GET requests you send, which keeps you within your daily query limits</li>
+  <li>Make sure that you deduplicate the PID’s, Serial Numbers, or Software Release strings so you can be more efficient in your querying</li>
+  <li>If you query the API end-points too quickly your requests will be blocked by Cisco’s rate limiter. Always include a sleep function of at 0.5 seconds so that you don’t overwhelm Cisco’s API service</li>
+</ul>
+
+<h2 id="example-get-eox-by-product-ids">Example: Get EoX by Product ID’s</h2>
+
+<p>This example is going to provide an overview of querying Cisco’s EoX API end-point <a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">Get EoX by Product ID’s</a>. These details are pulled from my <a href="https://github.com/brianyaklin/cisco-support-api-query">Cisco Support API Query Repo</a> which also includes an example.py to show an easy way of using my utility functions.</p>
+
+<blockquote>
+  <p>Before you begin make sure that you have registered your application with <a href="https://apiconsole.cisco.com/">Cisco’s API console</a> and have a valid Client Key and Client Secret with a grant-type of client credentials. Cisco outlines <a href="https://developer.cisco.com/docs/support-apis/#!application-registration/application-registration">application registration</a> in more detail if you need an overview</p>
+</blockquote>
+
+<p>We will break this exampledown into a few steps:</p>
+
+<ol>
+  <li>Install required modules</li>
+  <li>Authenticate with Cisco’s API service</li>
+  <li>Query the EoX API</li>
+  <li>Save the EoX records to a CSV file</li>
+</ol>
+
+<h3 id="1-install-required-modules">1. Install Required Modules</h3>
+
+<p>The main Python module that we will be using to interact with Cisco’s API’s will be the <a href="https://requests.readthedocs.io/en/master/user/quickstart/">Requests</a> package. This module is easy to use and I believe wraps the lower-layer urllib3 module. Requests allows you to send various HTTP requests (POST, GET, UPDATE, DELETE, etc) as well as provide URL headers and parameters. Response data from API’s like what Cisco offers often return data represented in XML or JSON, and the Requests module allows us to easily convert JSON data into a Python dictionary for our analysis. I will not be covering the Requests module in detail so I encourage you to explore the link above if you are curious.</p>
+
+<p>Copy the <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/requirements.txt">requirements.txt</a> file from the repo and install the pacakges.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">pip3 <span class="nb">install</span> <span class="nt">-r</span> requirements.txt</code></pre></figure>
+
+<h3 id="2-authenticate-with-ciscos-api-service">2. Authenticate with Cisco’s API Service</h3>
+
+<p>Cisco’s API’s use token-based authentication when sending queries. This requires you to first authenticate against Cisco’s API service using your client key and secret and if successful you will be provided with an authentication token which you can use in subsequent queries to Cisco API end-points that your application is registered for. The auth token that you are provided is good for 3600 seconds (60 minutes) which in all of my use-cases is more than sufficient.</p>
+
+<p>My <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/util/api_login.py">api_login.py</a> script is more detailed, so this will be slimmed down version from the Python interpreter.</p>
+
+<p>The following code is what we will work off of with a detailed explanation below.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="code"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">class</span> <span class="nc">ApiLogin</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">client_key</span> <span class="o">=</span> <span class="n">client_key</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">client_secret</span> <span class="o">=</span> <span class="n">client_secret</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">login</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">auth_start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">SSO_URL</span> <span class="o">=</span> <span class="s">'https://cloudsso.cisco.com/as/token.oauth2'</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">'grant_type'</span><span class="p">:</span> <span class="s">'client_credentials'</span><span class="p">,</span>
+            <span class="s">'client_id'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">client_key</span><span class="p">,</span>
+            <span class="s">'client_secret'</span><span class="p">:</span> <span class="bp">self</span><span class="p">.</span><span class="n">client_secret</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">SSO_URL</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">auth_resp</span> <span class="o">=</span> <span class="n">req</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">auth_token</span> <span class="o">=</span> \
+            <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="bp">self</span><span class="p">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s">'token_type'</span><span class="p">]</span><span class="si">}</span><span class="s"> </span><span class="si">{</span><span class="bp">self</span><span class="p">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s">'access_token'</span><span class="p">]</span><span class="si">}</span><span class="s">"</span>
+
+    <span class="k">def</span> <span class="nf">auth_still_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="p">.</span><span class="n">auth_start</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s">'expires_in'</span><span class="p">]):</span>
+            <span class="c1"># Login again, which will set a self.url_headers with a new token
+</span>            <span class="bp">self</span><span class="p">.</span><span class="n">login</span><span class="p">()</span>
+</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>What we are doing here is creating a Python class called ApiLogin and its __init__ function at line 5 requires two parameters; your client_key and client_secret. Upon instantiating a class and passing in client_key and client_secret arguments the <code class="language-plaintext highlighter-rouge">login()</code> function will immediately be called at line 8.</p>
+
+<p>Once <code class="language-plaintext highlighter-rouge">login()</code> has been called it sets the current time with <code class="language-plaintext highlighter-rouge">self.auth_start = time.time()</code>. This will be later used to determine if our authentication token has expired.</p>
+
+<p>To query the Cisco API login service we perform the following:</p>
+<ol>
+  <li>We set the URL to <code class="language-plaintext highlighter-rouge">https://cloudsso.cisco.com/as/token.oauth2</code> which is used for Cisco’s API login service</li>
+  <li>The URL parameters are set in a Python dictionary called <code class="language-plaintext highlighter-rouge">params</code> at line 15 which sets the grant_type (we hard code this to <code class="language-plaintext highlighter-rouge">client_credentials</code>) along with our client key and client secret. Note that you have to use the keys <code class="language-plaintext highlighter-rouge">grant_type</code>, <code class="language-plaintext highlighter-rouge">client_id</code> and <code class="language-plaintext highlighter-rouge">client_secret</code>, as this is what Cisco’s API login service requires</li>
+  <li>We are now ready to send our HTTP POST request using the Requests module at line 21. There are multiple arguments you can provide when using <code class="language-plaintext highlighter-rouge">requests.post()</code> but here we simply need to provide the URL to query and the URL parameters previously set</li>
+  <li>After sending the Post requests we test to confirm if the HTTP request was successful. This is accomplished using <code class="language-plaintext highlighter-rouge">req.raise_for_status()</code> which is a function the Requests module provides to us and it raises an HTTPError exception if an HTTP 4XX or 5XX response is received meaning that we either didn’t authenticate correctly or the server experienced an issue. Here is an example of the complete authentication response (the access token is obfuscated for obvious reasons). You can see that you are given an access_token, token_type and expires_in values
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">api</span><span class="p">.</span><span class="n">auth_resp</span>
+<span class="p">{</span><span class="s">'access_token'</span><span class="p">:</span> <span class="s">'AAABBBCCCDDDEEEFFFGGG'</span><span class="p">,</span> <span class="s">'token_type'</span><span class="p">:</span> <span class="s">'Bearer'</span><span class="p">,</span> <span class="s">'expires_in'</span><span class="p">:</span> <span class="mi">3599</span><span class="p">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>If no error was received we can access the response data by assigning the JSON response to a python dictionary using the <code class="language-plaintext highlighter-rouge">resp.json()</code> function call. We assign this to our variable <code class="language-plaintext highlighter-rouge">self.auth_resp</code> for us to use at line 30 by assigning the <code class="language-plaintext highlighter-rouge">access_type</code> and <code class="language-plaintext highlighter-rouge">access_token</code> key values to <code class="language-plaintext highlighter-rouge">self.auth_token</code>.</li>
+  <li>Finally, a function called <code class="language-plaintext highlighter-rouge">auth_still_valid()</code> is defined which takese the compares the current time, <code class="language-plaintext highlighter-rouge">self.auth_start</code> and <code class="language-plaintext highlighter-rouge">self.auth_resp['expires_in']</code> to determine if the token has expired or not. If it has, it calles <code class="language-plaintext highlighter-rouge">login()</code> again to obtain a new token</li>
+</ol>
+
+<p>So how would you use this class?</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">dotenv_values</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">util.api_login</span> <span class="kn">import</span> <span class="n">ApiLogin</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">client_key</span> <span class="o">=</span> <span class="n">dotenv_values</span><span class="p">(</span><span class="s">'.env'</span><span class="p">)[</span><span class="s">'CLIENT_KEY'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">client_secret</span> <span class="o">=</span> <span class="n">dotenv_values</span><span class="p">(</span><span class="s">'.env'</span><span class="p">)[</span><span class="s">'CLIENT_SECRET'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">api</span> <span class="o">=</span> <span class="n">ApiLogin</span><span class="p">(</span><span class="n">client_key</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">api</span><span class="p">.</span><span class="n">auth_token</span>
+<span class="s">'Bearer AAABBBCCCDDDEEEFFFGGG'</span></code></pre></figure>
+
+<blockquote>
+  <p>Keep your API keys in a secure location just like you would any other username/password you use. These keys are associated with your Cisco CCO account. You should not expose your keys to your applications end users, you should not store these directly in your source code or version control, and instead should use environment variables or some other secure mechanism for storing and consuming your API keys (ex. AWS KMS). The above example uses Python’s <a href="https://github.com/theskumar/python-dotenv">dotenv module</a> which allows you to store environment variables in a file called .env. Ensure that your .gitignore file is configured to ignore this file.</p>
+</blockquote>
+
+<p>The <code class="language-plaintext highlighter-rouge">api.auth_token</code> value is what will enable you to initiate subsequent queries against specific Cisco API end-points. The next section describes how we will use this and the response data for the EoX API end-point.</p>
+
+<h3 id="3-query-the-eox-api">3. Query the EoX API</h3>
+
+<p>Once you have authenticated with Cisco’s API service and have an authentication token you are now ready to query the EoX API end-point. We will be using the <a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">Get EoX by Product ID’s</a> end-point which allows us to query based on a product ID.</p>
+
+<p>This example does not cover how you would obtain all of your product ID’s from your entire infrastructure, but I have used a few methods to do so in the past:</p>
+<ul>
+  <li>Use Python modules such as <a href="https://ktbyers.github.io/netmiko/">netmiko</a> and <a href="https://github.com/networktocode/ntc-templates">ntc-templates</a> to obtain the output of a “show version” and parse it into a Python dictionary with the product ID’s and serial numbers</li>
+  <li>Use <a href="https://github.com/etingof/pysnmp">PySNMP</a> to query a devices <a href="https://snmp.cloudapps.cisco.com/Support/SNMP/do/BrowseOID.do?local=en&amp;translate=Translate&amp;objectInput=1.3.6.1.2.1.47.1.1.1.1">entPhysicalEntry</a> table which will contain an assortment of valuable information including your PID’s and serial numbers for each</li>
+  <li>Use any other source of information that you have available that describes your inventory and can provide PID’s</li>
+</ul>
+
+<blockquote>
+  <p>It is important to note that you should identify EoX information not only on your chassis PID but on all other pieces of hardware that are installed in your device. This includes modules, fans, power supplies, transceivers, etc</p>
+</blockquote>
+
+<p>My <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/util/api_eox.py">api_eox.py</a> script provides a mechanism to query Cisco’s Get EoX by Product ID’s API end-point, the code is as shown below:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre></td><td class="code"><pre><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">class</span> <span class="nc">ApiEox</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mime_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'application/json'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">url_headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">'Accept'</span><span class="p">:</span> <span class="n">mime_type</span><span class="p">,</span>
+            <span class="s">'Authorization'</span><span class="p">:</span> <span class="n">auth_token</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__send_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="p">.</span><span class="n">url_headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">req</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">req</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">query_by_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">BLACK_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s">''</span><span class="p">,</span> <span class="s">'n/a'</span><span class="p">,</span> <span class="s">'b'</span><span class="p">,</span> <span class="s">'p'</span><span class="p">,</span> <span class="s">'^mf'</span><span class="p">,</span> <span class="s">'unknown'</span><span class="p">,</span>
+                      <span class="s">'unspecified'</span><span class="p">,</span> <span class="s">'x'</span><span class="p">]</span>
+        <span class="n">MAX_ITEMS</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="n">pid</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pids</span> <span class="k">if</span> <span class="n">pid</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BLACK_LIST</span><span class="p">})</span>
+        <span class="n">API_URL</span> <span class="o">=</span> <span class="s">'https://api.cisco.com/supporttools/eox/rest/5/EOXByProductID/{}/{}'</span>
+
+        <span class="n">start_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">end_index</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+        <span class="k">while</span> <span class="n">start_index</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">items</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">page_index</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">pagination</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">while</span> <span class="n">pagination</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">API_URL</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+                    <span class="n">page_index</span><span class="p">,</span>
+                    <span class="p">(</span><span class="s">','</span><span class="p">).</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">items</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">__send_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">resp</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'EOXRecord'</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="p">.</span><span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">records</span> <span class="o">+</span> <span class="n">resp</span><span class="p">[</span><span class="s">'EOXRecord'</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">page_index</span> <span class="o">&gt;=</span> <span class="n">resp</span><span class="p">[</span><span class="s">'PaginationResponseRecord'</span><span class="p">][</span><span class="s">'LastIndex'</span><span class="p">]:</span>
+                    <span class="n">pagination</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">page_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Play nice with Cisco API's and rate limit your queries
+</span>                <span class="n">time</span><span class="p">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+            <span class="n">start_index</span> <span class="o">=</span> <span class="n">end_index</span>
+            <span class="n">end_index</span> <span class="o">+=</span> <span class="n">MAX_ITEMS</span>
+</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>This code creates a class named <code class="language-plaintext highlighter-rouge">ApiEox()</code> which allows us to query the EoX API multiple times and store the returned records in <code class="language-plaintext highlighter-rouge">self.records</code> for future reference.
+It includes a few other tricks like blacklisting certain PID’s, deduplicating the list of PID’s and controlling pagination of the returned records and reading the.</p>
+
+<p>Looking at the code in more detail we see:</p>
+<ol>
+  <li>The <code class="language-plaintext highlighter-rouge">\__init__</code> function accepts our auth_token we received in our ApiLogin() class, a MIME Type (we default by setting this to application/json but you can also use XML). These parameters are stored in the <code class="language-plaintext highlighter-rouge">self.url_headers</code> dictionary which will be used as part of our Requests.GET call later on</li>
+  <li>At lines 12 and 13 we declare <code class="language-plaintext highlighter-rouge">self.items</code> which will be used to store the list of PID’s, and <code class="language-plaintext highlighter-rouge">self.records</code> which will store the returned EOXRecords that the API sends us</li>
+  <li>The <code class="language-plaintext highlighter-rouge">__send_query</code> function is an internal class function that controls sending the HTTP request and returns the response. The details of this is covered in more detail in step 2 above for logging in to the Cisco API service</li>
+  <li>The bulk of our code is handled in the <code class="language-plaintext highlighter-rouge">query_by_pid()</code> function at line 23 which accepts a single parameter; a list of PID’s</li>
+  <li>I have defined a BLACK_LIST which is a list of unacceptable PID’s at line 24. Based on experience in how I have gathered inventory data from parsing “show version” or querying for the SNMP table of entPhysicalEntry there tends to be a few values returned in the PID column that are irrelevant</li>
+  <li>At line 28 I use a <a href="https://medium.com/swlh/set-comprehension-in-python3-for-beginners-80561a9b4007">Python set comprehension</a> which assigns the PID’s to our previously declared <code class="language-plaintext highlighter-rouge">self.items</code> variable list and performs two things for me:
+    <ol>
+      <li>It deduplicates the list of PID’s that were provided, so we don’t query Cisco’s API for the same item twice (ex. you may have multiple Cisco ISR4321/K9, so why query for the same information more than once)</li>
+      <li>I am able to compare each PID against my BLACK_LIST variable and discard it if its in the list</li>
+    </ol>
+  </li>
+  <li>We declare the API_URL for the Get EoX by Product ID at line 29</li>
+  <li>Because you can query up to a maximum of 20 PID’s in a single HTTP GET request to the API by comma seperating the PID’s in the URL you are calling I accomplish this by:
+    <ol>
+      <li>Declaring a <code class="language-plaintext highlighter-rouge">start_index</code> of 0 and <code class="language-plaintext highlighter-rouge">end_index</code> of our MAX_ITEMS (in this case 20) at lines 31 and 32</li>
+      <li>I then loop through all items for as long as our <code class="language-plaintext highlighter-rouge">start_index</code> is less than the length of our <code class="language-plaintext highlighter-rouge">self.items - 1</code>. We subtract 1 because Python lists are zero-indexed</li>
+      <li>I then define the URL to use in the query by doing a Python <code class="language-plaintext highlighter-rouge">join()</code> at lines 37 through 40. This <code class="language-plaintext highlighter-rouge">join()</code> statement will join together the PID’s between the list indexes from the start_index up to the end_index (or to the end of the list if there aren’t 20 items left), using a comma as a delimiter</li>
+      <li>Skipping down a few lines past the query and response details (discussed in another bullet below) I now increment my start_index and end_index values at lines 54 and 55 so that the next query, if necessary, will include the items in <code class="language-plaintext highlighter-rouge">self.items</code> from indexes 20 through 39</li>
+    </ol>
+  </li>
+  <li>At line 40 I call our private function <code class="language-plaintext highlighter-rouge">__send_query</code> with the URL as an argument and assign the response to the <code class="language-plaintext highlighter-rouge">resp</code> variable</li>
+  <li>A response from the Get EoX by Product ID API end-point is a JSON with keys (<a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">full API details here</a>) describing the PaginationResponseRecord and the EOXRecord (which can contain multiple records, for all of the PID’s you sent in the URL)</li>
+  <li>If an <code class="language-plaintext highlighter-rouge">EOXRecord</code> exists in the response I extend our <code class="language-plaintext highlighter-rouge">self.records</code> list to include the new records in line 43</li>
+  <li>We previously defined a page_index of 1 at line 34, but now we will review the PaginationResponseRecord to see if there is more than one page describing all of the records by looking at the LastIndex key at line 46. If there are multiple pages, we need to increment our page_index by one and query again. The while loop at line 36 will continue querying until our page_index value is the same as the LastIndex in the response and will then exit the loop</li>
+  <li>Because Cisco’s API’s only allow so many queries per second and per minute I include a sleep function with <code class="language-plaintext highlighter-rouge">time.sleep(0.5)</code> at line 52</li>
+</ol>
+
+<p>So tying this all together we can use this code as follows:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">util.api_eox</span> <span class="kn">import</span> <span class="n">ApiEox</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span> <span class="o">=</span> <span class="n">ApiEox</span><span class="p">(</span><span class="n">api</span><span class="p">.</span><span class="n">auth_token</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pids</span> <span class="o">=</span> <span class="p">[</span><span class="s">'WS-C3750X-48PF-S'</span><span class="p">,</span> <span class="s">'C3KX-PWR-1100WAC'</span><span class="p">,</span> <span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="p">.</span><span class="n">query_by_pid</span><span class="p">(</span><span class="n">pids</span><span class="p">)</span></code></pre></figure>
+
+<p>We have now queries the API to get EoX information for two PID’s. This information is stored in the <code class="language-plaintext highlighter-rouge">eox.records</code> class instance variable and is a list with two records:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">eox</span><span class="p">.</span><span class="n">records</span><span class="p">)</span>
+<span class="mi">2</span></code></pre></figure>
+
+<p>Each record is Python dictionary and has the following keys describing the record:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="p">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">keys</span><span class="p">()</span>
+<span class="n">dict_keys</span><span class="p">([</span><span class="s">'EOLProductID'</span><span class="p">,</span> <span class="s">'ProductIDDescription'</span><span class="p">,</span> <span class="s">'ProductBulletinNumber'</span><span class="p">,</span> <span class="s">'LinkToProductBulletinURL'</span><span class="p">,</span> <span class="s">'EOXExternalAnnouncementDate'</span><span class="p">,</span> <span class="s">'EndOfSaleDate'</span><span class="p">,</span> <span class="s">'EndOfSWMaintenanceReleases'</span><span class="p">,</span> <span class="s">'EndOfSecurityVulSupportDate'</span><span class="p">,</span> <span class="s">'EndOfRoutineFailureAnalysisDate'</span><span class="p">,</span> <span class="s">'EndOfServiceContractRenewal'</span><span class="p">,</span> <span class="s">'LastDateOfSupport'</span><span class="p">,</span> <span class="s">'EndOfSvcAttachDate'</span><span class="p">,</span> <span class="s">'UpdatedTimeStamp'</span><span class="p">,</span> <span class="s">'EOXMigrationDetails'</span><span class="p">,</span> <span class="s">'EOXInputType'</span><span class="p">,</span> <span class="s">'EOXInputValue'</span><span class="p">])</span></code></pre></figure>
+
+<p>A more detailed look at the first record shows that the Product ID of WS-C3750X-48PF-S went end of sale on 2016-10-30 and its last date of support was 2021-10-31</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="p">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'EndOfSaleDate'</span><span class="p">]</span>
+<span class="p">{</span><span class="s">'value'</span><span class="p">:</span> <span class="s">'2016-10-30'</span><span class="p">,</span> <span class="s">'dateFormat'</span><span class="p">:</span> <span class="s">'YYYY-MM-DD'</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="p">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'LastDateOfSupport'</span><span class="p">]</span>
+<span class="p">{</span><span class="s">'value'</span><span class="p">:</span> <span class="s">'2021-10-31'</span><span class="p">,</span> <span class="s">'dateFormat'</span><span class="p">:</span> <span class="s">'YYYY-MM-DD'</span><span class="p">}</span></code></pre></figure>
+
+<h3 id="4-save-the-eox-records-to-a-csv-file">4. Save the EoX records to a CSV file</h3>
+
+<p>So you now have the EoX records for all of the hardware within your environment stored in a Python dictionary. You will more than likely need to report on this to those responsible for financial planning, forecasting and coordination of replacing EoX equipment.
+A simple method would be to save these records to a CSV file which I will show below, but you could get even more advanced by having a report that links each record back to the actual network inventory on a device by device basis.</p>
+
+<p>The code to do a simple export to CSV is as follows</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+</pre></td><td class="code"><pre><span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="c1">#...previous code for logging into the API and obtaining EoX records
+</span>
+<span class="n">FNAME</span> <span class="o">=</span> <span class="s">'eox_report.csv'</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FNAME</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fhand</span><span class="p">:</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="p">.</span><span class="n">writer</span><span class="p">(</span><span class="n">fhand</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">','</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s">'"'</span><span class="p">,</span>
+                        <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="p">.</span><span class="n">QUOTE_MINIMAL</span><span class="p">)</span>
+    <span class="n">writer</span><span class="p">.</span><span class="n">writerow</span><span class="p">([</span><span class="s">'EOLProductID'</span><span class="p">,</span>
+                        <span class="s">'ProductIDDescription'</span><span class="p">,</span>
+                        <span class="s">'LastDateOfSupport'</span><span class="p">,</span>
+                        <span class="s">'EndOfSWMaintenanceReleases'</span><span class="p">,</span>
+                        <span class="s">'EOXExternalAnnouncementDate'</span><span class="p">,</span>
+                        <span class="s">'EndOfSaleDate'</span><span class="p">,</span>
+                        <span class="s">'EndOfSecurityVulSupportDate'</span><span class="p">,</span>
+                        <span class="s">'EndOfRoutineFailureAnalysisDate'</span><span class="p">,</span>
+                        <span class="s">'EndOfServiceContractRenewal'</span><span class="p">,</span>
+                        <span class="s">'EndOfSvcAttachDate'</span><span class="p">,</span>
+                        <span class="s">'LinkToProductBulletinURL'</span><span class="p">,</span> <span class="p">])</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">eox</span><span class="p">.</span><span class="n">records</span><span class="p">:</span>
+        <span class="n">writer</span><span class="p">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">record</span><span class="p">[</span><span class="s">'EOLProductID'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'ProductIDDescription'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'LastDateOfSupport'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfSWMaintenanceReleases'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EOXExternalAnnouncementDate'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfSaleDate'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfSecurityVulSupportDate'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfRoutineFailureAnalysisDate'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfServiceContractRenewal'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'EndOfSvcAttachDate'</span><span class="p">][</span><span class="s">'value'</span><span class="p">],</span>
+                            <span class="n">record</span><span class="p">[</span><span class="s">'LinkToProductBulletinURL'</span><span class="p">],</span> <span class="p">])</span>
+
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'EOX records written to file </span><span class="si">{</span><span class="n">FNAME</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></figure>
+
+<p>This code uses the Python CSV’s writer() function to loop through each record in eox.records and saves the contents of each record as a new row in that CSV file.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Using Cisco’s EoX API can help you and your customers by easily identifying which hardware is, or may soon become, end-of-life. You can transform the data in whichever way you wish to create powerful reports!</p>
+
+<h2 id="a-note-on-the-get-eox-by-software-release-strings-api-end-point">A note on the Get EoX by Software Release Strings API end-point</h2>
+
+<p>The Get EoX by Software Release Strings end-point was trickier to work with because it requires you to enter your software versions using a <a href="https://developer.cisco.com/docs/support-apis/#eox/SWReleaseStringType">SWReleaseStringType</a>. This requires you to create a string representing the software version and type together such as “input1=12.4(15),IOS&amp;input2=16.3.9,IOS-XE”. Depending on how you have transformed your data, this can be more difficult to programmatically create this URL query string.</p>
+
+<p>The other difficulty I had in working with this API end-point is I believed it would return end-of-life details on the software versions themselves. Instead, it returned EoX information using a PID as a key such as “S280IPBK9-12424T=” which is a representation of running 12.4(24)T on a Cisco 2801 IOS IP Base router. I would have found this much more useful if it returned these as two separate PID’s; one indicating 12.4(24)T and another as CISCO2801 so I could more easily compare this against my hardware and software inventory. If anyone has identified a way to use this other PID I would enjoy hearing how they have compared this with their inventory.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#api" class="page__taxonomy-item" rel="tag">API</a><span class="sep">, </span>
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a><span class="sep">, </span>
+    
+      <a href="/tags/#cisco" class="page__taxonomy-item" rel="tag">Cisco</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-02-09">February 9, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=A+Guide+to+Cisco+Support+API%27s+-+Part+2+-+EoX%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F07%2Fguide-to-cisco-support-apis-part-2.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F07%2Fguide-to-cisco-support-apis-part-2.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F02%2F07%2Fguide-to-cisco-support-apis-part-2.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/02/01/guide-to-cisco-support-apis-part-1.html" class="pagination--pager" title="A Guide to Cisco Support API’s - Part 1
+">Previous</a>
+    
+    
+      <a href="/2021/02/10/role-of-automated-health-checks.html" class="pagination--pager" title="The Role of Automated Health Checks
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

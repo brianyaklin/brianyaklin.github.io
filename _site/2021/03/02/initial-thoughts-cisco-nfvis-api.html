@@ -1,0 +1,892 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Initial Thoughts on Cisco NFVIS API - def brian(automate)</title>
+<meta name="description" content="With multiple Cisco NFVIS software upgrades planned in the near future I thought I would explore the API to see how this might help speed up the process. My initial goals for exploring the API were to:">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Initial Thoughts on Cisco NFVIS API">
+<meta property="og:url" content="http://localhost:4000/2021/03/02/initial-thoughts-cisco-nfvis-api.html">
+
+
+  <meta property="og:description" content="With multiple Cisco NFVIS software upgrades planned in the near future I thought I would explore the API to see how this might help speed up the process. My initial goals for exploring the API were to:">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-03-02T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/03/02/initial-thoughts-cisco-nfvis-api.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Initial Thoughts on Cisco NFVIS API">
+    <meta itemprop="description" content="With multiple Cisco NFVIS software upgrades planned in the near future I thought I would explore the API to see how this might help speed up the process. My initial goals for exploring the API were to:">
+    <meta itemprop="datePublished" content="2021-03-02T00:00:00-07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Initial Thoughts on Cisco NFVIS API
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-03-02T00:00:00-07:00">March 2, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          12 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#cisco-nfvis-api-documentation">Cisco NFVIS API Documentation</a></li><li><a href="#api-basics">API Basics</a></li><li><a href="#hardware-and-software-inventory">Hardware and Software Inventory</a></li><li><a href="#updating-ip-receive-acls">Updating IP Receive ACLs</a></li><li><a href="#closing-words">Closing Words</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>With multiple Cisco NFVIS software upgrades planned in the near future I thought I would explore the API to see how this might help speed up the process. My initial goals for exploring the API were to:</p>
+
+<ul>
+  <li>Discovery which end-points can be used for hardware and software inventory reporting</li>
+  <li>Determine how to update the IP receive ACL’s</li>
+  <li>Automate transfer and registration of the new NFVIS image files</li>
+</ul>
+
+<blockquote>
+  <p>Cisco Network Function Virtualization Infrastructure Software (NFVIS) is a Linux-based infrastructure software designed for the virtualization of network functions such as Cisco’s ISRv, ASAv, vWAAS and NGFWv as well as third-party platforms. This allows an organization to service-chain network functions without the need of deploying extra hardware.</p>
+</blockquote>
+
+<p>For those that aren’t familiar with the upgrade procedure of a Cisco ENCS platform running the NFVIS software, it is quite different than your typical Cisco router or switch. And understandably so, these devices are much more like a server running a hypervisor. Upgrading involves first identifying the correct image to move to (which has compatibility with the Cisco and 3rd party image you are running), copying the new image file to the platform, registering the image file (essentially a series of healthchecks on the file), and finally initiating the upgrade with that image. There big issue with the NFVIS software is that there is no method to downgrade to a previous release once you have upgraded.</p>
+
+<h2 id="cisco-nfvis-api-documentation">Cisco NFVIS API Documentation</h2>
+
+<p>The first hurdle that I came across was when attempting to load <a href="https://www.cisco.com/c/en/us/td/docs/routers/nfvis/user_guide/b-api-reference-for-cisco-enterprise-nfvis.html]">Cisco’s API Reference</a>through their regular site. For the past few weeks myself and others on my team have received a message when browsing to this link where it doesn’t load the page and simply returns the text ‘null’ under the Book Table of Contents section. I have been able to get a few results on Google linking to direct chapters, but not the chapters I needed for NFVIS system API calls. I eventually stumbled across <a href="https://content.cisco.com/platform_home.sjs?platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">Cisco Content Hub</a>. This was my first time playing around with this content site but I was able to find the information I needed.</p>
+
+<h2 id="api-basics">API Basics</h2>
+
+<p>The NFVIS REST API uses <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme">HTTP Basic Authentication</a> as its authentication scheme. This authentication scheme transmits the username and password as base64 encoded strings, which means that they are passed over the network as clear text. HTTPS/TLS should always be used with the management of any network device if you are using a web GUI or API calls, so as a result the Cisco ENCS and NVFIS software protects these credentials from being eavesdropped on. These credentials are included as a key/value pair in the HTTP Headers. Including <a href="https://requests.readthedocs.io/en/master/user/authentication/">Basic Authentication in the Python Requests</a> module is quite simple (details will be shown in a section below).</p>
+
+<p>When exchanging data with the NFVIS API you have two options for the format of which you would like to work with; JSON or XML. I prefer working with JSON as there is a <a href="https://docs.python.org/3/library/json.html">standard JSON Python library</a> for working with it, but both formats can easily be converted into Python dictionaries. The <a href="https://docs.python.org/3/library/xml.etree.elementtree.html">standard XML Python library</a> isn’t very user friendly, but <a href="https://pypi.org/project/xmltodict/">xmltodict</a> is a good open-source alternative. Whichever method you pick will require that you set the HTTP headers of Content-Type and Accept with the values in the table below.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data Format</th>
+      <th>Content-Type and Accept Header Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>XML</td>
+      <td>application/vnd.yang.data+xml</td>
+    </tr>
+    <tr>
+      <td>JSON</td>
+      <td>application/vnd.yang.data+json</td>
+    </tr>
+    <tr>
+      <td>JSON (alternative)</td>
+      <td>application/vnd.yang.collection+json</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Although the documentation generalizes and indicates to use the above content-types, I have found that in some circumstances the content-type and accept header needs to be set to <code class="language-plaintext highlighter-rouge">application/vnd.yang.collection+json</code>. My particular use-case was when querying for ENCS switch (not PNIC interfaces) <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_010101.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">interface statistics</a>. No where did it indicate in the documentation to use a YANG collection in the content-type/accept headers until you look at the example for the API end-point <code class="language-plaintext highlighter-rouge">/api/running/switch/interface/gigabitEthernet</code> to display the configuration of <em>all</em> interfaces (versus a single interface). This really tripped me up in the past until I finally saw the change in header value.</p>
+
+<p>Another thing to note is that you can specify a URL query parameter of <code class="language-plaintext highlighter-rouge">?deep</code> on GET requests for some API end-points that allow you to gather more detailed information. An example would be the API end-point for verifying a bridge configuration which is <code class="language-plaintext highlighter-rouge">/api/config/bridges?deep</code>.</p>
+
+<p>Lets look at a quick example of how to specify these settings when making an API GET request.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+
+<span class="n">BASE_URL</span> <span class="o">=</span> <span class="s">'https://10.1.1.1'</span>
+<span class="n">PATH</span> <span class="o">=</span> <span class="s">'/api/operational/platform-detail'</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/vnd.yang.data+json'</span><span class="p">,</span>
+    <span class="s">'Accept'</span><span class="p">:</span> <span class="s">'application/vnd.yang.data+json'</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">username</span> <span class="o">=</span> <span class="s">'myuser'</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s">'mypassword'</span>
+
+<span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>The above example sets our base URL and path so that we can query the API to get the platform details of the NFVIS device. We set our HTTP headers content-type and accept so that we will receive a JSON result. We then initiate a query with the Requests package by providing our URL, headers, and an authentication scheme of Basic with the username and password. Finally, if the query was successful we convert the JSON response into a Python dictionary named resp_data so that we can parse the data.</p>
+
+<h2 id="hardware-and-software-inventory">Hardware and Software Inventory</h2>
+
+<p>As with any software upgrade project you need to identify what software is currently running across your inventory. Although it appears that it might be possible to manage Cisco ENCS platforms with Cisco DNA Center, thats currently not an option with what I’m working with. As a result, I explored which API end-points might be possible to obtain this information and came across <code class="language-plaintext highlighter-rouge">/api/operational/platform-detail</code>. Based on the API query we made in the API Basics section above, lets look at the response data</p>
+
+<p>The first and only key in the dictionary represents the platform info. I have printed from this key onwards instead of the full dictionary as the formatting is easier to view below.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">resp_data</span><span class="p">[</span><span class="s">'platform_info:platform-detail'</span><span class="p">])</span>
+<span class="p">{</span><span class="s">'hardware_info'</span><span class="p">:</span> <span class="p">{</span><span class="s">'BIOS-Version'</span><span class="p">:</span> <span class="s">'ENCS54_2.6.071220181123'</span><span class="p">,</span>
+                   <span class="s">'CIMC-Version'</span><span class="p">:</span> <span class="s">'NA'</span><span class="p">,</span>
+                   <span class="s">'CIMC_IP'</span><span class="p">:</span> <span class="s">'NA'</span><span class="p">,</span>
+                   <span class="s">'CPU_Information'</span><span class="p">:</span> <span class="s">'Intel(R) Xeon(R) CPU D-1557 @ 1.50GHz '</span>
+                                      <span class="s">'12 cores'</span><span class="p">,</span>
+                   <span class="s">'Compile_Time'</span><span class="p">:</span> <span class="s">'Friday, October 19, 2018 [12:41:34 PDT]'</span><span class="p">,</span>
+                   <span class="s">'Disk_Size'</span><span class="p">:</span> <span class="s">'200.0 GB'</span><span class="p">,</span>
+                   <span class="s">'Entity-Desc'</span><span class="p">:</span> <span class="s">'Enterprise Network Compute System'</span><span class="p">,</span>
+                   <span class="s">'Entity-Name'</span><span class="p">:</span> <span class="s">'ENCS'</span><span class="p">,</span>
+                   <span class="s">'Manufacturer'</span><span class="p">:</span> <span class="s">'Cisco Systems, Inc.'</span><span class="p">,</span>
+                   <span class="s">'Memory_Information'</span><span class="p">:</span> <span class="s">'32741192 kB'</span><span class="p">,</span>
+                   <span class="s">'PID'</span><span class="p">:</span> <span class="s">'ENCS5412/K9'</span><span class="p">,</span>
+                   <span class="s">'SN'</span><span class="p">:</span> <span class="s">'FGL#########'</span><span class="p">,</span>
+                   <span class="s">'UUID'</span><span class="p">:</span> <span class="s">'aaabbbcccdddeeefff'</span><span class="p">,</span>
+                   <span class="s">'Version'</span><span class="p">:</span> <span class="s">'3.9.2-FC4'</span><span class="p">,</span>
+                   <span class="s">'hardware-version'</span><span class="p">:</span> <span class="s">'M3'</span><span class="p">},</span>
+ <span class="s">'port_detail'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'Name'</span><span class="p">:</span> <span class="s">'GE0-0'</span><span class="p">},</span> <span class="p">{</span><span class="s">'Name'</span><span class="p">:</span> <span class="s">'GE0-1'</span><span class="p">},</span> <span class="p">{</span><span class="s">'Name'</span><span class="p">:</span> <span class="s">'MGMT'</span><span class="p">}],</span>
+ <span class="s">'software_packages'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Kernel_Version'</span><span class="p">:</span> <span class="s">'3.10.0-693.11.1.1.el7.x86_64'</span><span class="p">,</span>
+                       <span class="s">'LibVirt_Version'</span><span class="p">:</span> <span class="s">'3.2.0'</span><span class="p">,</span>
+                       <span class="s">'OVS_Version'</span><span class="p">:</span> <span class="s">'2.5.2'</span><span class="p">,</span>
+                       <span class="s">'QEMU_Version'</span><span class="p">:</span> <span class="s">'1.5.3'</span><span class="p">},</span>
+ <span class="s">'switch_detail'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Name'</span><span class="p">:</span> <span class="s">'NA'</span><span class="p">,</span> <span class="s">'Ports'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s">'Type'</span><span class="p">:</span> <span class="s">'NA'</span><span class="p">,</span> <span class="s">'UUID'</span><span class="p">:</span> <span class="s">'NA'</span><span class="p">}}</span>
+</code></pre></div></div>
+
+<p>Looking further into this structure we can see that a variety of information is available and helpful in building out both a hardware and software inventory if we were to scan all NFVIS platforms in the environment. Within the information above I’m mainly looking at the following fields:</p>
+
+<ul>
+  <li>SN - The serial number of the chassis</li>
+  <li>PID - The Product ID of the chassis</li>
+  <li>Version - The NFVIS software version currently being used</li>
+</ul>
+
+<p>Placing this information into a report (ex. CSV) can help you track a software upgrade project, as it is easy to programmatically query all of your NFVIS platforms on a regular basis to see what has and has not been upgraded yet.</p>
+
+<h2 id="updating-ip-receive-acls">Updating IP Receive ACLs</h2>
+
+<p>To be able to upgrade the NFVIS software you need to be able to transfer the new image file to the device. This can be performed using the web GUI (which will automatically register the image) or through using SCP. SCP is a great choice for programmatically performing this option but it requires that the host you are sending the files from is included in an IP receive ACL on the NFVIS device and that the scpd protocol is permitted in that ACL. As an example, if our file server had IP address 10.4.4.40 the command we would use on the CLI of the NFVIS platform to allow this would be:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>config t
+   system settings ip-receive-acl 10.4.4.40/32 service [ ssh https icmp scpd snmp ] priority 10 action accept
+</code></pre></div></div>
+
+<p>The above command permits only our specific host IP to communicate with various services like SSH, HTTPS, ICMP, SCPD, and SNMP. You can add or remove services based on your deployment, but for this specific use-case we need SCPD. Additionally, the priority number of 10 was arbitrarily chosen by me but think of it as the ACL sequence number. The action can be either accept, reject or drop.</p>
+
+<p>However, going through a large number of devices and configuring these receive ACL’s would be difficult to manage and maintain and performing this programmatically would be far quicker. Unfortunately, what I’m about to show is that using the NFVIS API doesn’t make this an easy task.</p>
+
+<p>To perform this using the NFVIS API you need to use the <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_0110.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1#id_20198">System Configuration API’s</a> but the documentation doesn’t actually tell you how to specifically update the ip-receive-acl. In fact, it doesn’t mention receive ACL’s at all. It was only in diving through the <a href="https://github.com/CiscoDevNet/ansible-nfvis">Ansible NFVIS Role</a> that I was able to understand this further. The particular API end-point that must be used is <code class="language-plaintext highlighter-rouge">/api/config/system/settings</code> with a PUT request which is used to both modify or replace an existing resource. As Cisco’s <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_00.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">API Request Methods</a> documentation indicates, the PUT operation must contain the complete representation of the mandatory attributes of the resource. This means you need to include the configuration for the hostname, default-gw, managment IP address and management IP netmask.</p>
+
+<p>Exploring the response data by continuing with the Python code that was run in the API Basics section above, but now we will send a HTTP GET to the end-point <code class="language-plaintext highlighter-rouge">/api/config/system/settings</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PATH</span> <span class="o">=</span> <span class="s">'/api/config/system/settings'</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+
+<span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Now that we have our response data in a Python dictionary we can see what information in the below output that all of the mandatory fields are included (hostname, default-gw, managment IP address and netmask), but some additional details are also included (CIMC access, logging servers and levels and IP receive ACL details). What you can also see is that the IP receive ACL information <strong>does not</strong> include details like what we see in the CLI commands that would be used to configure this, namely the action, priority, and services. We are not able to get this information from the API.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">resp_data</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'system:settings'</span><span class="p">:</span> <span class="p">{</span><span class="s">'cimc-access'</span><span class="p">:</span> <span class="s">'enable'</span><span class="p">,</span>
+                     <span class="s">'default-gw'</span><span class="p">:</span> <span class="s">'10.1.1.1'</span><span class="p">,</span>
+                     <span class="s">'hostname'</span><span class="p">:</span> <span class="s">'ENCS-WAN1'</span><span class="p">,</span>
+                     <span class="s">'ip-receive-acls'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip-receive-acl'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'source'</span><span class="p">:</span> <span class="s">'0.0.0.0/0'</span><span class="p">},</span>
+                                                            <span class="p">{</span><span class="s">'source'</span><span class="p">:</span> <span class="s">'10.3.3.0/24'</span><span class="p">}]},</span>
+                     <span class="s">'logging'</span><span class="p">:</span> <span class="p">{</span><span class="s">'host'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'host'</span><span class="p">:</span> <span class="s">'10.3.3.30'</span><span class="p">}],</span>
+                                 <span class="s">'severity'</span><span class="p">:</span> <span class="s">'informational'</span><span class="p">},</span>
+                     <span class="s">'mgmt'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip'</span><span class="p">:</span> <span class="p">{</span><span class="s">'address'</span><span class="p">:</span> <span class="s">'10.1.1.2'</span><span class="p">,</span>
+                                     <span class="s">'netmask'</span><span class="p">:</span> <span class="s">'255.255.255.0'</span><span class="p">}},</span>
+                     <span class="s">'wan'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip'</span><span class="p">:</span> <span class="p">{</span><span class="s">'address'</span><span class="p">:</span> <span class="s">'192.168.1.1'</span><span class="p">,</span>
+                                    <span class="s">'netmask'</span><span class="p">:</span> <span class="s">'255.255.255.252'</span><span class="p">},</span>
+                             <span class="s">'vlan'</span><span class="p">:</span> <span class="mi">10</span><span class="p">}}}</span>
+</code></pre></div></div>
+
+<p>So I want to be able to update the ip-receive-acls to include a new entry for 10.4.4.40/32. In the <a href="https://github.com/CiscoDevNet/ansible-nfvis">Ansible NFVIS Role</a> I was able to see that to add an entry the existing ip-receive-acl list like shown below (taken from ansible-nfvis/library/nfvis_system.py in the Ansible role)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">response</span> <span class="o">=</span> <span class="n">nfvis</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">'/config/system/settings'</span><span class="p">)</span>
+    <span class="p">...</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s">'settings'</span><span class="p">:</span><span class="n">response</span><span class="p">[</span><span class="s">'system:settings'</span><span class="p">]}</span>
+    <span class="k">if</span> <span class="n">nfvis</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'trusted_source'</span><span class="p">]:</span>
+        <span class="n">ip_receive_acl</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">nfvis</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'trusted_source'</span><span class="p">]:</span>
+            <span class="n">ip_receive_acl</span><span class="p">.</span><span class="n">append</span><span class="p">({</span><span class="s">'source'</span><span class="p">:</span> <span class="n">network</span><span class="p">,</span> <span class="s">'action'</span><span class="p">:</span> <span class="s">'accept'</span><span class="p">,</span> <span class="s">'priority'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">'service'</span><span class="p">:</span> <span class="p">[</span><span class="s">'https'</span><span class="p">,</span> <span class="s">'icmp'</span><span class="p">,</span> <span class="s">'netconf'</span><span class="p">,</span> <span class="s">'scpd'</span><span class="p">,</span> <span class="s">'snmp'</span><span class="p">,</span> <span class="s">'ssh'</span><span class="p">]})</span>
+        <span class="k">if</span> <span class="s">'ip-receive-acls'</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">[</span><span class="s">'settings'</span><span class="p">]</span> <span class="ow">and</span> <span class="s">'ip-receive-acl'</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">[</span><span class="s">'settings'</span><span class="p">][</span><span class="s">'ip-receive-acls'</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">payload</span><span class="p">[</span><span class="s">'settings'</span><span class="p">][</span><span class="s">'ip-receive-acls'</span><span class="p">][</span><span class="s">'ip-receive-acl'</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ip_receive_acl</span><span class="p">:</span>
+                <span class="n">nfvis</span><span class="p">.</span><span class="n">result</span><span class="p">[</span><span class="s">'what_changed'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="s">'trusted_source'</span><span class="p">)</span>
+                <span class="n">payload</span><span class="p">[</span><span class="s">'settings'</span><span class="p">][</span><span class="s">'ip-receive-acls'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">'ip-receive-acl'</span><span class="p">:</span> <span class="n">ip_receive_acl</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nfvis</span><span class="p">.</span><span class="n">result</span><span class="p">[</span><span class="s">'what_changed'</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="s">'trusted_source'</span><span class="p">)</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s">'settings'</span><span class="p">][</span><span class="s">'ip-receive-acls'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">'ip-receive-acl'</span><span class="p">:</span> <span class="n">ip_receive_acl</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>Essentially the Ansible Role takes what is currently configured and assigns it to the response variable. Then the new payload variable is created by copying all existing system settings from the response variable. This ensures that all mandatory fields as well as all other fields are still defined with what we will be sending back to the API. Finally, if an Ansible YAML variable of <code class="language-plaintext highlighter-rouge">trusted_source</code> was set, iterate through entries and append each as a configuration which includes the source, action, prioority and services that are predefined within the role above. Evenetually it updates the payload with the new and old <code class="language-plaintext highlighter-rouge">ip-receive-acls</code> entries. This seems like a TON of work to simply add a single entry. You have to add all previous entries, merge them with your new entries, etc.</p>
+
+<p>I wanted to test out if the Ansible Role was complex for a specific reason or simply if the NFVIS API required it to be that way, so I tested out a few things myself. I have included comments to describe what I’m testing in the below output.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># A new dictionary representing a new IP receivel ACL entry I want to add
+</span><span class="n">new_entry</span> <span class="o">=</span> <span class="p">{</span><span class="s">'settings'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip-receive-acls'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip-receive-acl'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'priority'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">'action'</span><span class="p">:</span> <span class="s">'accept'</span><span class="p">,</span> <span class="s">'source'</span><span class="p">:</span> <span class="s">'10.4.4.40/32'</span><span class="p">,</span> <span class="s">'service'</span><span class="p">:</span> <span class="p">[</span><span class="s">'https'</span><span class="p">,</span> <span class="s">'icmp'</span><span class="p">,</span> <span class="s">'scpd'</span><span class="p">,</span> <span class="s">'snmp'</span><span class="p">,</span> <span class="s">'ssh'</span><span class="p">]}]}}}</span>
+
+<span class="c1"># The API requires we send it data in JSON or XML. I chose JSON
+# json.dumps() converts our Python dict into a JSON string
+</span><span class="n">json_entry</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+
+<span class="c1"># Now to HTTP PUT the data to the server
+</span><span class="n">PATH</span> <span class="o">=</span> <span class="s">'/api/config/system/settings'</span>
+<span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+
+<span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">put</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">json_entry</span>
+<span class="p">)</span>
+
+<span class="c1"># Looking at the response status code we got a 400 and an error:
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="p">.</span><span class="n">status_code</span>
+<span class="mi">400</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'errors'</span><span class="p">:</span> <span class="p">{</span><span class="s">'error'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'error-message'</span><span class="p">:</span> <span class="s">'unknown element: settings in /system:system/system:settings/system:settings'</span><span class="p">,</span> <span class="s">'error-urlpath'</span><span class="p">:</span> <span class="s">'/api/config/system/settings'</span><span class="p">,</span> <span class="s">'error-tag'</span><span class="p">:</span> <span class="s">'malformed-message'</span><span class="p">}]}}</span>
+
+<span class="c1"># So we need to include mandatory fields, lets try this instead
+</span><span class="n">new_entry</span> <span class="o">=</span> <span class="p">{</span><span class="s">'system:settings'</span><span class="p">:</span> <span class="p">{</span><span class="s">'wan'</span><span class="p">:</span> <span class="p">{</span><span class="s">'vlan'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">'ip'</span><span class="p">:</span> <span class="p">{</span><span class="s">'netmask'</span><span class="p">:</span> <span class="s">'255.255.255.252'</span><span class="p">,</span> <span class="s">'address'</span><span class="p">:</span> <span class="s">'192.168.1.1'</span><span class="p">}},</span> <span class="s">'default-gw'</span><span class="p">:</span> <span class="s">'10.1.1.1'</span><span class="p">,</span> <span class="s">'hostname'</span><span class="p">:</span> <span class="s">'ENCS-WAN1'</span><span class="p">,</span> <span class="s">'cimc-access'</span><span class="p">:</span> <span class="s">'enable'</span><span class="p">,</span> <span class="s">'ip-receive-acls'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip-receive-acl'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'priority'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">'action'</span><span class="p">:</span> <span class="s">'accept'</span><span class="p">,</span> <span class="s">'source'</span><span class="p">:</span> <span class="s">'0.0.0.0/0'</span><span class="p">,</span> <span class="s">'service'</span><span class="p">:</span> <span class="p">[</span><span class="s">'https'</span><span class="p">,</span> <span class="s">'icmp'</span><span class="p">,</span> <span class="s">'snmp'</span><span class="p">,</span> <span class="s">'ssh'</span><span class="p">{</span><span class="s">'priority'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">'action'</span><span class="p">:</span> <span class="s">'accept'</span><span class="p">,</span> <span class="s">'source'</span><span class="p">:</span> <span class="s">'10.4.4.40/32'</span><span class="p">,</span> <span class="s">'service'</span><span class="p">:</span> <span class="p">[</span><span class="s">'https'</span><span class="p">,</span> <span class="s">'icmp'</span><span class="p">,</span> <span class="s">'scpd'</span><span class="p">,</span> <span class="s">'snmp'</span><span class="p">,</span> <span class="s">'ssh'</span><span class="p">]}]},</span> <span class="s">'mgmt'</span><span class="p">:</span> <span class="p">{</span><span class="s">'ip'</span><span class="p">:</span> <span class="p">{</span><span class="s">'netmask'</span><span class="p">:</span> <span class="s">'255.255.255.0'</span><span class="p">,</span> <span class="s">'address'</span><span class="p">:</span> <span class="s">'10.1.1.2'</span><span class="p">}},</span> <span class="s">'logging'</span><span class="p">:</span> <span class="p">{</span><span class="s">'host'</span><span class="p">:</span> <span class="p">[{</span><span class="s">'host'</span><span class="p">:</span> <span class="s">'10.3.3.30'</span><span class="p">}],</span> <span class="s">'severity'</span><span class="p">:</span> <span class="s">'informational'</span><span class="p">}}}</span>
+<span class="n">json_entry</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+<span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">put</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">),</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">json_entry</span>
+<span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="p">.</span><span class="n">status_code</span>
+<span class="mi">200</span>
+</code></pre></div></div>
+
+<p>After sending the HTTP PUT when testing this out I actually received a timeout exception. Make sure you include the timeout=20 parameter in your Requests call. This is because the Cisco NFVIS platform needs to commit the change that you sent to it and this seems to take a long time.</p>
+
+<p>The difficult with the working solution above is:</p>
+
+<ol>
+  <li>You need to redefine the already existing ACL entry for 0.0.0.0/0, but you don’t actually know how it was configured because you can’t see that in the original HTTP GET request</li>
+  <li>If you forget to include all previous entries, they are actually removed from the configuration so you have the ability to cause an impact</li>
+</ol>
+
+<p>The only way I can see this being effective is if you are doing something close to Infrastructure as Code (IAC) and have a template of what IP receivel ACL entries should already exist stored in version control. Then if you are simply adding a new entry to all devices you can update your IAC and pull from that template to be deployed to your device. Still though, there are the mandatory fields that need to be included in the HTTP PUT such as the hostname, default-gw and management IP and netmask.</p>
+
+<h2 id="closing-words">Closing Words</h2>
+
+<p>My experience so far with the NFVIS API for data gathering and reporting has been a positive one. I can’t say the same about making configuration changes via the API though. I’m still exploring the API and trying to find a more reasonable way to make configuration changes, as well as automating the deployment of new image files using SCP and registering those images via the API. Once I have experimented with this further I’ll post about it with my experience!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#cisco" class="page__taxonomy-item" rel="tag">Cisco</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-03-02T00:00:00-07:00">March 2, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Initial+Thoughts+on+Cisco+NFVIS+API%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F02%2Finitial-thoughts-cisco-nfvis-api.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F02%2Finitial-thoughts-cisco-nfvis-api.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F02%2Finitial-thoughts-cisco-nfvis-api.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/02/16/overview-of-vmanage-api.html" class="pagination--pager" title="Overview of the Viptela vManage API
+">Previous</a>
+    
+    
+      <a href="/2021/03/10/base64-encoding-http-basic-auth.html" class="pagination--pager" title="Base64 Encoding with HTTP Basic Auth for API’s
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

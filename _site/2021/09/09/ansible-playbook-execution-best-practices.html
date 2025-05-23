@@ -1,0 +1,909 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Best Practices for Safe Ansible Playbook Execution - def brian(automate)</title>
+<meta name="description" content="Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against the correct set of devices, and avoid any surprises!">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Best Practices for Safe Ansible Playbook Execution">
+<meta property="og:url" content="http://localhost:4000/2021/09/09/ansible-playbook-execution-best-practices.html">
+
+
+  <meta property="og:description" content="Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against the correct set of devices, and avoid any surprises!">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-09-09T00:00:00-06:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/09/09/ansible-playbook-execution-best-practices.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Best Practices for Safe Ansible Playbook Execution">
+    <meta itemprop="description" content="Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against the correct set of devices, and avoid any surprises!">
+    <meta itemprop="datePublished" content="2021-09-09T00:00:00-06:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Best Practices for Safe Ansible Playbook Execution
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-09-09T00:00:00-06:00">September 9, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          8 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#example-ansible-inventory-and-playbook">Example Ansible Inventory and Playbook</a></li><li><a href="#best-practice--1---manually-specifying-inventory-file">Best Practice # 1 - Manually specifying inventory file</a></li><li><a href="#best-practice--2---using-the-ansible-playbook-list-hosts-flag">Best Practice # 2 - Using the ansible-playbook list-hosts flag</a></li><li><a href="#best-practice--3---using-the-ansible-playbook-list-tasks-flag">Best Practice # 3 - Using the ansible-playbook –list-tasks flag</a></li><li><a href="#tying-it-all-together">Tying it all together</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>Ansible can be a very powerful automation tool, allowing you to interact with hundreds or thousands of network devices at once. The automation is defined through a combination of inventory files, variable files, and playbooks (with optional task files and roles). The combination of these features makes a very powerful automation tool, but with that comes a high-level of risk. In this guide I highlight a few best practices to follow when executing Ansible playbooks. By following these best practices you will have increased confidence that you are implementing the correct tasks against the correct set of devices, and avoid any surprises!</p>
+
+<p>The ansible-playbook best practices covered in this post are:</p>
+
+<ol>
+  <li>Manually specifying your inventory file</li>
+  <li>Using the list-hosts flag to confirm the hosts are as you expect</li>
+  <li>Using the list-tasks flag to confirm the tasks that will be implemented</li>
+</ol>
+
+<h2 id="example-ansible-inventory-and-playbook">Example Ansible Inventory and Playbook</h2>
+
+<p>In this post I will be using the following Ansible file structure:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>tree
+<span class="nb">.</span>
+├── ansible.cfg
+├── group_vars
+│   └── ios.yml
+├── inventory
+│   ├── hosts.yml
+│   └── ios_routers.yml
+└── test-pb.yml
+
+2 directories, 5 files
+</code></pre></div></div>
+
+<p>The inventory file that we will be using is ios_routers.yml:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">ios</span><span class="pi">:</span>
+  <span class="na">hosts</span><span class="pi">:</span>
+    <span class="na">RouterA</span><span class="pi">:</span>
+      <span class="na">ansible_host</span><span class="pi">:</span> <span class="s">192.168.10.150</span>
+      <span class="na">syslog_servers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">192.168.1.1</span>
+        <span class="pi">-</span> <span class="s">192.168.1.2</span>
+    <span class="na">RouterB</span><span class="pi">:</span>
+      <span class="na">ansible_host</span><span class="pi">:</span> <span class="s">192.168.10.151</span>
+  <span class="na">children</span><span class="pi">:</span>
+    <span class="na">calgary</span><span class="pi">:</span>
+      <span class="na">hosts</span><span class="pi">:</span>
+        <span class="na">RouterA</span><span class="pi">:</span>
+    <span class="na">ottawa</span><span class="pi">:</span>
+      <span class="na">hosts</span><span class="pi">:</span>
+        <span class="na">RouterB</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<p>Finally, the example playbook that I have is as shown below. The specific details about what each task does is not important, what is important is that we have multiple tasks, some of which are related. This will become more apparent in my explanation of the list-tasks flag later on.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="pi">-</span> <span class="na">hosts</span><span class="pi">:</span> <span class="s">ios</span>
+  <span class="na">gather_facts</span><span class="pi">:</span> <span class="s">False</span>
+
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Configure banner</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">banner</span>
+      <span class="s">cisco.ios.ios_banner</span><span class="pi">:</span>
+        <span class="na">banner</span><span class="pi">:</span> <span class="s">login</span>
+        <span class="na">text</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">banners.login</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Remove MOTD banner</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">banner</span>
+      <span class="s">cisco.ios.ios_banner</span><span class="pi">:</span>
+        <span class="na">banner</span><span class="pi">:</span> <span class="s">motd</span>
+        <span class="na">text</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">banners.motd</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Remove EXEC banner</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">banner</span>
+      <span class="s">cisco.ios.ios_banner</span><span class="pi">:</span>
+        <span class="na">banner</span><span class="pi">:</span> <span class="s">exec</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">absent</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Remove incoming banner</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">banner</span>
+      <span class="s">cisco.ios.ios_banner</span><span class="pi">:</span>
+        <span class="na">banner</span><span class="pi">:</span> <span class="s">incoming</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">absent</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Confure logging hosts</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">logging</span>
+      <span class="na">ios_logging</span><span class="pi">:</span>
+        <span class="na">dest</span><span class="pi">:</span> <span class="s">host</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">item</span><span class="nv"> </span><span class="s">}}"</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+      <span class="na">loop</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">syslog_servers</span><span class="nv"> </span><span class="s">}}"</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Adjust local logging buffer</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">logging</span>
+      <span class="na">ios_logging</span><span class="pi">:</span>
+        <span class="na">dest</span><span class="pi">:</span> <span class="s">buffered</span>
+        <span class="na">size</span><span class="pi">:</span> <span class="m">5000</span>
+        <span class="na">level</span><span class="pi">:</span> <span class="s">informational</span>
+        <span class="na">state</span><span class="pi">:</span> <span class="s">present</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Configure SNMP</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">snmp</span>
+      <span class="na">ios_config</span><span class="pi">:</span>
+        <span class="na">lines</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">snmp-server location {{ snmp.location }}</span>
+          <span class="pi">-</span> <span class="s">snmp-server contact {{ snmp.contact }}</span>
+          <span class="pi">-</span> <span class="s">snmp-server community {{ snmp.community }} ro SNMP_ACL</span>
+      <span class="na">no_log</span><span class="pi">:</span> <span class="s">True</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Configure SNMP ACL</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">snmp</span>
+      <span class="na">ios_config</span><span class="pi">:</span>
+        <span class="na">lines</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">permit {{ item }}</span>
+        <span class="na">parents</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">ip access-list standard SNMP_ACL</span>
+      <span class="na">loop</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">snmp.servers</span><span class="nv"> </span><span class="s">}}"</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Configure Local Accounts</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">users</span>
+      <span class="na">ios_config</span><span class="pi">:</span>
+        <span class="na">lines</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="s">username {{ item.username }} secret {{ item.password }}</span>
+      <span class="na">loop</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">users</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="na">no_log</span><span class="pi">:</span> <span class="s">True</span>
+
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Save configuration</span>
+      <span class="na">tags</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">save</span>
+      <span class="na">ios_config</span><span class="pi">:</span>
+        <span class="na">save_when</span><span class="pi">:</span> <span class="s">modified</span>
+</code></pre></div></div>
+
+<h2 id="best-practice--1---manually-specifying-inventory-file">Best Practice # 1 - Manually specifying inventory file</h2>
+
+<p>There are multiple ways for the ansible-playbook command to find an inventory file to execute against. This can be through the use of the ANSIBLE_INVENTORY variable, the default location of inventory/hosts.yml, by using the -i flag on the ansible-playbook command, dynamic inventory scripts, etc. With many different methods of defining your inventory, I find the safest method is to manually and explicitly identify it when executing a playbook. This ensures that if you created an inventory file for a specific change you are implementing, there is no chance of ansible-playbook picking up a different inventory file through one of the other methods. This will help you avoid uninentional changes being executed against devices unrelated to your change.</p>
+
+<p>In my example folder structure there are two inventory files, but the one that I want to execute my playbook against is ios_routers.yml. To specify this I use the -i flag with the ansible-playbook command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span><span class="nb">ls </span>inventory/
+hosts.yml  ios_routers.yml
+byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">-i</span> inventory/ios_routers.yml
+</code></pre></div></div>
+
+<p>In the words of <a href="https://www.python.org/dev/peps/pep-0020/">The Zen of Python</a>, <strong>Explicit is better than implicit</strong>.</p>
+
+<h2 id="best-practice--2---using-the-ansible-playbook-list-hosts-flag">Best Practice # 2 - Using the ansible-playbook list-hosts flag</h2>
+
+<p>In addition to manually specifying the inventory file you want to execute your playbook against, there are often times where you may wish to only run the playbook against a subset of hosts in that inventory. Perhaps you have one master inventory file and you execute your playbooks against a particular group, or a host pattern. To confirm that you are running your playbook against the specific intended hosts, you can use the –list-hosts flag to confirm before execution that Ansible has found the correct hosts.</p>
+
+<blockquote>
+  <p>You get extra bonus points if your organization has a well defined host naming convention for your network devices. Naming conventions are super helpful in conveying context, such as location or function, and can help in allowing you to use simple pattern matching with your Ansible playbooks.</p>
+</blockquote>
+
+<p>When using the –list-hosts flag your playbook will not actually be executed. This gives you an opportunity to examine the returned hosts to confirm they are correct, before executing your playbook against them (by removing the –list-hosts flag):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">--list-hosts</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    pattern: <span class="o">[</span><span class="s1">'ios'</span><span class="o">]</span>
+    hosts <span class="o">(</span>1<span class="o">)</span>:
+      RouterA
+</code></pre></div></div>
+
+<p>In the above command I forgot to specify my inventory file with the -i flag. However, by using the –list-hosts flag it allowed me to spot that I was missing RouterB in the hosts that would be included as part of Play #1. I now realize my mistake, specify the host file manually and re-run my check with the –list-hosts flag to confirm that both RouterA and RouterB are now identified:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">-i</span> inventory/ios_routers.yml <span class="nt">--list-hosts</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    pattern: <span class="o">[</span><span class="s1">'ios'</span><span class="o">]</span>
+    hosts <span class="o">(</span>2<span class="o">)</span>:
+      RouterB
+      RouterA
+</code></pre></div></div>
+
+<p>Finally, as one last example, if I only wanted to execute a playbook against a subset of my inventory by using a pattern, I can use the –list-hosts flag to ensure that my pattern is correct. In this case I only want to execute the playbook against the RouterB host.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">-i</span> inventory/ios_routers.yml <span class="nt">--limit</span> RouterB <span class="nt">--list-hosts</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    pattern: <span class="o">[</span><span class="s1">'ios'</span><span class="o">]</span>
+    hosts <span class="o">(</span>1<span class="o">)</span>:
+      RouterB
+</code></pre></div></div>
+
+<h2 id="best-practice--3---using-the-ansible-playbook-list-tasks-flag">Best Practice # 3 - Using the ansible-playbook –list-tasks flag</h2>
+
+<p>It is possible to have dozens of tasks (or more!) included in a playbook, and these can be included through separate task files, roles, etc. Depending on the purpose of your playbook and the automation that you might want to execute you may only want to implement a subset of the tasks. The ansible-playbook –list-tasks flag allows you to see which tasks will be executed. Like the –list-hosts flag previously covered, the –list-tasks flag will not actually execute your playbook. It allows you to see what will be executed, confirm it is as expected, and then you remove the flag and implement your changes.</p>
+
+<p>To start, lets run the –list-tasks flag against our test-pb.yml. You can see below that we have 10 tasks, some of which are related (see the TAGS values).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">--list-tasks</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    tasks:
+      Configure banner	TAGS: <span class="o">[</span>banner]
+      Remove MOTD banner	TAGS: <span class="o">[</span>banner]
+      Remove EXEC banner	TAGS: <span class="o">[</span>banner]
+      Remove incoming banner	TAGS: <span class="o">[</span>banner]
+      Confure logging hosts	TAGS: <span class="o">[</span>logging]
+      Adjust <span class="nb">local </span>logging buffer	TAGS: <span class="o">[</span>logging]
+      Configure SNMP	TAGS: <span class="o">[</span>snmp]
+      Configure SNMP ACL	TAGS: <span class="o">[</span>snmp]
+      Configure Local Accounts	TAGS: <span class="o">[</span><span class="nb">users</span><span class="o">]</span>
+      Save configuration	TAGS: <span class="o">[</span>save]
+</code></pre></div></div>
+
+<blockquote>
+  <p>Providing meaningful names to your tasks is very important. It helps you and anyone else using your playbook know what each task is going to do without having to read through the playbook task by task. It also helps everyone use the –list-tasks flag effectively</p>
+</blockquote>
+
+<p>As an example, perhaps your organization just updated its device banner standards and only wants to run those tasks. Although Ansible tasks and modules are intended to be idempotent (only making changes when necessary and if needed), which means you could run all tasks and only the changes that are necessary (the banner) would be executed, it could drastically extend the amount of time the playbook tasks to execute. This is because Ansible needs to validate if each task needs to be executed, before actually implementing it. Instead, if you know that you only want to update the banner, you can use the -t flag to specify the <strong>banner</strong> tag I have associated with each of those tasks. But how do you know that you didn’t make a mistake when creating or specifying that tag? By using the –list-tasks flag:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">-t</span> banner,save <span class="nt">--list-tasks</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    tasks:
+      Configure banner	TAGS: <span class="o">[</span>banner]
+      Remove MOTD banner	TAGS: <span class="o">[</span>banner]
+      Remove EXEC banner	TAGS: <span class="o">[</span>banner]
+      Remove incoming banner	TAGS: <span class="o">[</span>banner]
+      Save configuration	TAGS: <span class="o">[</span>save]
+</code></pre></div></div>
+
+<p>Now we can see that only the tasks specific to updating the banner will be executed.</p>
+
+<blockquote>
+  <p>I also have a specific task for saving the configuration (using the <strong>save</strong> tag). This helps ensure that if changes are made that they will be saved to the startup-configuration. Not all Ansible Cisco modules will do this by default (or even have the option), so instead of writing the <strong>save_when</strong> option on each of my tasks, I include it at the end of my playbook.</p>
+</blockquote>
+
+<h2 id="tying-it-all-together">Tying it all together</h2>
+
+<p>It turns out that you can use both the –list-hosts and –list-tasks flags at the same time. This allows you to validate that both the inventory and the expected tasks are correct, before you implement. The below output shows you both the hosts that were identified (in my case RouterB) and the specific tasks (banner updates, and saving the configuration):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>byaklin@ansiblevm:~/ansible-example<span class="nv">$ </span>ansible-playbook test-pb.yml <span class="nt">-i</span> inventory/ios_routers.yml <span class="nt">--limit</span> RouterB <span class="nt">-t</span> banner,save <span class="nt">--list-tasks</span> <span class="nt">--list-hosts</span>
+
+playbook: test-pb.yml
+
+  play <span class="c">#1 (ios): ios	TAGS: []</span>
+    pattern: <span class="o">[</span><span class="s1">'ios'</span><span class="o">]</span>
+    hosts <span class="o">(</span>1<span class="o">)</span>:
+      RouterB
+    tasks:
+      Configure banner	TAGS: <span class="o">[</span>banner]
+      Remove MOTD banner	TAGS: <span class="o">[</span>banner]
+      Remove EXEC banner	TAGS: <span class="o">[</span>banner]
+      Remove incoming banner	TAGS: <span class="o">[</span>banner]
+      Save configuration	TAGS: <span class="o">[</span>save]
+</code></pre></div></div>
+
+<p>Whenever I go to implement an automation using Ansible, before executing the playbook I use these options to validate that everything is as I expect it to be. I also log this information to a file and save it as part of my pre-change information gathering attached to a change record. This is to help cover myself should any unrelated issues pop-up in the network infrastructure. It’s a bit of a CYA, and by showing your customers and management that you are using best practices for first verifying your playbooks (in addition to all the testing you did you with your playbook in a lab environment!), you will gain the confidence and trust from your stakeholders. This helps further promote using automation as part of your job, if you can demonstrate it being done in a safe way.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#ansible" class="page__taxonomy-item" rel="tag">Ansible</a><span class="sep">, </span>
+    
+      <a href="/tags/#automation" class="page__taxonomy-item" rel="tag">Automation</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-09-09T00:00:00-06:00">September 9, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Best+Practices+for+Safe+Ansible+Playbook+Execution%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F09%2F09%2Fansible-playbook-execution-best-practices.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F09%2F09%2Fansible-playbook-execution-best-practices.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F09%2F09%2Fansible-playbook-execution-best-practices.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/08/27/guide-to-deploy-saml-anyconnect.html" class="pagination--pager" title="A Practical Guide to Deploying SAML for AnyConnect (External)
+">Previous</a>
+    
+    
+      <a href="/2021/09/26/cisco-sa-aaa-Yx47ZT8Q-netconf-restconf-auth-bypass.html" class="pagination--pager" title="Cisco IOS XE Netconf and Restconf Authentication Bypass Vulnerability
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

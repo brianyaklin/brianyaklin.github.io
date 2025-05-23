@@ -1,0 +1,748 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Base64 Encoding with HTTP Basic Auth for API’s - def brian(automate)</title>
+<meta name="description" content="I have been exploring the Cisco DNA Center REST API as part of studying for the Cisco Certified DevNet Associate certification exam. Today while reading through the official certification guide it talked about how authorization into the API required that your credentials be passed as a base64 encoded string, but it didn’t indicate how to accomplish this.">
+
+
+  <meta name="author" content="Brian Yaklin">
+  
+  <meta property="article:author" content="Brian Yaklin">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="def brian(automate)">
+<meta property="og:title" content="Base64 Encoding with HTTP Basic Auth for API’s">
+<meta property="og:url" content="http://localhost:4000/2021/03/10/base64-encoding-http-basic-auth.html">
+
+
+  <meta property="og:description" content="I have been exploring the Cisco DNA Center REST API as part of studying for the Cisco Certified DevNet Associate certification exam. Today while reading through the official certification guide it talked about how authorization into the API required that your credentials be passed as a base64 encoded string, but it didn’t indicate how to accomplish this.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg">
+
+
+
+
+
+  <meta property="article:published_time" content="2021-03-10T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/2021/03/10/base64-encoding-http-basic-auth.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Brian Yaklin",
+      "url": "http://localhost:4000/",
+      "sameAs": ["https://twitter.com/byaklin6","https://www.linkedin.com/in/brian-yaklin-6420173a","https://github.com/brianyaklin"]
+    
+  }
+</script>
+
+
+
+  <meta name="msvalidate.01" content="9EB6A2509D67F58E3513A614006C3CAF">
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+<link rel="manifest" href="/assets/images/site.webmanifest">
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/android-chrome-192x192.png" alt="def brian(automate)"></a>
+        
+        <a class="site-title" href="/">
+          def brian(automate)
+          <span class="site-subtitle">Covering topics relating to networking and automation!</span>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/author-avatar.jpeg" alt="Brian Yaklin" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Brian Yaklin</h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Calgary, AB</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://github.com/brianyaklin" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/brian-yaklin-6420173a" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/byaklin6" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://tools.yaklin.ca" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-toolbox" aria-hidden="true"></i><span class="label">Networking Tools</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Base64 Encoding with HTTP Basic Auth for API’s">
+    <meta itemprop="description" content="I have been exploring the Cisco DNA Center REST API as part of studying for the Cisco Certified DevNet Associate certification exam. Today while reading through the official certification guide it talked about how authorization into the API required that your credentials be passed as a base64 encoded string, but it didn’t indicate how to accomplish this.">
+    <meta itemprop="datePublished" content="2021-03-10T00:00:00-07:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Base64 Encoding with HTTP Basic Auth for API’s
+</h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-03-10T00:00:00-07:00">March 10, 2021</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#what-is-base64-encoding">What is base64 encoding?</a></li><li><a href="#using-base64-with-http-basic-auth">Using base64 with HTTP Basic Auth</a></li><li><a href="#a-quicker-way-of-using-http-basic-auth-with-requests">A quicker way of using HTTP Basic Auth with Requests</a></li><li><a href="#http-basic-auth-with-ansible-uri-module">HTTP Basic Auth with Ansible URI Module</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>I have been exploring the <a href="https://developer.cisco.com/docs/dna-center/#!cisco-dna-2-1-2-x-api-overview">Cisco DNA Center REST API</a> as part of studying for the <a href="https://developer.cisco.com/certification/devnet-associate/">Cisco Certified DevNet Associate</a> certification exam. Today while reading through the official certification guide it talked about how authorization into the API required that your credentials be passed as a base64 encoded string, but it didn’t indicate how to accomplish this.</p>
+
+<p>For those that aren’t familiar with <a href="https://devnetsandbox.cisco.com/RM/Topology">Cisco’s DevNet Sandboxes</a>, Cisco provides <strong>free</strong> access to read-only always-on and reservation based sandbox environments. These environments permit a developer access to a wide variety of technologies that Cisco customers deploy, including ACI, ISE, FirePower FMC, Viptela vManage, StealthWatch, Umbrella, Webex Meetings, and many more. The one that I’m currently exploring is the Cisco DNA Center REST API. This article is going to briefly explain base64 encoding and how to use it for authorization with REST API’s, specifically Cisco DNA Center. If you wanted to follow along, open up the Always-On sandbox for Cisco DNA Center AO 2.1.2.5.</p>
+
+<h2 id="what-is-base64-encoding">What is base64 encoding?</h2>
+
+<p>There are quite a few articles out there, but the one that I found on <a href="https://stackabuse.com/encoding-and-decoding-base64-strings-in-python/">Stack Abuse explained it</a> quite well and simply enough. I encourage you to read the article to gain a better understand. The main highlights on base64:</p>
+
+<ul>
+  <li>It’s a conversion between bytes and ASCII characters</li>
+  <li>There are 64 characters represented in total (26 Uppercase, 26 Lowercase, 10 numbers, and + and / characters)</li>
+  <li>Important: base64 is not an encryption algorithm as it can be easily reversed, so should not be used for security purposes</li>
+</ul>
+
+<h2 id="using-base64-with-http-basic-auth">Using base64 with HTTP Basic Auth</h2>
+
+<p>I have talked briefly about HTTP Basic Auth in my guide to the <a href="/2021/03/02/initial-thoughts-cisco-nfvis-api.html">Cisco NFVIS API</a>. It is an authentication scheme that includes your username and password in an HTTP ‘Authentication’ header. It is very important that when using Basic Auth that you use HTTPS, as the credentials are not encrypted in the HTTP headers. Security is dependent on HTTPS/TLS.</p>
+
+<p>Base64 encoding for authentication with a REST API will take on a few different forms, depending on the REST API so check the documentation. The <a href="https://developer.cisco.com/docs/dna-center/#!cisco-dna-2-1-2-x-api-overview">Cisco DNA Center REST API documentation</a> indicates that the usernamd and password should be represented as a string that is colon separated before being encoded as base64. In the case of Cisco’s DevNet sandbox for DNA Center, that means the username and password would be:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>devnetuser:Cisco123
+</code></pre></div></div>
+
+<blockquote>
+  <p>Other API’s may require you to separate the username and password with a + sign or another character.</p>
+</blockquote>
+
+<p>So how can you use this to authorize yourself against the DNA Center REST API? See the following steps using Pythons Request module.</p>
+
+<p>First lets import the <a href="https://docs.python.org/3/library/base64.html">base64 module</a> and convert our username and password into a base64 encoded byte string.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">base64</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">auth_str</span> <span class="o">=</span> <span class="s">'devnetuser:Cisco123!'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">byte_str</span> <span class="o">=</span> <span class="n">auth_str</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">byte_str</span>
+<span class="sa">b</span><span class="s">'devnetuser:Cisco123!'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">auth_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">byte_str</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">auth_b64</span>
+<span class="sa">b</span><span class="s">'ZGV2bmV0dXNlcjpDaXNjbzEyMyE='</span>
+</code></pre></div></div>
+
+<p>You can see above that we can create a byte string using the <code class="language-plaintext highlighter-rouge">.encode('ascii')</code> function on our auth_str object. We need to do this because the base64.b64encode() function requires a bytes-like object. We then create an auth_b64 byte string which is now our username and password encoded the way the REST API will require it. If you are using another tool like cURL or Postman to test REST API’s, you can take this string and set it in your HTTP headers. The rest of this article focuses on using it with Pythons Request module.</p>
+
+<p>To authenticate with the DNA Center REST API we need to send a POST request to <code class="language-plaintext highlighter-rouge">/dna/system/api/v1/auth/token</code> with an Authorization and Content-Type HTTP header, and if we successfully authenticate we will be returned an API token which we can use in subsequent API requests.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">requests</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+<span class="p">...</span>     <span class="s">'Authorization'</span><span class="p">:</span> <span class="s">'Basic {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">auth_b64</span><span class="p">.</span><span class="n">decode</span><span class="p">()),</span>
+<span class="p">...</span>     <span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+<span class="p">...</span> <span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AUTH_URL</span> <span class="o">=</span> <span class="s">'https://sandboxdnac.cisco.com/dna/system/api/v1/auth/token'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">AUTH_URL</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="p">.</span><span class="n">status_code</span>
+<span class="mi">200</span>
+</code></pre></div></div>
+
+<p>In the above commands we imported the Requests package and set our HTTP headers with an Authorization header and Content-Type header that specifies we want to have data returned in JSON format. Not that for the Authorization header we actually need to perform a <code class="language-plaintext highlighter-rouge">decode()</code> on the byte string we previously created so that it is represented as a Python string object. This ensures that the REST API likes the data we send it. Finally, we send an HTTP POST request to the AUTH_URL and add our headers to the request. If you successfully authenticated you will see a response status code of 200/OK.</p>
+
+<p>The data that the REST API returns to us is actually a JSON response containing the authorization token we can use in subsequent API requests:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp_data</span><span class="p">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="n">dict_keys</span><span class="p">([</span><span class="s">'Token'</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp_data</span><span class="p">[</span><span class="s">'Token'</span><span class="p">]</span>
+<span class="s">'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MDJjMGUyODE0NzEwYTIyZDFmN2UxNzIiLCJhdXRoU291cmNlIjoiaW50ZXJuYWwiLCJ0ZW5hbnROYW1lIjoiVE5UMCIsInJvbGVzIjpbIjYwMmJlYmU1MTQ3MTBhMDBjOThmYTQwOSJdLCJ0ZW5hbnRJZCI6IjYwMmJlYmU1MTQ3MTBhMDBjOThmYTQwMiIsImV4cCI6MTYxNTM4ODA4NCwiaWF0IjoxNjE1Mzg0NDg0LCJqdGkiOiI5MjI3MmQ5Mi1lODRjLTRmMTUtOTFhNy1lNDI3ZmYwNmQxMDgiLCJ1c2VybmFtZSI6ImRldm5ldHVzZXIifQ.ZyJAEvSsjKm7Re-uTnXN7kyVf_pYVHwrmLl9m3z39XEkWUncWQhjRYybhgkUjVolJM10oaL31miWXRefZA0DYjXD0bW7zta_5Lr9AyFV66stosDtpzC_80Frh_n5oVi4gR4lvFtqPWixTrSB4c4aJxF1TqkFMUX8q_HpyDC0pcIRVOtyjTKltcmG8USOQQhPEMLW6vdwP8JEfK7HJUPuj0cMpIlXALqJE_k-5qvxHbNWWiIIST99wPGKAAA35aN_02THNSTuRF_bm2Oxr4ScWuwou3TwKIajB5Bp4jg-sTboO5NzRnGhkq9ZcA_S0j22KgceD2W431e6q1f7wK4_7g'</span>
+<span class="o">&gt;&gt;&gt;</span>
+</code></pre></div></div>
+
+<p>This response token is actually a JSON Web Token (JWT) and if you plug it into the <a href="https://jwt.io/">debugger at jwt.io</a> you can see some additional details. The benefits of using a token for authorization subsequent API calls are:</p>
+
+<ul>
+  <li>They are stateless, meaning the server receiving the request can validate them immediately as they are signed with a public key</li>
+  <li>They have an expiration date/time</li>
+  <li>They can be revoked by the server if they are compromised</li>
+  <li>They are signed, so they can’t be tampered with</li>
+</ul>
+
+<h2 id="a-quicker-way-of-using-http-basic-auth-with-requests">A quicker way of using HTTP Basic Auth with Requests</h2>
+
+<p>The above example of importing the base64 module and converting the username/password was used to demonstrate base64 encoded strings for HTTP Basic Auth. The good news is the Python Requests module includes a shortcut for you by importing requests.auth.HTTPBasicAuth. This makes it far simpler to use as demonstrated in this example.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">requests</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/json'</span><span class="p">,}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">username</span> <span class="o">=</span> <span class="s">'devnetuser'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">password</span> <span class="o">=</span> <span class="s">'Cisco123!'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AUTH_URL</span> <span class="o">=</span> <span class="s">'https://sandboxdnac.cisco.com/dna/system/api/v1/auth/token'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span>
+<span class="p">...</span>     <span class="n">AUTH_URL</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+<span class="p">...</span>     <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="p">.</span><span class="n">status_code</span>
+<span class="mi">200</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp_data</span><span class="p">[</span><span class="s">'Token'</span><span class="p">]</span>
+<span class="s">'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MDJjMGUyODE0NzEwYTIyZDFmN2UxNzIiLCJhdXRoU291cmNlIjoiaW50ZXJuYWwiLCJ0ZW5hbnROYW1lIjoiVE5UMCIsInJvbGVzIjpbIjYwMmJlYmU1MTQ3MTBhMDBjOThmYTQwOSJdLCJ0ZW5hbnRJZCI6IjYwMmJlYmU1MTQ3MTBhMDBjOThmYTQwMiIsImV4cCI6MTYxNTM4OTA2OCwiaWF0IjoxNjE1Mzg1NDY4LCJqdGkiOiJlMTI3ODRjZC1iOGYyLTRlMzQtOGRhOS01ZWJkNTk5MTRlMTIiLCJ1c2VybmFtZSI6ImRldm5ldHVzZXIifQ.kKOBqO-eBJTDqK7t3heN057wVQLMTzGGbPn1vL4SQcvMsd2LLQ6CBn2Mr1QPgluit11gzjx3wM7FOLRJILBbZhhbSxSDymfZoNu2CZzdtIy7yz53bDDHwWMf5m8ymqBrFfb-Si8W_vEaT5XTbyjAydWyMiWN4l7ddKH7PC6h6ZoFdI6ko3bFh8H3j3IvSG64dFQp5OLzrMWmKaxqr2OvdlJMo_bXKuuW1pBr8ifjuaPTs3dKhVjbsIrxeQ7fgmvHge5pvfmzPQqEFV-yNYR9fNwEZ8T3FyLKfD_O2NCPiiw5RsYqUWZQkvAT7kqvOeluLHvrTwn3sHvHvGqxhncs2Q'</span>
+<span class="o">&gt;&gt;&gt;</span>
+</code></pre></div></div>
+
+<h2 id="http-basic-auth-with-ansible-uri-module">HTTP Basic Auth with Ansible URI Module</h2>
+
+<p>While I haven’t use HTTP Basic Auth with <a href="https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html">Ansible’s URI module</a>, it appears to support this authentication mechanism by providing the url_password and url_username parameters. You potentially need to set the force_basic_auth parameter to True if the REST API you’re working with doesn’t send an HTTP 401 status code on an initial request.</p>
+
+<p>And with that I’m hoping you have gained a better understanding of base64 encoding and HTTP Basic Auth with REST API’s!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#cisco" class="page__taxonomy-item" rel="tag">Cisco</a><span class="sep">, </span>
+    
+      <a href="/tags/#python" class="page__taxonomy-item" rel="tag">Python</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-03-10T00:00:00-07:00">March 10, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Base64+Encoding+with+HTTP+Basic+Auth+for+API%27s%20http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F10%2Fbase64-encoding-http-basic-auth.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F10%2Fbase64-encoding-http-basic-auth.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Flocalhost%3A4000%2F2021%2F03%2F10%2Fbase64-encoding-http-basic-auth.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/03/02/initial-thoughts-cisco-nfvis-api.html" class="pagination--pager" title="Initial Thoughts on Cisco NFVIS API
+">Previous</a>
+    
+    
+      <a href="/2021/03/18/exploring-netconf-cisco-iosxe.html" class="pagination--pager" title="Exploring NETCONF and YANG on Cisco IOS-XE
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/kelly-sikkema-gcHFXsdcmJE-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/10/network-apis-part-1-overview.html" rel="permalink">Network API’s Part 1 - Overview
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-10T00:00:00-07:00">March 10, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Application programming interfaces (API’s) have become extremely popular with networking vendors over the past decade. This is a result of their flexibility,...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/edvard-alexander-rolvaag-E75ZuAIpCzo-unsplash.jpeg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/03/02/parse-pysnmp-object-names.html" rel="permalink">Parse PySNMP Object Identities for MIB Variable Names
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-03-02T00:00:00-07:00">March 2, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">After using SNMP to query a remote device for a particular ObjectType and getting the response ObjectType (which includes the MIB identity and the correspond...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/19/secure-query-with-snmpv3-and-pysnmp.html" rel="permalink">Secure Queries with SNMPv3 and PySNMP
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-19T00:00:00-07:00">January 19, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">The information obtained with SNMP from network devices ranges from being simple timeseries type data like interface metrics to complex and sensitive status ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src="/assets/images/hal-gatewood-8MBd4rAgJ-c-unsplash_small.jpg" alt="">
+      </div>
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/01/16/bulk-data-gathering-with-pysnmp.html" rel="permalink">Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-fw fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-01-16T00:00:00-07:00">January 16, 2022</time>
+      </span>
+    
+
+    <span class="page__meta-sep"></span>
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-fw fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Up until now my articles (PySNMP HLAPI, Compiling MIB’s for PySNMP) have focused on using simple SNMP GET requests with PySNMP’s getCmd. This works great for...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 def brian(automate). Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>
