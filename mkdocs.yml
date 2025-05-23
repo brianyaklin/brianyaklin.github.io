@@ -1,6 +1,7 @@
 site_name: Yaklin.ca
 site_description: Covering topics relating to networking and automation!
 site_url: https://www.yaklin.com
+repo_name: brianyaklin
 repo_url: https://github.com/brianyaklin
 
 theme:
@@ -20,6 +21,7 @@ theme:
     scheme: slate
   icon:
     logo: fontawesome/solid/route
+  favicon: assets/images/favicon.ico
 
 plugins:
   - search
