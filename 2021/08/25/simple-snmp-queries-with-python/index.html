@@ -1,0 +1,1346 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Covering topics relating to networking and automation!">
+      
+      
+      
+        <link rel="canonical" href="https://www.yaklin.com/2021/08/25/simple-snmp-queries-with-python/">
+      
+      
+        <link rel="prev" href="../../05/using-ansible-inventory-files-in-python-scripts/">
+      
+      
+        <link rel="next" href="../../27/a-practical-guide-to-deploying-saml-for-anyconnect-external/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Simple SNMP Queries with Python - Yaklin.ca</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-Q1WGH30J2R"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-Q1WGH30J2R",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-Q1WGH30J2R",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#simple-snmp-queries-with-python" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Yaklin.ca" class="md-header__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yaklin.ca
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Simple SNMP Queries with Python
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Yaklin.ca" class="md-nav__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    Yaklin.ca
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2022/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2022
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2021
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/automation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Automation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/nac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NAC
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/network-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Network Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/programmability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Programmability
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/vulnerabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Vulnerabilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-pysnmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      What is PySNMP?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../.." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../../../../assets/images/brian-avatar.jpeg" alt="Brian Yaklin">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Brian Yaklin
+                        
+                      </strong>
+                      <br>
+                      Creator
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2021-08-25 00:00:00+00:00" class="md-ellipsis">August 25, 2021</time>
+                      </div>
+                    </li>
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 13h1.5v2.82l2.44 1.41-.75 1.3L15 16.69zm4-5H5v11h4.67c-.43-.91-.67-1.93-.67-3a7 7 0 0 1 7-7c1.07 0 2.09.24 3 .67zM5 21a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2h1V1h2v2h8V1h2v2h1a2 2 0 0 1 2 2v6.1c1.24 1.26 2 2.99 2 4.9a7 7 0 0 1-7 7c-1.91 0-3.64-.76-4.9-2zm11-9.85A4.85 4.85 0 0 0 11.15 16c0 2.68 2.17 4.85 4.85 4.85A4.85 4.85 0 0 0 20.85 16c0-2.68-2.17-4.85-4.85-4.85"/></svg>
+                          <time datetime="2025-05-23 00:00:00+00:00" class="md-ellipsis">May 23, 2025</time>
+                        </div>
+                      </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/automation/">Automation</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              10 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+              <ul class="md-post__meta md-nav__list">
+                <li class="md-nav__item md-nav__item--section">
+                  <div class="md-post__title">
+                    <span class="md-ellipsis">
+                      Related links
+                    </span>
+                  </div>
+                  <nav class="md-nav">
+                    <ul class="md-nav__list">
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/lextudio/pysnmp" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    PySNMP Project
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Simple SNMP Queries with Python
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../2022/01/11/snmp-queries-with-pysnmp-high-level-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SNMP Queries with PySNMP High-Level API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../2022/01/14/compiling-snmp-mibs-for-pysnmp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiling SNMP MIB's for PySNMP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../2022/01/16/bulk-data-gathering-with-pysnmp-nextcmd-and-bulkcmd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Bulk Data Gathering with PySNMP nextCmd and bulkCmd
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../2022/01/19/secure-queries-with-snmpv3-and-pysnmp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Secure Queries with SNMPv3 and PySNMP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                        
+                        
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../2022/03/02/parse-pysnmp-object-identities-for-mib-variable-names/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parse PySNMP Object Identities for MIB Variable Names
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+                      
+                    </ul>
+                  </nav>
+                </li>
+              </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <span class="md-tag">Automation</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Python</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">SNMP</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="simple-snmp-queries-with-python">Simple SNMP Queries with Python<a class="headerlink" href="#simple-snmp-queries-with-python" title="Permanent link">&para;</a></h1>
+<p>The need to query network devices for information on a repeated and consistent basis always been a critical function of performing network management. Monitoring the health of your network devices, building reports for use by management, querying the status of a particular function, and so on. There are an increasing number of ways to perform this type of data gathering. From the extremes of manually logging in to run a CLI command or check a web GUI, to using the latest API or Netconf, network engineers have their choice of protocol to use. However, nothing is as common and widely deployed as Simple Network Management Protocol (SNMP). Most network monitoring platforms will rely on using SNMP, especially if a particular network platform is a decentralized platform like common routers and switches, requiring each network device to be queried individually instead of through a centralized controller.</p>
+<!-- more -->
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The historical <a href="https://github.com/etingof/pysnmp">pysnmp</a> project, which has not been maintained due the the unfortunate passing of the maintainer, has since been <a href="https://github.com/lextudio/pysnmp">forked</a> and is being actively maintained (disclaimer, I have yet to test it yet). Most links in my SNMP posts to the PySNMP readthedocs should automatically redirect to the latest documentation, but the technical nature of my posts has not yet been updated. I hope to update these posts so that the community has a good resource to reference for the updated package.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This article explains a simple method of querying devices without needing pre-complied MIB's, but this method isn't the standard way of using PySNMP. Refer to the following posts for more up-to-date articles on PySNMP: <a href="../../../../2022/01/11/snmp-queries-with-pysnmp-high-level-api/">PySNMP's HLAPI for SNMP GET Requests</a>, <a href="../../../../2022/01/14/compiling-snmp-mibs-for-pysnmp/">Compiling MIB's for PySNMP with PySMI</a>, <a href="../../../../2022/01/16/bulk-data-gathering-with-pysnmp-nextcmd-and-bulkcmd/">Bulk Data Gathering with PySNMP's nextCmd and bulkCMD</a>.</p>
+</div>
+<p>Because of SNMP's common use, this article covers how you can use <a href="https://pysnmp.readthedocs.io/en/latest/">PySNMP</a> and Python to programmatically querying your network devices. This will not be an introduction to SNMP. If you're looking to brush up on your SNMP knowledge, PySNMP actually has an SNMP <a href="https://pysnmp.readthedocs.io/en/latest/docs/snmp-history.html">history</a> and <a href="https://pysnmp.readthedocs.io/en/latest/docs/snmp-design.html">design</a> page you may find useful.</p>
+<h2 id="what-is-pysnmp">What is PySNMP?<a class="headerlink" href="#what-is-pysnmp" title="Permanent link">&para;</a></h2>
+<p><a href="https://pysnmp.readthedocs.io/en/latest/">PySNMP</a> is a Python package used for all manners of SNMP related functions. You can use the package to send SNMP GET or GETNEXT requests, send SNMP traps, or act as an SNMP agent which will respond to SNMP requests. I will be focusing on the GET and GETNEXT requests. PySNMP also supports all versions of SNMP, most of my examples below will be SNMP version 2c followed by a brief section covering how to use SNMP v3. There are a lot of features with this package, such as methods for performing asynchronous SNMP queries, but I will just be touching on the high-level API.</p>
+<p>In my research of finding SNMP packages for use with Python, PySNMP is by far the most complete and feature-rich package. In fact, Ansible's <a href="https://galaxy.ansible.com/community/general">general community role</a> still uses PySNMP for the <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts module</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The code examples within this document hard code SNMP community values and SNMP v3 USM auth/priv information. DO NOT do this in production. Instead, use a secrets manager that you can programmatically query and/or environment variables. Always ensure that you are not hard coding secrets and commiting them to source control.</p>
+</div>
+<h1 id="getting-started-with-pysnmp">Getting Started with PySNMP<a class="headerlink" href="#getting-started-with-pysnmp" title="Permanent link">&para;</a></h1>
+<p>In the examples I present in this post I have chosen to use the Ansible <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts</a> method of SNMP queries with PySNMP instead of the method presented in the <a href="https://pysnmp.readthedocs.io/en/latest/quick-start.html">PySNMP quick start</a> documentation. I have found Ansible's method far easier to use for any queries to network devices for OID's not already in the standard MIB's that PySNMP can reference. PySNMP appears to be unable to take in standard MIB files and instead requires that they be converted to a specific <a href="https://github.com/etingof/pysnmp-mibs">PySNMP format</a> using <a href="https://github.com/etingof/pysmi/blob/master/scripts/mibdump.py">PySMI mibdump tool</a>. I have found this tool difficult to use, so for simplicity I will use the Ansible method of performing SNMP queries which uses OID's directly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>I've become more acquainted with PySMI's capabilities of compiling MIB's. Check out my <a href="../../../../2022/01/14/compiling-snmp-mibs-for-pysnmp/">latest post</a> on how to use PySMI and mibdump.py to compile text MIB files into a format that PySNMP can read!</p>
+</div>
+<p>Lets start with a simple example of using SNMP v2c to send a query to a network device for sysName.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pysnmp.entity.rfc3413.oneliner</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdgen</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">SYSNAME</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.2.1.1.5.0&#39;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;10.1.1.1&#39;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">snmp_ro_comm</span> <span class="o">=</span> <span class="s1">&#39;mysnmprocomm&#39;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Define a PySNMP CommunityData object named auth, by providing the SNMP community string</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">CommunityData</span><span class="p">(</span><span class="n">snmp_ro_comm</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Define the CommandGenerator, which will be used to send SNMP queries</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># Query a network device using the getCmd() function, providing the auth object, a UDP transport</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># our OID for SYSNAME, and don&#39;t lookup the OID in PySNMP&#39;s MIB&#39;s</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">getCmd</span><span class="p">(</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p">)</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="c1"># Check if there was an error querying the device</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="c1"># We only expect a single response from the host for sysName, but varBinds is an object</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="c1"># that we need to iterate over. It provides the OID and the value, both of which have a</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="c1"># prettyPrint() method so that you can get the actual string data</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span></code></pre></div>
+<p>To break down the above code a bit more, we query a host at IP address 10.1.1.1 with an SNMP v2c community string of mysnmprocomm for the sysName OID 1.3.6.1.2.1.1.5.0. This is performed by first importing PySNMP's oneliner cmdgen module which is a simplified method for performing SNMP queries versus the PySNMP high-level API (HLAPI). To use this module we first create a cmdgen CommandGenerator object which allows you to perform SNMP operations such as bulkCmd, getCmd, nextCmd and setCmd. In our example, we are using getCmd() which takes a few arguments:</p>
+<ul>
+<li>authData which we provide as an auth object created using cmdgen.CommunityData()</li>
+<li>A UDP transport which is where we provide the host IP address and common SNMP UDP port of 161</li>
+<li>A MIB variable which we have associated with our SYSNAME variables OID value</li>
+<li>An indication to not look the OID up in PySNMP's provided MIB references</li>
+</ul>
+<p>When issuing the getCmd() command it will return four variables</p>
+<ul>
+<li>errorIndication - A string that when present indicates an SNMP error, along with the provided text of the error</li>
+<li>errorStatus - A string that when present indicates an SNMP PDU error</li>
+<li>errorIndex - The index in varBinds that generated the error</li>
+<li>varBinds - A sequence of MIB variable values returned via SNMP. These are <a href="https://pysnmp.readthedocs.io/en/latest/docs/api-reference.html#pysnmp.smi.rfc1902.ObjectType">PySNMP ObjectType</a> class instances</li>
+</ul>
+<p>To explore the errorIndication variable further, lets say that the host is not responding to SNMP. After calling the cmdgen.getCmd() function and getting the four returned values, a host thats non-responsive would look as follows (below):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">getCmd</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">...</span>     <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">...</span>     <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">...</span>     <span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="o">...</span>     <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="o">...</span> <span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">RequestTimedOut</span><span class="p">(</span><span class="s1">&#39;No SNMP response received before timeout&#39;</span><span class="p">)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">varBinds</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">()</span>
+</span></code></pre></div>
+<p>So errorIndication has an actual string value associated with it indicating that the request timed out, and varBinds is an empty Tuple. Lets look at what happens when the host is reachable and responds to sysName:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">getCmd</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">...</span>     <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="o">...</span>     <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="o">...</span>     <span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="o">...</span>     <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="o">...</span> <span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">varBinds</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="mi">1</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">varBinds</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">[(</span><span class="o">&lt;</span><span class="n">ObjectName</span> <span class="n">value</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tagSet</span> <span class="o">&lt;</span><span class="n">TagSet</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tags</span> <span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">payload</span> <span class="p">[</span><span class="mf">1.3.6.1.2.1.1.5.0</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">OctetString</span> <span class="n">value</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tagSet</span> <span class="o">&lt;</span><span class="n">TagSet</span> <span class="nb">object</span><span class="p">,</span> <span class="n">tags</span> <span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">subtypeSpec</span> <span class="o">&lt;</span><span class="n">ConstraintsIntersection</span> <span class="nb">object</span><span class="p">,</span> <span class="n">consts</span> <span class="o">&lt;</span><span class="n">ValueSizeConstraint</span> <span class="nb">object</span><span class="p">,</span> <span class="n">consts</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">65535</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="n">encoding</span> <span class="n">iso</span><span class="o">-</span><span class="mi">8859</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">payload</span> <span class="p">[</span><span class="n">myrouter</span><span class="o">.</span><span class="n">yaklin</span><span class="o">.</span><span class="n">ca</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)]</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="o">...</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="mf">1.3.6.1.2.1.1.5.0</span> <span class="n">myrouter</span><span class="o">.</span><span class="n">yaklin</span><span class="o">.</span><span class="n">ca</span>
+</span></code></pre></div>
+<p>You can see that the actual varBinds Tuple contains a single entry witih multiple parameters. If we iterate over that entry we can get the OID which was returned, along with the value.</p>
+<p>Why would the returned OID be needed? Shouldn't we already know which OID we queried? You'll see that when querying using the nextCmd() method for a table of OID's, such as when querying the status of each interface on a device, you will need the returned OID as it will contain the high-level OID (e.g. 1.3.6.1.2.1.2.2.1.8 for ifOperStatus), concatenated with the ifIndex value for the interface</p>
+<h2 id="querying-multiple-oids-at-once">Querying Multiple OID's at Once<a class="headerlink" href="#querying-multiple-oids-at-once" title="Permanent link">&para;</a></h2>
+<p>It turns out that you can actually provide multiple OID's to PySNMP's getCmd() method. If we wanted to query for both sysName and sysDescr, we could do so as follows (below I am only showing a subset of the code instead of repeating what was shown in the first example above):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">SYSDESCR</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.2.1.1.1.0&#39;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">SYSNAME</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.2.1.1.5.0&#39;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Create a Tuple of the OID&#39;s that you want to query</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">oids</span> <span class="o">=</span> <span class="p">(</span><span class="n">SYSNAME</span><span class="p">,</span> <span class="n">SYSDESCR</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">getCmd</span><span class="p">(</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="o">*</span><span class="p">[</span><span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">oid</span><span class="p">)</span> <span class="k">for</span> <span class="n">oid</span> <span class="ow">in</span> <span class="n">oids</span><span class="p">],</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>Now when we inspect varBinds we see we have two variable responses. One for sysName and the other for sysDescr:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">varBinds</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="mi">2</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="o">...</span>     <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="o">...</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="mf">1.3.6.1.2.1.1.5.0</span> <span class="n">myrouter</span><span class="o">.</span><span class="n">yaklin</span><span class="o">.</span><span class="n">ca</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="mf">1.3.6.1.2.1.1.1.0</span> <span class="mh">0x436973636f20494f5320536f6674776172652c203238303020536f667477617265202843323830304e4d2d414456454e54455250524953454b392d4d292c2056657273696f6e2031322e3428313363292c2052454c4541534520534f4654574152452028666332290d0a546563686e6963616c20537570706f72743a20687474703a2f2f7777772e636973636f2e636f6d2f74656368737570706f72740d0a436f707972696768742028632920313938362d3230303720627920436973636f2053797374656d732c20496e632e0d0a436f6d70696c6564205468752031342d4a756e2d30372031383a35312062792070726f645f72656c5f7465616d</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The sysDescr response is actually a hex representation that needs to be decoded. Using <a href="../../../../2022/01/11/snmp-queries-with-pysnmp-high-level-api/">PySNMP's HLAPI</a> will automatically decode this for us. However, if you wish to continue using cmdGen, decoding this is outside the scope of this post, but I would recommend reviewing the Ansible <a href="https://github.com/ansible-collections/community.general/blob/main/plugins/modules/net_tools/snmp_facts.py">snmp_facts</a> module and its decode_hex() and to_text() functions.</p>
+</div>
+<h2 id="querying-an-snmp-table-using-nextcmd">Querying an SNMP table using nextCmd()<a class="headerlink" href="#querying-an-snmp-table-using-nextcmd" title="Permanent link">&para;</a></h2>
+<p>To query an SNMP table for details you need to use the nextCmd() function. This is very similar to the getCmd() function, with only some minor adjustments. SNMP tables are used for data such as interface details (admin or operational up/down status, duplex, speed, etc) and metrics (bytes in/out, errors, discards, etc), the physical inventory of a device (such as entPhysicalModelName for querying Cisco's EoX API - Check out my posts on the API's in <a href="../../../02/01/a-guide-to-cisco-support-apis---part-1/">part 1</a> and <a href="../../../02/07/a-guide-to-cisco-support-apis---part-2---eox/">part 2</a>).</p>
+<p>Below I present a complete code snippet highlighting its use. I have adjusted the comments specific to the changes from the previous snippet.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pysnmp.entity.rfc3413.oneliner</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdgen</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">IFOPERSTATUS</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.2.1.2.2.1.8&#39;</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;10.1.1.1&#39;</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">snmp_ro_comm</span> <span class="o">=</span> <span class="s1">&#39;mysnmprocomm&#39;</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">CommunityData</span><span class="p">(</span><span class="n">snmp_ro_comm</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1"># Query a network device using the nextCmd() function. We&#39;re providing the ifOperStatus</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="c1"># OID and expect an SNMP table response, which we will call varTable</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varTable</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">nextCmd</span><span class="p">(</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">IFOPERSTATUS</span><span class="p">),</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="p">)</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="c1"># We can now iterate over each interface to get its operational status</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="k">for</span> <span class="n">varBinds</span> <span class="ow">in</span> <span class="n">varTable</span><span class="p">:</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="s1">&#39;Operational Status&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span></code></pre></div>
+<p>When using nextCmd() it will return a table of varBinds, so we need to iterate first over the table and then over the varBinds. The results of this query to my test router show four interfaces with their operational status. The values for ifOperStatus are numeric values representing the <a href="http://www.net-snmp.org/docs/mibs/interfaces.html">operational status</a> where a response value of 1 means the interface is operationally up and 2 means it is down.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">varBinds</span> <span class="ow">in</span> <span class="n">varTable</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="o">...</span>     <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="o">...</span>         <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="s1">&#39;Operational Status&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="o">...</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="mf">1.3.6.1.2.1.2.2.1.8.1</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">2</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="mf">1.3.6.1.2.1.2.2.1.8.2</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">1</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="mf">1.3.6.1.2.1.2.2.1.8.3</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">2</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="mf">1.3.6.1.2.1.2.2.1.8.5</span> <span class="n">Operational</span> <span class="n">Status</span> <span class="mi">1</span>
+</span></code></pre></div>
+<p>You'll also see in the above output that although we queries for the OID of 1.3.6.1.2.1.2.2.1.8, we now see each response OID has the ifIndex value (1, 2, 3, and 5 in the above example) appended to the end. This can allow you to query for ifName and ifDescr so that you can provide more human readable details around which interfaces are up and down.</p>
+<h2 id="querying-using-snmp-v3">Querying using SNMP v3<a class="headerlink" href="#querying-using-snmp-v3" title="Permanent link">&para;</a></h2>
+<p>Many SNMP deployements that I come across are still using SNMP v1 or v2c versions which are insecure as the queries and responses are not encrypted. If you're fortunate enough to work in an SNMP v3 environment, you need to adjust how you create the auth credentials provided to getCmd() and nextCmd(). If you're still using SNMP v1 or v2c, there's never a better time than now to advocate for SNMP v3, or another method of obtaining telemetry through a protocol that uses strong authentication and encryption.</p>
+<p>There are multiple parameters that need to be provided to create an SNMP v3 auth credential to provide to getCmd() and nextCmd(). The following shows a common example using SHA512 and AES256 with SNMP v3, and how to create the auth object for further use by these functions:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pysnmp.entity.rfc3413.oneliner</span><span class="w"> </span><span class="kn">import</span> <span class="n">cmdgen</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">SYSNAME</span> <span class="o">=</span> <span class="s1">&#39;1.3.6.1.2.1.1.5.0&#39;</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;10.1.1.1&#39;</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1"># Define a PySNMP UsmUserData object named auth, by providing the SNMP v3 username,</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="c1"># auth key and protocol, and priv key and protocol</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">auth</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">UsmUserData</span><span class="p">(</span><span class="n">userName</span><span class="o">=</span><span class="s1">&#39;mysnmpuser&#39;</span><span class="p">,</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>                          <span class="n">authKey</span><span class="o">=</span><span class="s1">&#39;myauthpassphrase&#39;</span><span class="p">,</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>                          <span class="n">authProtocol</span><span class="o">=</span><span class="n">cmdgen</span><span class="o">.</span><span class="n">usmHMAC384SHA512AuthProtocol</span><span class="p">,</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>                          <span class="n">privKey</span><span class="o">=</span><span class="s1">&#39;myprivpassphrase&#39;</span><span class="p">,</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>                          <span class="n">privProtocol</span><span class="o">=</span><span class="n">cmdgen</span><span class="o">.</span><span class="n">usmAesCfb256Protocol</span><span class="p">)</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="n">cmdGen</span> <span class="o">=</span> <span class="n">cmdgen</span><span class="o">.</span><span class="n">CommandGenerator</span><span class="p">()</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="n">errorIndication</span><span class="p">,</span> <span class="n">errorStatus</span><span class="p">,</span> <span class="n">errorIndex</span><span class="p">,</span> <span class="n">varBinds</span> <span class="o">=</span> <span class="n">cmdGen</span><span class="o">.</span><span class="n">getCmd</span><span class="p">(</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="n">auth</span><span class="p">,</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">UdpTransportTarget</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="mi">161</span><span class="p">)),</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    <span class="n">cmdgen</span><span class="o">.</span><span class="n">MibVariable</span><span class="p">(</span><span class="n">SYSNAME</span><span class="p">),</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>    <span class="n">lookupMib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="p">)</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="k">if</span> <span class="n">errorIndication</span><span class="p">:</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">varBinds</span><span class="p">:</span>
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">oid</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">(),</span> <span class="n">val</span><span class="o">.</span><span class="n">prettyPrint</span><span class="p">())</span>
+</span></code></pre></div>
+<p>PySNMP has classes that you can use for the auth and priv protocols in use by SNMP v3. The following are their class names:</p>
+<ul>
+<li>Auth Protocol Classes</li>
+<li>cmdgen.usmHMACMD5AuthProtocol</li>
+<li>cmdgen.usmHMACSHAAuthProtocol</li>
+<li>cmdgen.usmHMAC128SHA224AuthProtocol</li>
+<li>cmdgen.usmHMAC192SHA256AuthProtocol</li>
+<li>cmdgen.usmHMAC256SHA384AuthProtocol</li>
+<li>cmdgen.usmHMAC384SHA512AuthProtocol</li>
+<li>cmdgen.usmNoAuthProtocol (the default, if authProtocol is not provided)</li>
+<li>Priv Protocol Classes</li>
+<li>cmdgen.usmDESPrivProtocol</li>
+<li>cmdgen.usm3DESEDEPrivProtocol</li>
+<li>cmdgen.usmAesCfb128Protocol</li>
+<li>cmdgen.usmAesCfb192Protocol</li>
+<li>cmdgen.usmAesCfb256Protocol</li>
+<li>cmdgen.usmNoPrivProtocol (the default, if no privProtocol is provided)</li>
+</ul>
+<h2 id="wrapping-up">Wrapping Up<a class="headerlink" href="#wrapping-up" title="Permanent link">&para;</a></h2>
+<p>Using SNMP within Python doesn't have to be hard, and it offers an easier approach to obtaining device details and metrics without having to scrape CLI output with regular expressions. The data that you obtain can be used for all sorts of things including monitoring, reporting and troubleshooting. I have previously presented using the <a href="../../../02/07/a-guide-to-cisco-support-apis---part-2---eox/">Cisco EoX Support API</a> to query Cisco's site for end-of-life information, but I didn't provide a method to gather the list of product ID's programmatically from your network inventory. SNMP would be a great tool to get this information by querying entPhysicalModelName to get your list of product ID's. I'm hoping to write a post specifically about this in the near future!</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="brianyaklin/brianyaklin.github.io"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMzQ1MTczNDU="
+        data-category="Announcements"
+        data-category-id="DIC_kwDOE_BUYc4CqgVU"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="1"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../05/using-ansible-inventory-files-in-python-scripts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Using Ansible Inventory Files in Python Scripts">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Using Ansible Inventory Files in Python Scripts
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../27/a-practical-guide-to-deploying-saml-for-anyconnect-external/" class="md-footer__link md-footer__link--next" aria-label="Next: A Practical Guide to Deploying SAML for AnyConnect (External)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                A Practical Guide to Deploying SAML for AnyConnect (External)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Yaklin.ca – <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Manage settings</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.indexes", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "toc.follow", "content.code.copy", "content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

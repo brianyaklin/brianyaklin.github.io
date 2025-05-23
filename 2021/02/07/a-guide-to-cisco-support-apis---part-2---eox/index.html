@@ -1,0 +1,1431 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Covering topics relating to networking and automation!">
+      
+      
+      
+        <link rel="canonical" href="https://www.yaklin.com/2021/02/07/a-guide-to-cisco-support-apis---part-2---eox/">
+      
+      
+        <link rel="prev" href="../../01/a-guide-to-cisco-support-apis---part-1/">
+      
+      
+        <link rel="next" href="../../10/the-role-of-automated-health-checks/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>A Guide to Cisco Support API's - Part 2 - EoX - Yaklin.ca</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-Q1WGH30J2R"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-Q1WGH30J2R",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-Q1WGH30J2R",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#a-guide-to-cisco-support-apis-part-2-eox" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Yaklin.ca" class="md-header__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yaklin.ca
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              A Guide to Cisco Support API's - Part 2 - EoX
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Yaklin.ca" class="md-nav__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    Yaklin.ca
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2022/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2022
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2021
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/automation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Automation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/nac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NAC
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/network-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Network Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/programmability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Programmability
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/vulnerabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Vulnerabilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-the-eox-api-and-why-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      What is the EoX API and why use it?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-get-eox-by-product-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Get EoX by Product ID's
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example: Get EoX by Product ID&#39;s">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-required-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Install Required Modules
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-authenticate-with-ciscos-api-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Authenticate with Cisco's API Service
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-query-the-eox-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Query the EoX API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-save-the-eox-records-to-a-csv-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Save the EoX records to a CSV file
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-note-on-the-get-eox-by-software-release-strings-api-end-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      A note on the Get EoX by Software Release Strings API end-point
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../.." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../../../../assets/images/brian-avatar.jpeg" alt="Brian Yaklin">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Brian Yaklin
+                        
+                      </strong>
+                      <br>
+                      Creator
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2021-02-07 00:00:00+00:00" class="md-ellipsis">February 7, 2021</time>
+                      </div>
+                    </li>
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 13h1.5v2.82l2.44 1.41-.75 1.3L15 16.69zm4-5H5v11h4.67c-.43-.91-.67-1.93-.67-3a7 7 0 0 1 7-7c1.07 0 2.09.24 3 .67zM5 21a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2h1V1h2v2h8V1h2v2h1a2 2 0 0 1 2 2v6.1c1.24 1.26 2 2.99 2 4.9a7 7 0 0 1-7 7c-1.91 0-3.64-.76-4.9-2zm11-9.85A4.85 4.85 0 0 0 11.15 16c0 2.68 2.17 4.85 4.85 4.85A4.85 4.85 0 0 0 20.85 16c0-2.68-2.17-4.85-4.85-4.85"/></svg>
+                          <time datetime="2021-02-09 00:00:00+00:00" class="md-ellipsis">February 9, 2021</time>
+                        </div>
+                      </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/programmability/">Programmability</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              13 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <span class="md-tag">API</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Automation</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Cisco</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Python</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="a-guide-to-cisco-support-apis-part-2-eox">A Guide to Cisco Support API's - Part 2 - EoX<a class="headerlink" href="#a-guide-to-cisco-support-apis-part-2-eox" title="Permanent link">&para;</a></h1>
+<p>The Cisco Support API's provide some very useful end-points that enable you
+to gain efficiencies on managing your Cisco hardware and software inventory.
+In this post I present the use of the End of Life (EoX) API that allows you to
+identify end-of-life equipment within your environment. The code snippets below will be written in in Python and closely follows my <a href="https://github.com/brianyaklin/cisco-support-api-query">Cisco Support API Query Repo</a> on GitHub. Feel free to clone the repo, I intend to include more API end-points in the near future.</p>
+<p>For a more general overview of the Cisco Support API's refer to
+<a href="../../01/a-guide-to-cisco-support-apis---part-1/">part 1</a> of this series.</p>
+<!-- more -->
+
+<h2 id="what-is-the-eox-api-and-why-use-it">What is the EoX API and why use it?<a class="headerlink" href="#what-is-the-eox-api-and-why-use-it" title="Permanent link">&para;</a></h2>
+<p>End-of-life hardware and software in an environment can be a risk to any organization. A vendor who has declared a particular model of hardware or version
+of software is no longer going to permit you to RMA that hardware if it fails and
+they may decide to no longer create patches for software versions. This leaves
+you susceptible to hardware failures which you can't easily replace, or dangerous
+security risks in software that is not getting patched.</p>
+<p>The Cisco EoX API allows you to quickly obtain end-of-life information, by passing to the API as URL parameters your Product ID's (PID's), serial numbers, or software
+release strings. There are end-points for each of these as well as a more general
+API end-point for querying for EoX information in a specified date range. You can
+reference <a href="https://developer.cisco.com/docs/support-apis/#!eox/features">Cisco's EoX API</a> documentation for complete details on their use.</p>
+<p>Here are a few notes on my experience working with these API end-points so far:</p>
+<ul>
+<li>I find the Get EoX by Product ID's end-point to be the most useful. It allows you to query up to 20 PID's at a time which helps reduce the number of GET requests you send, which keeps you within your daily query limits</li>
+<li>Make sure that you deduplicate the PID's, Serial Numbers, or Software Release strings so you can be more efficient in your querying</li>
+<li>If you query the API end-points too quickly your requests will be blocked by Cisco's rate limiter. Always include a sleep function of at 0.5 seconds so that you don't overwhelm Cisco's API service</li>
+</ul>
+<h2 id="example-get-eox-by-product-ids">Example: Get EoX by Product ID's<a class="headerlink" href="#example-get-eox-by-product-ids" title="Permanent link">&para;</a></h2>
+<p>This example is going to provide an overview of querying Cisco's EoX API end-point <a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">Get EoX by Product ID's</a>. These details are pulled from my <a href="https://github.com/brianyaklin/cisco-support-api-query">Cisco Support API Query Repo</a> which also includes an example.py to show an easy way of using my utility functions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Before you begin make sure that you have registered your application with <a href="https://apiconsole.cisco.com/">Cisco's API console</a> and have a valid Client Key and Client Secret with a grant-type of client credentials. Cisco outlines <a href="https://developer.cisco.com/docs/support-apis/#!application-registration/application-registration">application registration</a> in more detail if you need an overview</p>
+</div>
+<p>We will break this exampledown into a few steps:</p>
+<ol>
+<li>Install required modules</li>
+<li>Authenticate with Cisco's API service</li>
+<li>Query the EoX API</li>
+<li>Save the EoX records to a CSV file</li>
+</ol>
+<h3 id="1-install-required-modules">1. Install Required Modules<a class="headerlink" href="#1-install-required-modules" title="Permanent link">&para;</a></h3>
+<p>The main Python module that we will be using to interact with Cisco's API's will be the <a href="https://requests.readthedocs.io/en/master/user/quickstart/">Requests</a> package. This module is easy to use and I believe wraps the lower-layer urllib3 module. Requests allows you to send various HTTP requests (POST, GET, UPDATE, DELETE, etc) as well as provide URL headers and parameters. Response data from API's like what Cisco offers often return data represented in XML or JSON, and the Requests module allows us to easily convert JSON data into a Python dictionary for our analysis. I will not be covering the Requests module in detail so I encourage you to explore the link above if you are curious.</p>
+<p>Copy the <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/requirements.txt">requirements.txt</a> file from the repo and install the pacakges.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip3 install -r requirements.txt
+</span></code></pre></div></p>
+<h3 id="2-authenticate-with-ciscos-api-service">2. Authenticate with Cisco's API Service<a class="headerlink" href="#2-authenticate-with-ciscos-api-service" title="Permanent link">&para;</a></h3>
+<p>Cisco's API's use token-based authentication when sending queries. This requires you to first authenticate against Cisco's API service using your client key and secret and if successful you will be provided with an authentication token which you can use in subsequent queries to Cisco API end-points that your application is registered for. The auth token that you are provided is good for 3600 seconds (60 minutes) which in all of my use-cases is more than sufficient.</p>
+<p>My <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/util/api_login.py">api_login.py</a> script is more detailed, so this will be slimmed down version from the Python interpreter.</p>
+<p>The following code is what we will work off of with a detailed explanation below.
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-1-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-1-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-1-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-1-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-1-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-1-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-1-10">10</a></span>
+<span class="normal"><a href="#__codelineno-1-11">11</a></span>
+<span class="normal"><a href="#__codelineno-1-12">12</a></span>
+<span class="normal"><a href="#__codelineno-1-13">13</a></span>
+<span class="normal"><a href="#__codelineno-1-14">14</a></span>
+<span class="normal"><a href="#__codelineno-1-15">15</a></span>
+<span class="normal"><a href="#__codelineno-1-16">16</a></span>
+<span class="normal"><a href="#__codelineno-1-17">17</a></span>
+<span class="normal"><a href="#__codelineno-1-18">18</a></span>
+<span class="normal"><a href="#__codelineno-1-19">19</a></span>
+<span class="normal"><a href="#__codelineno-1-20">20</a></span>
+<span class="normal"><a href="#__codelineno-1-21">21</a></span>
+<span class="normal"><a href="#__codelineno-1-22">22</a></span>
+<span class="normal"><a href="#__codelineno-1-23">23</a></span>
+<span class="normal"><a href="#__codelineno-1-24">24</a></span>
+<span class="normal"><a href="#__codelineno-1-25">25</a></span>
+<span class="normal"><a href="#__codelineno-1-26">26</a></span>
+<span class="normal"><a href="#__codelineno-1-27">27</a></span>
+<span class="normal"><a href="#__codelineno-1-28">28</a></span>
+<span class="normal"><a href="#__codelineno-1-29">29</a></span>
+<span class="normal"><a href="#__codelineno-1-30">30</a></span>
+<span class="normal"><a href="#__codelineno-1-31">31</a></span>
+<span class="normal"><a href="#__codelineno-1-32">32</a></span>
+<span class="normal"><a href="#__codelineno-1-33">33</a></span>
+<span class="normal"><a href="#__codelineno-1-34">34</a></span>
+<span class="normal"><a href="#__codelineno-1-35">35</a></span>
+<span class="normal"><a href="#__codelineno-1-36">36</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">ApiLogin</span><span class="p">():</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="k">def</span><span class="w"> </span><span class="o">**</span><span class="n">init</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="bp">self</span><span class="o">.</span><span class="n">client_key</span> <span class="o">=</span> <span class="n">client_key</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="bp">self</span><span class="o">.</span><span class="n">client_secret</span> <span class="o">=</span> <span class="n">client_secret</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13"></a>        <span class="n">SSO_URL</span> <span class="o">=</span> <span class="s1">&#39;https://cloudsso.cisco.com/as/token.oauth2&#39;</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14"></a>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15"></a>        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16"></a>            <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17"></a>            <span class="s1">&#39;client_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_key</span><span class="p">,</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18"></a>            <span class="s1">&#39;client_secret&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_secret</span><span class="p">,</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19"></a>        <span class="p">}</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20"></a>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21"></a>        <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22"></a>            <span class="n">SSO_URL</span><span class="p">,</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23"></a>            <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24"></a>            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25"></a>        <span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26"></a>        <span class="n">req</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27"></a>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_resp</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29"></a>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> \
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32"></a>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">auth_still_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34"></a>        <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_start</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_resp</span><span class="p">[</span><span class="s1">&#39;expires_in&#39;</span><span class="p">]):</span>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35"></a>            <span class="c1"># Login again, which will set a self.url_headers with a new token</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+</span></code></pre></div></td></tr></table></div></p>
+<p>What we are doing here is creating a Python class called ApiLogin and its __init__ function at line 5 requires two parameters; your client_key and client_secret. Upon instantiating a class and passing in client_key and client_secret arguments the <code>login()</code> function will immediately be called at line 8.</p>
+<p>Once <code>login()</code> has been called it sets the current time with <code>self.auth_start = time.time()</code>. This will be later used to determine if our authentication token has expired.</p>
+<p>To query the Cisco API login service we perform the following:</p>
+<ol>
+<li>We set the URL to <code>https://cloudsso.cisco.com/as/token.oauth2</code> which is used for Cisco's API login service</li>
+<li>The URL parameters are set in a Python dictionary called <code>params</code> at line 15 which sets the grant_type (we hard code this to <code>client_credentials</code>) along with our client key and client secret. Note that you have to use the keys <code>grant_type</code>, <code>client_id</code> and <code>client_secret</code>, as this is what Cisco's API login service requires</li>
+<li>We are now ready to send our HTTP POST request using the Requests module at line 21. There are multiple arguments you can provide when using <code>requests.post()</code> but here we simply need to provide the URL to query and the URL parameters previously set</li>
+<li>After sending the Post requests we test to confirm if the HTTP request was successful. This is accomplished using <code>req.raise_for_status()</code> which is a function the Requests module provides to us and it raises an HTTPError exception if an HTTP 4XX or 5XX response is received meaning that we either didn't authenticate correctly or the server experienced an issue. Here is an example of the complete authentication response (the access token is obfuscated for obvious reasons). You can see that you are given an access_token, token_type and expires_in values</li>
+</ol>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">api</span><span class="o">.</span><span class="n">auth_resp</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="p">{</span><span class="s1">&#39;access_token&#39;</span><span class="p">:</span> <span class="s1">&#39;AAABBBCCCDDDEEEFFFGGG&#39;</span><span class="p">,</span> <span class="s1">&#39;token_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Bearer&#39;</span><span class="p">,</span> <span class="s1">&#39;expires_in&#39;</span><span class="p">:</span> <span class="mi">3599</span><span class="p">}</span>
+</span></code></pre></div>
+<ol>
+<li>If no error was received we can access the response data by assigning the JSON response to a python dictionary using the <code>resp.json()</code> function call. We assign this to our variable <code>self.auth_resp</code> for us to use at line 30 by assigning the <code>access_type</code> and <code>access_token</code> key values to <code>self.auth_token</code>.</li>
+<li>Finally, a function called <code>auth_still_valid()</code> is defined which takese the compares the current time, <code>self.auth_start</code> and <code>self.auth_resp['expires_in']</code> to determine if the token has expired or not. If it has, it calles <code>login()</code> again to obtain a new token</li>
+</ol>
+<p>So how would you use this class?</p>
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1">1</a></span>
+<span class="normal"><a href="#__codelineno-3-2">2</a></span>
+<span class="normal"><a href="#__codelineno-3-3">3</a></span>
+<span class="normal"><a href="#__codelineno-3-4">4</a></span>
+<span class="normal"><a href="#__codelineno-3-5">5</a></span>
+<span class="normal"><a href="#__codelineno-3-6">6</a></span>
+<span class="normal"><a href="#__codelineno-3-7">7</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">dotenv_values</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">util.api_login</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApiLogin</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">client_key</span> <span class="o">=</span> <span class="n">dotenv_values</span><span class="p">(</span><span class="s1">&#39;.env&#39;</span><span class="p">)[</span><span class="s1">&#39;CLIENT_KEY&#39;</span><span class="p">]</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">client_secret</span> <span class="o">=</span> <span class="n">dotenv_values</span><span class="p">(</span><span class="s1">&#39;.env&#39;</span><span class="p">)[</span><span class="s1">&#39;CLIENT_SECRET&#39;</span><span class="p">]</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">api</span> <span class="o">=</span> <span class="n">ApiLogin</span><span class="p">(</span><span class="n">client_key</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">api</span><span class="o">.</span><span class="n">auth_token</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><span class="s1">&#39;Bearer AAABBBCCCDDDEEEFFFGGG&#39;</span>
+</span></code></pre></div></td></tr></table></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Keep your API keys in a secure location just like you would any other username/password you use. These keys are associated with your Cisco CCO account. You should not expose your keys to your applications end users, you should not store these directly in your source code or version control, and instead should use environment variables or some other secure mechanism for storing and consuming your API keys (ex. AWS KMS). The above example uses Python's <a href="https://github.com/theskumar/python-dotenv">dotenv module</a> which allows you to store environment variables in a file called .env. Ensure that your .gitignore file is configured to ignore this file.</p>
+</div>
+<p>The <code>api.auth_token</code> value is what will enable you to initiate subsequent queries against specific Cisco API end-points. The next section describes how we will use this and the response data for the EoX API end-point.</p>
+<h3 id="3-query-the-eox-api">3. Query the EoX API<a class="headerlink" href="#3-query-the-eox-api" title="Permanent link">&para;</a></h3>
+<p>Once you have authenticated with Cisco's API service and have an authentication token you are now ready to query the EoX API end-point. We will be using the <a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">Get EoX by Product ID's</a> end-point which allows us to query based on a product ID.</p>
+<p>This example does not cover how you would obtain all of your product ID's from your entire infrastructure, but I have used a few methods to do so in the past:</p>
+<ul>
+<li>Use Python modules such as <a href="https://ktbyers.github.io/netmiko/">netmiko</a> and <a href="https://github.com/networktocode/ntc-templates">ntc-templates</a> to obtain the output of a "show version" and parse it into a Python dictionary with the product ID's and serial numbers</li>
+<li>Use <a href="https://github.com/etingof/pysnmp">PySNMP</a> to query a devices <a href="https://snmp.cloudapps.cisco.com/Support/SNMP/do/BrowseOID.do?local=en&amp;translate=Translate&amp;objectInput=1.3.6.1.2.1.47.1.1.1.1">entPhysicalEntry</a> table which will contain an assortment of valuable information including your PID's and serial numbers for each</li>
+<li>Use any other source of information that you have available that describes your inventory and can provide PID's</li>
+</ul>
+<blockquote>
+<p>It is important to note that you should identify EoX information not only on your chassis PID but on all other pieces of hardware that are installed in your device. This includes modules, fans, power supplies, transceivers, etc</p>
+</blockquote>
+<p>My <a href="https://github.com/brianyaklin/cisco-support-api-query/blob/main/util/api_eox.py">api_eox.py</a> script provides a mechanism to query Cisco's Get EoX by Product ID's API end-point, the code is as shown below:</p>
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-4-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-4-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-4-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-4-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-4-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-4-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-4-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-4-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-4-10">10</a></span>
+<span class="normal"><a href="#__codelineno-4-11">11</a></span>
+<span class="normal"><a href="#__codelineno-4-12">12</a></span>
+<span class="normal"><a href="#__codelineno-4-13">13</a></span>
+<span class="normal"><a href="#__codelineno-4-14">14</a></span>
+<span class="normal"><a href="#__codelineno-4-15">15</a></span>
+<span class="normal"><a href="#__codelineno-4-16">16</a></span>
+<span class="normal"><a href="#__codelineno-4-17">17</a></span>
+<span class="normal"><a href="#__codelineno-4-18">18</a></span>
+<span class="normal"><a href="#__codelineno-4-19">19</a></span>
+<span class="normal"><a href="#__codelineno-4-20">20</a></span>
+<span class="normal"><a href="#__codelineno-4-21">21</a></span>
+<span class="normal"><a href="#__codelineno-4-22">22</a></span>
+<span class="normal"><a href="#__codelineno-4-23">23</a></span>
+<span class="normal"><a href="#__codelineno-4-24">24</a></span>
+<span class="normal"><a href="#__codelineno-4-25">25</a></span>
+<span class="normal"><a href="#__codelineno-4-26">26</a></span>
+<span class="normal"><a href="#__codelineno-4-27">27</a></span>
+<span class="normal"><a href="#__codelineno-4-28">28</a></span>
+<span class="normal"><a href="#__codelineno-4-29">29</a></span>
+<span class="normal"><a href="#__codelineno-4-30">30</a></span>
+<span class="normal"><a href="#__codelineno-4-31">31</a></span>
+<span class="normal"><a href="#__codelineno-4-32">32</a></span>
+<span class="normal"><a href="#__codelineno-4-33">33</a></span>
+<span class="normal"><a href="#__codelineno-4-34">34</a></span>
+<span class="normal"><a href="#__codelineno-4-35">35</a></span>
+<span class="normal"><a href="#__codelineno-4-36">36</a></span>
+<span class="normal"><a href="#__codelineno-4-37">37</a></span>
+<span class="normal"><a href="#__codelineno-4-38">38</a></span>
+<span class="normal"><a href="#__codelineno-4-39">39</a></span>
+<span class="normal"><a href="#__codelineno-4-40">40</a></span>
+<span class="normal"><a href="#__codelineno-4-41">41</a></span>
+<span class="normal"><a href="#__codelineno-4-42">42</a></span>
+<span class="normal"><a href="#__codelineno-4-43">43</a></span>
+<span class="normal"><a href="#__codelineno-4-44">44</a></span>
+<span class="normal"><a href="#__codelineno-4-45">45</a></span>
+<span class="normal"><a href="#__codelineno-4-46">46</a></span>
+<span class="normal"><a href="#__codelineno-4-47">47</a></span>
+<span class="normal"><a href="#__codelineno-4-48">48</a></span>
+<span class="normal"><a href="#__codelineno-4-49">49</a></span>
+<span class="normal"><a href="#__codelineno-4-50">50</a></span>
+<span class="normal"><a href="#__codelineno-4-51">51</a></span>
+<span class="normal"><a href="#__codelineno-4-52">52</a></span>
+<span class="normal"><a href="#__codelineno-4-53">53</a></span>
+<span class="normal"><a href="#__codelineno-4-54">54</a></span>
+<span class="normal"><a href="#__codelineno-4-55">55</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">ApiEox</span><span class="p">():</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mime_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">url_headers</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9"></a>        <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="n">mime_type</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10"></a>        <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="n">auth_token</span><span class="p">,</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11"></a>        <span class="p">}</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14"></a>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__send_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16"></a>        <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17"></a>            <span class="n">url</span><span class="p">,</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18"></a>            <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url_headers</span><span class="p">,</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19"></a>            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20"></a>        <span class="p">)</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21"></a>        <span class="n">req</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22"></a>        <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23"></a>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">query_by_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25"></a>        <span class="n">BLACK_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;^mf&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26"></a>                      <span class="s1">&#39;unspecified&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">]</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27"></a>        <span class="n">MAX_ITEMS</span> <span class="o">=</span> <span class="mi">20</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="n">pid</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pids</span> <span class="k">if</span> <span class="n">pid</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BLACK_LIST</span><span class="p">})</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29"></a>        <span class="n">API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.cisco.com/supporttools/eox/rest/5/EOXByProductID/</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30"></a>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31"></a>        <span class="n">start_index</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32"></a>        <span class="n">end_index</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33"></a>        <span class="k">while</span> <span class="n">start_index</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34"></a>            <span class="n">page_index</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35"></a>            <span class="n">pagination</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36"></a>            <span class="k">while</span> <span class="n">pagination</span><span class="p">:</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37"></a>                <span class="n">url</span> <span class="o">=</span> <span class="n">API_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38"></a>                    <span class="n">page_index</span><span class="p">,</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39"></a>                    <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">])</span>
+</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40"></a>                <span class="p">)</span>
+</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41"></a>                <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__send_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42"></a>
+</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43"></a>                <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;EOXRecord&#39;</span><span class="p">):</span>
+</span><span id="__span-4-44"><a id="__codelineno-4-44" name="__codelineno-4-44"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">+</span> <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;EOXRecord&#39;</span><span class="p">]</span>
+</span><span id="__span-4-45"><a id="__codelineno-4-45" name="__codelineno-4-45"></a>
+</span><span id="__span-4-46"><a id="__codelineno-4-46" name="__codelineno-4-46"></a>                <span class="k">if</span> <span class="n">page_index</span> <span class="o">&gt;=</span> <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;PaginationResponseRecord&#39;</span><span class="p">][</span><span class="s1">&#39;LastIndex&#39;</span><span class="p">]:</span>
+</span><span id="__span-4-47"><a id="__codelineno-4-47" name="__codelineno-4-47"></a>                    <span class="n">pagination</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-4-48"><a id="__codelineno-4-48" name="__codelineno-4-48"></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-4-49"><a id="__codelineno-4-49" name="__codelineno-4-49"></a>                    <span class="n">page_index</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="__span-4-50"><a id="__codelineno-4-50" name="__codelineno-4-50"></a>
+</span><span id="__span-4-51"><a id="__codelineno-4-51" name="__codelineno-4-51"></a>                <span class="c1"># Play nice with Cisco API&#39;s and rate limit your queries</span>
+</span><span id="__span-4-52"><a id="__codelineno-4-52" name="__codelineno-4-52"></a>                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+</span><span id="__span-4-53"><a id="__codelineno-4-53" name="__codelineno-4-53"></a>
+</span><span id="__span-4-54"><a id="__codelineno-4-54" name="__codelineno-4-54"></a>            <span class="n">start_index</span> <span class="o">=</span> <span class="n">end_index</span>
+</span><span id="__span-4-55"><a id="__codelineno-4-55" name="__codelineno-4-55"></a>            <span class="n">end_index</span> <span class="o">+=</span> <span class="n">MAX_ITEMS</span>
+</span></code></pre></div></td></tr></table></div>
+<p>This code creates a class named <code>ApiEox()</code> which allows us to query the EoX API multiple times and store the returned records in <code>self.records</code> for future reference.
+It includes a few other tricks like blacklisting certain PID's, deduplicating the list of PID's and controlling pagination of the returned records and reading the.</p>
+<p>Looking at the code in more detail we see:</p>
+<ol>
+<li>The <code>\__init__</code> function accepts our auth_token we received in our ApiLogin() class, a MIME Type (we default by setting this to application/json but you can also use XML). These parameters are stored in the <code>self.url_headers</code> dictionary which will be used as part of our Requests.GET call later on</li>
+<li>At lines 12 and 13 we declare <code>self.items</code> which will be used to store the list of PID's, and <code>self.records</code> which will store the returned EOXRecords that the API sends us</li>
+<li>The <code>__send_query</code> function is an internal class function that controls sending the HTTP request and returns the response. The details of this is covered in more detail in step 2 above for logging in to the Cisco API service</li>
+<li>The bulk of our code is handled in the <code>query_by_pid()</code> function at line 23 which accepts a single parameter; a list of PID's</li>
+<li>I have defined a BLACK_LIST which is a list of unacceptable PID's at line 24. Based on experience in how I have gathered inventory data from parsing "show version" or querying for the SNMP table of entPhysicalEntry there tends to be a few values returned in the PID column that are irrelevant</li>
+<li>At line 28 I use a <a href="https://medium.com/swlh/set-comprehension-in-python3-for-beginners-80561a9b4007">Python set comprehension</a> which assigns the PID's to our previously declared <code>self.items</code> variable list and performs two things for me:</li>
+<li>It deduplicates the list of PID's that were provided, so we don't query Cisco's API for the same item twice (ex. you may have multiple Cisco ISR4321/K9, so why query for the same information more than once)</li>
+<li>I am able to compare each PID against my BLACK_LIST variable and discard it if its in the list</li>
+<li>We declare the API_URL for the Get EoX by Product ID at line 29</li>
+<li>Because you can query up to a maximum of 20 PID's in a single HTTP GET request to the API by comma seperating the PID's in the URL you are calling I accomplish this by:</li>
+<li>Declaring a <code>start_index</code> of 0 and <code>end_index</code> of our MAX_ITEMS (in this case 20) at lines 31 and 32</li>
+<li>I then loop through all items for as long as our <code>start_index</code> is less than the length of our <code>self.items - 1</code>. We subtract 1 because Python lists are zero-indexed</li>
+<li>I then define the URL to use in the query by doing a Python <code>join()</code> at lines 37 through 40. This <code>join()</code> statement will join together the PID's between the list indexes from the start_index up to the end_index (or to the end of the list if there aren't 20 items left), using a comma as a delimiter</li>
+<li>Skipping down a few lines past the query and response details (discussed in another bullet below) I now increment my start_index and end_index values at lines 54 and 55 so that the next query, if necessary, will include the items in <code>self.items</code> from indexes 20 through 39</li>
+<li>At line 40 I call our private function <code>__send_query</code> with the URL as an argument and assign the response to the <code>resp</code> variable</li>
+<li>A response from the Get EoX by Product ID API end-point is a JSON with keys (<a href="https://developer.cisco.com/docs/support-apis/#!eox/get-eox-by-product-ids">full API details here</a>) describing the PaginationResponseRecord and the EOXRecord (which can contain multiple records, for all of the PID's you sent in the URL)</li>
+<li>If an <code>EOXRecord</code> exists in the response I extend our <code>self.records</code> list to include the new records in line 43</li>
+<li>We previously defined a page_index of 1 at line 34, but now we will review the PaginationResponseRecord to see if there is more than one page describing all of the records by looking at the LastIndex key at line 46. If there are multiple pages, we need to increment our page_index by one and query again. The while loop at line 36 will continue querying until our page_index value is the same as the LastIndex in the response and will then exit the loop</li>
+<li>Because Cisco's API's only allow so many queries per second and per minute I include a sleep function with <code>time.sleep(0.5)</code> at line 52</li>
+</ol>
+<p>So tying this all together we can use this code as follows:
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span>
+<span class="normal"><a href="#__codelineno-5-2">2</a></span>
+<span class="normal"><a href="#__codelineno-5-3">3</a></span>
+<span class="normal"><a href="#__codelineno-5-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">util.api_eox</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApiEox</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span> <span class="o">=</span> <span class="n">ApiEox</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">auth_token</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;WS-C3750X-48PF-S&#39;</span><span class="p">,</span> <span class="s1">&#39;C3KX-PWR-1100WAC&#39;</span><span class="p">,</span> <span class="p">]</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="o">.</span><span class="n">query_by_pid</span><span class="p">(</span><span class="n">pids</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div></p>
+<p>We have now queries the API to get EoX information for two PID's. This information is stored in the <code>eox.records</code> class instance variable and is a list with two records:
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span>
+<span class="normal"><a href="#__codelineno-6-2">2</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">eox</span><span class="o">.</span><span class="n">records</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span>
+</span></code></pre></div></td></tr></table></div></p>
+<p>Each record is Python dictionary and has the following keys describing the record:
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">1</a></span>
+<span class="normal"><a href="#__codelineno-7-2">2</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">dict_keys</span><span class="p">([</span><span class="s1">&#39;EOLProductID&#39;</span><span class="p">,</span> <span class="s1">&#39;ProductIDDescription&#39;</span><span class="p">,</span> <span class="s1">&#39;ProductBulletinNumber&#39;</span><span class="p">,</span> <span class="s1">&#39;LinkToProductBulletinURL&#39;</span><span class="p">,</span> <span class="s1">&#39;EOXExternalAnnouncementDate&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfSaleDate&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfSWMaintenanceReleases&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfSecurityVulSupportDate&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfRoutineFailureAnalysisDate&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfServiceContractRenewal&#39;</span><span class="p">,</span> <span class="s1">&#39;LastDateOfSupport&#39;</span><span class="p">,</span> <span class="s1">&#39;EndOfSvcAttachDate&#39;</span><span class="p">,</span> <span class="s1">&#39;UpdatedTimeStamp&#39;</span><span class="p">,</span> <span class="s1">&#39;EOXMigrationDetails&#39;</span><span class="p">,</span> <span class="s1">&#39;EOXInputType&#39;</span><span class="p">,</span> <span class="s1">&#39;EOXInputValue&#39;</span><span class="p">])</span>
+</span></code></pre></div></td></tr></table></div></p>
+<p>A more detailed look at the first record shows that the Product ID of WS-C3750X-48PF-S went end of sale on 2016-10-30 and its last date of support was 2021-10-31
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-1">1</a></span>
+<span class="normal"><a href="#__codelineno-8-2">2</a></span>
+<span class="normal"><a href="#__codelineno-8-3">3</a></span>
+<span class="normal"><a href="#__codelineno-8-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;EndOfSaleDate&#39;</span><span class="p">]</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;2016-10-30&#39;</span><span class="p">,</span> <span class="s1">&#39;dateFormat&#39;</span><span class="p">:</span> <span class="s1">&#39;YYYY-MM-DD&#39;</span><span class="p">}</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">eox</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;LastDateOfSupport&#39;</span><span class="p">]</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;2021-10-31&#39;</span><span class="p">,</span> <span class="s1">&#39;dateFormat&#39;</span><span class="p">:</span> <span class="s1">&#39;YYYY-MM-DD&#39;</span><span class="p">}</span>
+</span></code></pre></div></td></tr></table></div></p>
+<h3 id="4-save-the-eox-records-to-a-csv-file">4. Save the EoX records to a CSV file<a class="headerlink" href="#4-save-the-eox-records-to-a-csv-file" title="Permanent link">&para;</a></h3>
+<p>So you now have the EoX records for all of the hardware within your environment stored in a Python dictionary. You will more than likely need to report on this to those responsible for financial planning, forecasting and coordination of replacing EoX equipment.
+A simple method would be to save these records to a CSV file which I will show below, but you could get even more advanced by having a report that links each record back to the actual network inventory on a device by device basis.</p>
+<p>The code to do a simple export to CSV is as follows
+<div class="language-py highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-9-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-9-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-9-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-9-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-9-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-9-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-9-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-9-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-9-10">10</a></span>
+<span class="normal"><a href="#__codelineno-9-11">11</a></span>
+<span class="normal"><a href="#__codelineno-9-12">12</a></span>
+<span class="normal"><a href="#__codelineno-9-13">13</a></span>
+<span class="normal"><a href="#__codelineno-9-14">14</a></span>
+<span class="normal"><a href="#__codelineno-9-15">15</a></span>
+<span class="normal"><a href="#__codelineno-9-16">16</a></span>
+<span class="normal"><a href="#__codelineno-9-17">17</a></span>
+<span class="normal"><a href="#__codelineno-9-18">18</a></span>
+<span class="normal"><a href="#__codelineno-9-19">19</a></span>
+<span class="normal"><a href="#__codelineno-9-20">20</a></span>
+<span class="normal"><a href="#__codelineno-9-21">21</a></span>
+<span class="normal"><a href="#__codelineno-9-22">22</a></span>
+<span class="normal"><a href="#__codelineno-9-23">23</a></span>
+<span class="normal"><a href="#__codelineno-9-24">24</a></span>
+<span class="normal"><a href="#__codelineno-9-25">25</a></span>
+<span class="normal"><a href="#__codelineno-9-26">26</a></span>
+<span class="normal"><a href="#__codelineno-9-27">27</a></span>
+<span class="normal"><a href="#__codelineno-9-28">28</a></span>
+<span class="normal"><a href="#__codelineno-9-29">29</a></span>
+<span class="normal"><a href="#__codelineno-9-30">30</a></span>
+<span class="normal"><a href="#__codelineno-9-31">31</a></span>
+<span class="normal"><a href="#__codelineno-9-32">32</a></span>
+<span class="normal"><a href="#__codelineno-9-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="c1">#...previous code for logging into the API and obtaining EoX records</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="n">FNAME</span> <span class="o">=</span> <span class="s1">&#39;eox_report.csv&#39;</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FNAME</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fhand</span><span class="p">:</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">fhand</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_MINIMAL</span><span class="p">)</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;EOLProductID&#39;</span><span class="p">,</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="s1">&#39;ProductIDDescription&#39;</span><span class="p">,</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="s1">&#39;LastDateOfSupport&#39;</span><span class="p">,</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="s1">&#39;EndOfSWMaintenanceReleases&#39;</span><span class="p">,</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="s1">&#39;EOXExternalAnnouncementDate&#39;</span><span class="p">,</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="s1">&#39;EndOfSaleDate&#39;</span><span class="p">,</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="s1">&#39;EndOfSecurityVulSupportDate&#39;</span><span class="p">,</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="s1">&#39;EndOfRoutineFailureAnalysisDate&#39;</span><span class="p">,</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="s1">&#39;EndOfServiceContractRenewal&#39;</span><span class="p">,</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="s1">&#39;EndOfSvcAttachDate&#39;</span><span class="p">,</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="s1">&#39;LinkToProductBulletinURL&#39;</span><span class="p">,</span> <span class="p">])</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">eox</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EOLProductID&#39;</span><span class="p">],</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;ProductIDDescription&#39;</span><span class="p">],</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;LastDateOfSupport&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfSWMaintenanceReleases&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EOXExternalAnnouncementDate&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfSaleDate&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfSecurityVulSupportDate&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfRoutineFailureAnalysisDate&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfServiceContractRenewal&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;EndOfSvcAttachDate&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31"></a><span class="n">record</span><span class="p">[</span><span class="s1">&#39;LinkToProductBulletinURL&#39;</span><span class="p">],</span> <span class="p">])</span>
+</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32"></a>
+</span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;EOX records written to file </span><span class="si">{</span><span class="n">FNAME</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></code></pre></div></td></tr></table></div></p>
+<p>This code uses the Python CSV's writer() function to loop through each record in eox.records and saves the contents of each record as a new row in that CSV file.</p>
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>Using Cisco's EoX API can help you and your customers by easily identifying which hardware is, or may soon become, end-of-life. You can transform the data in whichever way you wish to create powerful reports!</p>
+<h2 id="a-note-on-the-get-eox-by-software-release-strings-api-end-point">A note on the Get EoX by Software Release Strings API end-point<a class="headerlink" href="#a-note-on-the-get-eox-by-software-release-strings-api-end-point" title="Permanent link">&para;</a></h2>
+<p>The Get EoX by Software Release Strings end-point was trickier to work with because it requires you to enter your software versions using a <a href="https://developer.cisco.com/docs/support-apis/#eox/SWReleaseStringType">SWReleaseStringType</a>. This requires you to create a string representing the software version and type together such as "input1=12.4(15),IOS&amp;input2=16.3.9,IOS-XE". Depending on how you have transformed your data, this can be more difficult to programmatically create this URL query string.</p>
+<p>The other difficulty I had in working with this API end-point is I believed it would return end-of-life details on the software versions themselves. Instead, it returned EoX information using a PID as a key such as "S280IPBK9-12424T=" which is a representation of running 12.4(24)T on a Cisco 2801 IOS IP Base router. I would have found this much more useful if it returned these as two separate PID's; one indicating 12.4(24)T and another as CISCO2801 so I could more easily compare this against my hardware and software inventory. If anyone has identified a way to use this other PID I would enjoy hearing how they have compared this with their inventory.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="brianyaklin/brianyaklin.github.io"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMzQ1MTczNDU="
+        data-category="Announcements"
+        data-category-id="DIC_kwDOE_BUYc4CqgVU"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="1"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../01/a-guide-to-cisco-support-apis---part-1/" class="md-footer__link md-footer__link--prev" aria-label="Previous: A Guide to Cisco Support API&#39;s - Part 1">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                A Guide to Cisco Support API's - Part 1
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../10/the-role-of-automated-health-checks/" class="md-footer__link md-footer__link--next" aria-label="Next: The Role of Automated Health Checks">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                The Role of Automated Health Checks
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Yaklin.ca – <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Manage settings</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.indexes", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "toc.follow", "content.code.copy", "content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

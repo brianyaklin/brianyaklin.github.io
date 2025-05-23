@@ -1,0 +1,1186 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Covering topics relating to networking and automation!">
+      
+      
+      
+        <link rel="canonical" href="https://www.yaklin.com/2021/03/02/initial-thoughts-on-cisco-nfvis-api/">
+      
+      
+        <link rel="prev" href="../../../02/16/overview-of-the-viptela-vmanage-api/">
+      
+      
+        <link rel="next" href="../../10/base64-encoding-with-http-basic-auth-for-apis/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Initial Thoughts on Cisco NFVIS API - Yaklin.ca</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-Q1WGH30J2R"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-Q1WGH30J2R",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-Q1WGH30J2R",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#initial-thoughts-on-cisco-nfvis-api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Yaklin.ca" class="md-header__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yaklin.ca
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Initial Thoughts on Cisco NFVIS API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Yaklin.ca" class="md-nav__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    Yaklin.ca
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2022/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2022
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2021
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/automation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Automation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/nac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NAC
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/network-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Network Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/programmability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Programmability
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/vulnerabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Vulnerabilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cisco-nfvis-api-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cisco NFVIS API Documentation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-basics" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Basics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-and-software-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hardware and Software Inventory
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-ip-receive-acls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating IP Receive ACLs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#closing-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      Closing Words
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../.." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../../../../assets/images/brian-avatar.jpeg" alt="Brian Yaklin">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Brian Yaklin
+                        
+                      </strong>
+                      <br>
+                      Creator
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2021-03-02 00:00:00+00:00" class="md-ellipsis">March 2, 2021</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/programmability/">Programmability</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              11 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <span class="md-tag">Cisco</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Python</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="initial-thoughts-on-cisco-nfvis-api">Initial Thoughts on Cisco NFVIS API<a class="headerlink" href="#initial-thoughts-on-cisco-nfvis-api" title="Permanent link">&para;</a></h1>
+<p>With multiple Cisco NFVIS software upgrades planned in the near future I thought I would explore the API to see how this might help speed up the process. My initial goals for exploring the API were to:</p>
+<ul>
+<li>Discovery which end-points can be used for hardware and software inventory reporting</li>
+<li>Determine how to update the IP receive ACL's</li>
+<li>Automate transfer and registration of the new NFVIS image files</li>
+</ul>
+<!-- more -->
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cisco Network Function Virtualization Infrastructure Software (NFVIS) is a Linux-based infrastructure software designed for the virtualization of network functions such as Cisco's ISRv, ASAv, vWAAS and NGFWv as well as third-party platforms. This allows an organization to service-chain network functions without the need of deploying extra hardware.</p>
+</div>
+<p>For those that aren't familiar with the upgrade procedure of a Cisco ENCS platform running the NFVIS software, it is quite different than your typical Cisco router or switch. And understandably so, these devices are much more like a server running a hypervisor. Upgrading involves first identifying the correct image to move to (which has compatibility with the Cisco and 3rd party image you are running), copying the new image file to the platform, registering the image file (essentially a series of healthchecks on the file), and finally initiating the upgrade with that image. There big issue with the NFVIS software is that there is no method to downgrade to a previous release once you have upgraded.</p>
+<h2 id="cisco-nfvis-api-documentation">Cisco NFVIS API Documentation<a class="headerlink" href="#cisco-nfvis-api-documentation" title="Permanent link">&para;</a></h2>
+<p>The first hurdle that I came across was when attempting to load <a href="https://www.cisco.com/c/en/us/td/docs/routers/nfvis/user_guide/b-api-reference-for-cisco-enterprise-nfvis.html]">Cisco's API Reference</a>through their regular site. For the past few weeks myself and others on my team have received a message when browsing to this link where it doesn't load the page and simply returns the text 'null' under the Book Table of Contents section. I have been able to get a few results on Google linking to direct chapters, but not the chapters I needed for NFVIS system API calls. I eventually stumbled across <a href="https://content.cisco.com/platform_home.sjs?platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">Cisco Content Hub</a>. This was my first time playing around with this content site but I was able to find the information I needed.</p>
+<h2 id="api-basics">API Basics<a class="headerlink" href="#api-basics" title="Permanent link">&para;</a></h2>
+<p>The NFVIS REST API uses <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme">HTTP Basic Authentication</a> as its authentication scheme. This authentication scheme transmits the username and password as base64 encoded strings, which means that they are passed over the network as clear text. HTTPS/TLS should always be used with the management of any network device if you are using a web GUI or API calls, so as a result the Cisco ENCS and NVFIS software protects these credentials from being eavesdropped on. These credentials are included as a key/value pair in the HTTP Headers. Including <a href="https://requests.readthedocs.io/en/master/user/authentication/">Basic Authentication in the Python Requests</a> module is quite simple (details will be shown in a section below).</p>
+<p>When exchanging data with the NFVIS API you have two options for the format of which you would like to work with; JSON or XML. I prefer working with JSON as there is a <a href="https://docs.python.org/3/library/json.html">standard JSON Python library</a> for working with it, but both formats can easily be converted into Python dictionaries. The <a href="https://docs.python.org/3/library/xml.etree.elementtree.html">standard XML Python library</a> isn't very user friendly, but <a href="https://pypi.org/project/xmltodict/">xmltodict</a> is a good open-source alternative. Whichever method you pick will require that you set the HTTP headers of Content-Type and Accept with the values in the table below.</p>
+<table>
+<thead>
+<tr>
+<th>Data Format</th>
+<th>Content-Type and Accept Header Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XML</td>
+<td>application/vnd.yang.data+xml</td>
+</tr>
+<tr>
+<td>JSON</td>
+<td>application/vnd.yang.data+json</td>
+</tr>
+<tr>
+<td>JSON (alternative)</td>
+<td>application/vnd.yang.collection+json</td>
+</tr>
+</tbody>
+</table>
+<p>Although the documentation generalizes and indicates to use the above content-types, I have found that in some circumstances the content-type and accept header needs to be set to <code>application/vnd.yang.collection+json</code>. My particular use-case was when querying for ENCS switch (not PNIC interfaces) <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_010101.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">interface statistics</a>. No where did it indicate in the documentation to use a YANG collection in the content-type/accept headers until you look at the example for the API end-point <code>/api/running/switch/interface/gigabitEthernet</code> to display the configuration of <em>all</em> interfaces (versus a single interface). This really tripped me up in the past until I finally saw the change in header value.</p>
+<p>Another thing to note is that you can specify a URL query parameter of <code>?deep</code> on GET requests for some API end-points that allow you to gather more detailed information. An example would be the API end-point for verifying a bridge configuration which is <code>/api/config/bridges?deep</code>.</p>
+<p>Lets look at a quick example of how to specify these settings when making an API GET request.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urljoin</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">requests.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://10.1.1.1&#39;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;/api/operational/platform-detail&#39;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.yang.data+json&#39;</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.yang.data+json&#39;</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;myuser&#39;</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">password</span> <span class="o">=</span> <span class="s1">&#39;mypassword&#39;</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">url</span><span class="p">,</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="p">)</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></code></pre></div>
+<p>The above example sets our base URL and path so that we can query the API to get the platform details of the NFVIS device. We set our HTTP headers content-type and accept so that we will receive a JSON result. We then initiate a query with the Requests package by providing our URL, headers, and an authentication scheme of Basic with the username and password. Finally, if the query was successful we convert the JSON response into a Python dictionary named resp_data so that we can parse the data.</p>
+<h2 id="hardware-and-software-inventory">Hardware and Software Inventory<a class="headerlink" href="#hardware-and-software-inventory" title="Permanent link">&para;</a></h2>
+<p>As with any software upgrade project you need to identify what software is currently running across your inventory. Although it appears that it might be possible to manage Cisco ENCS platforms with Cisco DNA Center, thats currently not an option with what I'm working with. As a result, I explored which API end-points might be possible to obtain this information and came across <code>/api/operational/platform-detail</code>. Based on the API query we made in the API Basics section above, lets look at the response data</p>
+<p>The first and only key in the dictionary represents the platform info. I have printed from this key onwards instead of the full dictionary as the formatting is easier to view below.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">resp_data</span><span class="p">[</span><span class="s1">&#39;platform_info:platform-detail&#39;</span><span class="p">])</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">{</span><span class="s1">&#39;hardware_info&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;BIOS-Version&#39;</span><span class="p">:</span> <span class="s1">&#39;ENCS54_2.6.071220181123&#39;</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                   <span class="s1">&#39;CIMC-Version&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                   <span class="s1">&#39;CIMC_IP&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>                   <span class="s1">&#39;CPU_Information&#39;</span><span class="p">:</span> <span class="s1">&#39;Intel(R) Xeon(R) CPU D-1557 @ 1.50GHz &#39;</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>                                      <span class="s1">&#39;12 cores&#39;</span><span class="p">,</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>                   <span class="s1">&#39;Compile_Time&#39;</span><span class="p">:</span> <span class="s1">&#39;Friday, October 19, 2018 [12:41:34 PDT]&#39;</span><span class="p">,</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>                   <span class="s1">&#39;Disk_Size&#39;</span><span class="p">:</span> <span class="s1">&#39;200.0 GB&#39;</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>                   <span class="s1">&#39;Entity-Desc&#39;</span><span class="p">:</span> <span class="s1">&#39;Enterprise Network Compute System&#39;</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>                   <span class="s1">&#39;Entity-Name&#39;</span><span class="p">:</span> <span class="s1">&#39;ENCS&#39;</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                   <span class="s1">&#39;Manufacturer&#39;</span><span class="p">:</span> <span class="s1">&#39;Cisco Systems, Inc.&#39;</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                   <span class="s1">&#39;Memory_Information&#39;</span><span class="p">:</span> <span class="s1">&#39;32741192 kB&#39;</span><span class="p">,</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>                   <span class="s1">&#39;PID&#39;</span><span class="p">:</span> <span class="s1">&#39;ENCS5412/K9&#39;</span><span class="p">,</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>                   <span class="s1">&#39;SN&#39;</span><span class="p">:</span> <span class="s1">&#39;FGL#########&#39;</span><span class="p">,</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>                   <span class="s1">&#39;UUID&#39;</span><span class="p">:</span> <span class="s1">&#39;aaabbbcccdddeeefff&#39;</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>                   <span class="s1">&#39;Version&#39;</span><span class="p">:</span> <span class="s1">&#39;3.9.2-FC4&#39;</span><span class="p">,</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>                   <span class="s1">&#39;hardware-version&#39;</span><span class="p">:</span> <span class="s1">&#39;M3&#39;</span><span class="p">},</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a> <span class="s1">&#39;port_detail&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;GE0-0&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;GE0-1&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;MGMT&#39;</span><span class="p">}],</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a> <span class="s1">&#39;software_packages&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Kernel_Version&#39;</span><span class="p">:</span> <span class="s1">&#39;3.10.0-693.11.1.1.el7.x86_64&#39;</span><span class="p">,</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>                       <span class="s1">&#39;LibVirt_Version&#39;</span><span class="p">:</span> <span class="s1">&#39;3.2.0&#39;</span><span class="p">,</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>                       <span class="s1">&#39;OVS_Version&#39;</span><span class="p">:</span> <span class="s1">&#39;2.5.2&#39;</span><span class="p">,</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>                       <span class="s1">&#39;QEMU_Version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.5.3&#39;</span><span class="p">},</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a> <span class="s1">&#39;switch_detail&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;Ports&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;Type&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;UUID&#39;</span><span class="p">:</span> <span class="s1">&#39;NA&#39;</span><span class="p">}}</span>
+</span></code></pre></div>
+<p>Looking further into this structure we can see that a variety of information is available and helpful in building out both a hardware and software inventory if we were to scan all NFVIS platforms in the environment. Within the information above I'm mainly looking at the following fields:</p>
+<ul>
+<li>SN - The serial number of the chassis</li>
+<li>PID - The Product ID of the chassis</li>
+<li>Version - The NFVIS software version currently being used</li>
+</ul>
+<p>Placing this information into a report (ex. CSV) can help you track a software upgrade project, as it is easy to programmatically query all of your NFVIS platforms on a regular basis to see what has and has not been upgraded yet.</p>
+<h2 id="updating-ip-receive-acls">Updating IP Receive ACLs<a class="headerlink" href="#updating-ip-receive-acls" title="Permanent link">&para;</a></h2>
+<p>To be able to upgrade the NFVIS software you need to be able to transfer the new image file to the device. This can be performed using the web GUI (which will automatically register the image) or through using SCP. SCP is a great choice for programmatically performing this option but it requires that the host you are sending the files from is included in an IP receive ACL on the NFVIS device and that the scpd protocol is permitted in that ACL. As an example, if our file server had IP address 10.4.4.40 the command we would use on the CLI of the NFVIS platform to allow this would be:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>config t
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   system settings ip-receive-acl 10.4.4.40/32 service [ ssh https icmp scpd snmp ] priority 10 action accept
+</span></code></pre></div>
+<p>The above command permits only our specific host IP to communicate with various services like SSH, HTTPS, ICMP, SCPD, and SNMP. You can add or remove services based on your deployment, but for this specific use-case we need SCPD. Additionally, the priority number of 10 was arbitrarily chosen by me but think of it as the ACL sequence number. The action can be either accept, reject or drop.</p>
+<p>However, going through a large number of devices and configuring these receive ACL's would be difficult to manage and maintain and performing this programmatically would be far quicker. Unfortunately, what I'm about to show is that using the NFVIS API doesn't make this an easy task.</p>
+<p>To perform this using the NFVIS API you need to use the <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_0110.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1#id_20198">System Configuration API's</a> but the documentation doesn't actually tell you how to specifically update the ip-receive-acl. In fact, it doesn't mention receive ACL's at all. It was only in diving through the <a href="https://github.com/CiscoDevNet/ansible-nfvis">Ansible NFVIS Role</a> that I was able to understand this further. The particular API end-point that must be used is <code>/api/config/system/settings</code> with a PUT request which is used to both modify or replace an existing resource. As Cisco's <a href="https://content.cisco.com/chapter.sjs?uri=%2Fsearchable%2Fchapter%2Fcontent%2Fen%2Fus%2Ftd%2Fdocs%2Frouters%2Fnfvis%2Fuser_guide%2Fb-api-reference-for-cisco-enterprise-nfvis%2Fb-api-reference-for-cisco-enterprise-nfvis_chapter_00.html.xml&amp;platform=Cisco%20Enterprise%20NFV%20Infrastructure%20Software&amp;release=3.9.1">API Request Methods</a> documentation indicates, the PUT operation must contain the complete representation of the mandatory attributes of the resource. This means you need to include the configuration for the hostname, default-gw, managment IP address and management IP netmask.</p>
+<p>Exploring the response data by continuing with the Python code that was run in the API Basics section above, but now we will send a HTTP GET to the end-point <code>/api/config/system/settings</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;/api/config/system/settings&#39;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">url</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">resp_data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></code></pre></div>
+<p>Now that we have our response data in a Python dictionary we can see what information in the below output that all of the mandatory fields are included (hostname, default-gw, managment IP address and netmask), but some additional details are also included (CIMC access, logging servers and levels and IP receive ACL details). What you can also see is that the IP receive ACL information <strong>does not</strong> include details like what we see in the CLI commands that would be used to configure this, namely the action, priority, and services. We are not able to get this information from the API.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">pprint</span><span class="p">(</span><span class="n">resp_data</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">{</span><span class="s1">&#39;system:settings&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;cimc-access&#39;</span><span class="p">:</span> <span class="s1">&#39;enable&#39;</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>                     <span class="s1">&#39;default-gw&#39;</span><span class="p">:</span> <span class="s1">&#39;10.1.1.1&#39;</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>                     <span class="s1">&#39;hostname&#39;</span><span class="p">:</span> <span class="s1">&#39;ENCS-WAN1&#39;</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>                     <span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">},</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>                                                            <span class="p">{</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;10.3.3.0/24&#39;</span><span class="p">}]},</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>                     <span class="s1">&#39;logging&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;10.3.3.30&#39;</span><span class="p">}],</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>                                 <span class="s1">&#39;severity&#39;</span><span class="p">:</span> <span class="s1">&#39;informational&#39;</span><span class="p">},</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>                     <span class="s1">&#39;mgmt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;10.1.1.2&#39;</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>                                     <span class="s1">&#39;netmask&#39;</span><span class="p">:</span> <span class="s1">&#39;255.255.255.0&#39;</span><span class="p">}},</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>                     <span class="s1">&#39;wan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;192.168.1.1&#39;</span><span class="p">,</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>                                    <span class="s1">&#39;netmask&#39;</span><span class="p">:</span> <span class="s1">&#39;255.255.255.252&#39;</span><span class="p">},</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>                             <span class="s1">&#39;vlan&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}}}</span>
+</span></code></pre></div>
+<p>So I want to be able to update the ip-receive-acls to include a new entry for 10.4.4.40/32. In the <a href="https://github.com/CiscoDevNet/ansible-nfvis">Ansible NFVIS Role</a> I was able to see that to add an entry the existing ip-receive-acl list like shown below (taken from ansible-nfvis/library/nfvis_system.py in the Ansible role)</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">nfvis</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s1">&#39;/config/system/settings&#39;</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="o">...</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;settings&#39;</span><span class="p">:</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;system:settings&#39;</span><span class="p">]}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="k">if</span> <span class="n">nfvis</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;trusted_source&#39;</span><span class="p">]:</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        <span class="n">ip_receive_acl</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">nfvis</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;trusted_source&#39;</span><span class="p">]:</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>            <span class="n">ip_receive_acl</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">network</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;accept&#39;</span><span class="p">,</span> <span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span> <span class="s1">&#39;netconf&#39;</span><span class="p">,</span> <span class="s1">&#39;scpd&#39;</span><span class="p">,</span> <span class="s1">&#39;snmp&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">]})</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="k">if</span> <span class="s1">&#39;ip-receive-acls&#39;</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;ip-receive-acl&#39;</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">]:</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>            <span class="k">if</span> <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">][</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ip_receive_acl</span><span class="p">:</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>                <span class="n">nfvis</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;what_changed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;trusted_source&#39;</span><span class="p">)</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>                <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">:</span> <span class="n">ip_receive_acl</span><span class="p">}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>            <span class="n">nfvis</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;what_changed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;trusted_source&#39;</span><span class="p">)</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>            <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;settings&#39;</span><span class="p">][</span><span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">:</span> <span class="n">ip_receive_acl</span><span class="p">}</span>
+</span></code></pre></div>
+<p>Essentially the Ansible Role takes what is currently configured and assigns it to the response variable. Then the new payload variable is created by copying all existing system settings from the response variable. This ensures that all mandatory fields as well as all other fields are still defined with what we will be sending back to the API. Finally, if an Ansible YAML variable of <code>trusted_source</code> was set, iterate through entries and append each as a configuration which includes the source, action, prioority and services that are predefined within the role above. Evenetually it updates the payload with the new and old <code>ip-receive-acls</code> entries. This seems like a TON of work to simply add a single entry. You have to add all previous entries, merge them with your new entries, etc.</p>
+<p>I wanted to test out if the Ansible Role was complex for a specific reason or simply if the NFVIS API required it to be that way, so I tested out a few things myself. I have included comments to describe what I'm testing in the below output.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># A new dictionary representing a new IP receivel ACL entry I want to add</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">new_entry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;settings&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;accept&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;10.4.4.40/32&#39;</span><span class="p">,</span> <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span> <span class="s1">&#39;scpd&#39;</span><span class="p">,</span> <span class="s1">&#39;snmp&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">]}]}}}</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># The API requires we send it data in JSON or XML. I chose JSON</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># json.dumps() converts our Python dict into a JSON string</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">json_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Now to HTTP PUT the data to the server</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;/api/config/system/settings&#39;</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="n">url</span><span class="p">,</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">),</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="n">data</span><span class="o">=</span><span class="n">json_entry</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="p">)</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="c1"># Looking at the response status code we got a 400 and an error:</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="mi">400</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="p">{</span><span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;error-message&#39;</span><span class="p">:</span> <span class="s1">&#39;unknown element: settings in /system:system/system:settings/system:settings&#39;</span><span class="p">,</span> <span class="s1">&#39;error-urlpath&#39;</span><span class="p">:</span> <span class="s1">&#39;/api/config/system/settings&#39;</span><span class="p">,</span> <span class="s1">&#39;error-tag&#39;</span><span class="p">:</span> <span class="s1">&#39;malformed-message&#39;</span><span class="p">}]}}</span>
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="c1"># So we need to include mandatory fields, lets try this instead</span>
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="n">new_entry</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;system:settings&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;wan&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;vlan&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;netmask&#39;</span><span class="p">:</span> <span class="s1">&#39;255.255.255.252&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;192.168.1.1&#39;</span><span class="p">}},</span> <span class="s1">&#39;default-gw&#39;</span><span class="p">:</span> <span class="s1">&#39;10.1.1.1&#39;</span><span class="p">,</span> <span class="s1">&#39;hostname&#39;</span><span class="p">:</span> <span class="s1">&#39;ENCS-WAN1&#39;</span><span class="p">,</span> <span class="s1">&#39;cimc-access&#39;</span><span class="p">:</span> <span class="s1">&#39;enable&#39;</span><span class="p">,</span> <span class="s1">&#39;ip-receive-acls&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip-receive-acl&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;accept&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">,</span> <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span> <span class="s1">&#39;snmp&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">{</span><span class="s1">&#39;priority&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;accept&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;10.4.4.40/32&#39;</span><span class="p">,</span> <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;https&#39;</span><span class="p">,</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span> <span class="s1">&#39;scpd&#39;</span><span class="p">,</span> <span class="s1">&#39;snmp&#39;</span><span class="p">,</span> <span class="s1">&#39;ssh&#39;</span><span class="p">]}]},</span> <span class="s1">&#39;mgmt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;netmask&#39;</span><span class="p">:</span> <span class="s1">&#39;255.255.255.0&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;10.1.1.2&#39;</span><span class="p">}},</span> <span class="s1">&#39;logging&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;10.3.3.30&#39;</span><span class="p">}],</span> <span class="s1">&#39;severity&#39;</span><span class="p">:</span> <span class="s1">&#39;informational&#39;</span><span class="p">}}}</span>
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="n">json_entry</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_entry</span><span class="p">)</span>
+</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+</span><span id="__span-6-33"><a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>    <span class="n">url</span><span class="p">,</span>
+</span><span id="__span-6-34"><a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+</span><span id="__span-6-35"><a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>    <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-6-36"><a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+</span><span id="__span-6-37"><a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a>    <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">),</span>
+</span><span id="__span-6-38"><a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a>    <span class="n">data</span><span class="o">=</span><span class="n">json_entry</span>
+</span><span id="__span-6-39"><a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a><span class="p">)</span>
+</span><span id="__span-6-40"><a id="__codelineno-6-40" name="__codelineno-6-40" href="#__codelineno-6-40"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+</span><span id="__span-6-41"><a id="__codelineno-6-41" name="__codelineno-6-41" href="#__codelineno-6-41"></a><span class="mi">200</span>
+</span></code></pre></div>
+<p>After sending the HTTP PUT when testing this out I actually received a timeout exception. Make sure you include the timeout=20 parameter in your Requests call. This is because the Cisco NFVIS platform needs to commit the change that you sent to it and this seems to take a long time.</p>
+<p>The difficulty with the working solution above is:</p>
+<ol>
+<li>You need to redefine the already existing ACL entry for 0.0.0.0/0, but you don't actually know how it was configured because you can't see that in the original HTTP GET request</li>
+<li>If you forget to include all previous entries, they are actually removed from the configuration so you have the ability to cause an impact</li>
+</ol>
+<p>The only way I can see this being effective is if you are doing something close to Infrastructure as Code (IAC) and have a template of what IP receivel ACL entries should already exist stored in version control. Then if you are simply adding a new entry to all devices you can update your IAC and pull from that template to be deployed to your device. Still though, there are the mandatory fields that need to be included in the HTTP PUT such as the hostname, default-gw and management IP and netmask.</p>
+<h2 id="closing-words">Closing Words<a class="headerlink" href="#closing-words" title="Permanent link">&para;</a></h2>
+<p>My experience so far with the NFVIS API for data gathering and reporting has been a positive one. I can't say the same about making configuration changes via the API though. I'm still exploring the API and trying to find a more reasonable way to make configuration changes, as well as automating the deployment of new image files using SCP and registering those images via the API. Once I have experimented with this further I'll post about it with my experience!</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="brianyaklin/brianyaklin.github.io"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMzQ1MTczNDU="
+        data-category="Announcements"
+        data-category-id="DIC_kwDOE_BUYc4CqgVU"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="1"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../../02/16/overview-of-the-viptela-vmanage-api/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview of the Viptela vManage API">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Overview of the Viptela vManage API
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../10/base64-encoding-with-http-basic-auth-for-apis/" class="md-footer__link md-footer__link--next" aria-label="Next: Base64 Encoding with HTTP Basic Auth for API&#39;s">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Base64 Encoding with HTTP Basic Auth for API's
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Yaklin.ca – <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Manage settings</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.indexes", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "toc.follow", "content.code.copy", "content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1221 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Covering topics relating to networking and automation!">
+      
+      
+      
+        <link rel="canonical" href="https://www.yaklin.com/2021/12/27/cisco-ise-24-to-30-upgrade-procedure/">
+      
+      
+        <link rel="prev" href="../../../09/26/cisco-ios-xe-netconf-and-restconf-authentication-bypass-vulnerability/">
+      
+      
+        <link rel="next" href="../../29/the-role-of-network-security-to-fight-log4shell/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Cisco ISE 2.4 to 3.0 Upgrade Procedure - Yaklin.ca</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-Q1WGH30J2R"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-Q1WGH30J2R",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-Q1WGH30J2R",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cisco-ise-24-to-30-upgrade-procedure" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Yaklin.ca" class="md-header__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yaklin.ca
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Cisco ISE 2.4 to 3.0 Upgrade Procedure
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Yaklin.ca" class="md-nav__button md-logo" aria-label="Yaklin.ca" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M512 96c0 50.2-59.1 125.1-84.6 155-3.8 4.4-9.4 6.1-14.5 5H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c53 0 96 43 96 96s-43 96-96 96H139.6c8.7-9.9 19.3-22.6 30-36.8 6.3-8.4 12.8-17.6 19-27.2H416c17.7 0 32-14.3 32-32s-14.3-32-32-32h-96c-53 0-96-43-96-96s43-96 96-96h39.8c-21-31.5-39.8-67.7-39.8-96 0-53 43-96 96-96s96 43 96 96M117.1 489.1c-3.8 4.3-7.2 8.1-10.1 11.3l-1.8 2-.2-.2c-6 4.6-14.6 4-20-1.8C59.8 473 0 402.5 0 352c0-53 43-96 96-96s96 43 96 96c0 30-21.1 67-43.5 97.9-10.7 14.7-21.7 28-30.8 38.5zM128 352a32 32 0 1 0-64 0 32 32 0 1 0 64 0m288-224a32 32 0 1 0 0-64 32 32 0 1 0 0 64"/></svg>
+
+    </a>
+    Yaklin.ca
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/brianyaklin" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    brianyaklin
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2022/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2022
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2021
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/automation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Automation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/nac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    NAC
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/network-security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Network Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/programmability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Programmability
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/vulnerabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Vulnerabilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-cisco-ise-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Cisco ISE Environment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cisco-ise-upgrade-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cisco ISE Upgrade Methods
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-and-verification-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation and Verification Plan
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation and Verification Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-0-pre-change-readiness" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 0 - Pre-Change Readiness
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1-create-cisco-ise-30-primary-admin-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 - Create Cisco ISE 3.0 Primary Admin Node
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-create-cisco-ise-30-primary-monitor-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 - Create Cisco ISE 3.0 Primary Monitor Node
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-create-cisco-ise-30-node-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3 - Create Cisco ISE 3.0 Node Groups
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-create-cisco-ise-30-policy-service-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4 - Create Cisco ISE 3.0 Policy Service Nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-create-cisco-ise-30-secondary-monitor-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5 - Create Cisco ISE 3.0 Secondary Monitor Node
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-create-cisco-ise-30-secondary-admin-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6 - Create Cisco ISE 3.0 Secondary Admin Node
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-7-promote-cisco-ise-30-admin-and-monitor-nodes-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 7 - Promote Cisco ISE 3.0 Admin and Monitor Nodes (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-8-re-enable-pan-auto-failover" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 8 - Re-Enable PAN Auto-Failover
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backout-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      Backout Plan
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../.." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../../../../assets/images/brian-avatar.jpeg" alt="Brian Yaklin">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Brian Yaklin
+                        
+                      </strong>
+                      <br>
+                      Creator
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2021-12-27 00:00:00+00:00" class="md-ellipsis">December 27, 2021</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/nac/">NAC</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              15 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <span class="md-tag">Cisco</span>
+      
+    
+      
+      
+      
+        <span class="md-tag">Security</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="cisco-ise-24-to-30-upgrade-procedure">Cisco ISE 2.4 to 3.0 Upgrade Procedure<a class="headerlink" href="#cisco-ise-24-to-30-upgrade-procedure" title="Permanent link">&para;</a></h1>
+<p>If you have ever read through <a href="https://www.cisco.com/c/en/us/td/docs/security/ise/3-0/upgrade_guide/HTML/b_upgrade_method_3_0.html#id_121933">Cisco ISE 3.0 Upgrade Guide</a> you know that it involves a lot of decision points and having to reference many other Cisco reference documents just to build a complete implementation plan for upgrading Cisco ISE from 2.x to 3.x. It is a complicated process if you have never been through it before, and often times you're left with more questions than answers when researching how to proceed. This usually involves engaging Cisco TAC to help clarify points that aren't necessarily obvious in their documentation. Having gone through this upgrade path this past year, I thought that documenting the procedures that I followed may help others gain success in their own upgrades. Understand that all implementations are different, so use this as another piece of information as you research how to perform this upgrade.</p>
+<!-- more -->
+
+<h2 id="example-cisco-ise-environment">Example Cisco ISE Environment<a class="headerlink" href="#example-cisco-ise-environment" title="Permanent link">&para;</a></h2>
+<p>This guide is built based on the following Cisco ISE environment:</p>
+<ul>
+<li>All Cisco ISE nodes are virtual machines running on VMWare ESXi</li>
+<li>Nodes are deployed as follows</li>
+<li>Two Admin (primary/secondary)</li>
+<li>Two Monitor (primary/secondary)</li>
+<li>Four PSN's</li>
+<li>None of the PSN's are behind load balancers</li>
+<li>PSN's are only being used for TACACS/RADIUS authentication, not for any discovery or dot1x authentication</li>
+<li>AD is used as an external identify source</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cisco's documentation briefly glosses over placing your PSN's behind a load balancer. I have seen this done in larger organizations, but not in smaller ones. There is definitely a benefit to using a load balancer, as it allows you to take a PSN out of rotation so that you can upgrade it and change its IP address (which will save you a few steps in this guide). You avoid causing an outage for clients using the PSN's as they are querying againt a load balancer VIP and you should only be upgrading one PSN in the load balancer pool at a time.</p>
+</div>
+<h2 id="cisco-ise-upgrade-methods">Cisco ISE Upgrade Methods<a class="headerlink" href="#cisco-ise-upgrade-methods" title="Permanent link">&para;</a></h2>
+<p>Cisco provides three different methods that you can follow for upgrading Cisco ISE:</p>
+<ol>
+<li>Backup and Restore method, which Cisco recommends but is the the most difficult to implement</li>
+<li>Upgrade using the GUI, which takes more time but is the 'easiest' method to follow</li>
+<li>Upgrade using the CLI, which is just slightly more difficult than using the GUI</li>
+</ol>
+<p>Not all deployments are able to use each of these methods. In this particular example, the GUI and CLI options are not possible because of how the Cisco ISE 2.4 VM's were deployed. Version 3.0 <a href="https://www.cisco.com/c/en/us/td/docs/security/ise/3-0/install_guide/b_ise_InstallationGuide30/b_ise_InstallationGuide30_chapter_2.html#ID-1417-000000d9">requires signinficantly more disk space</a> than version 2.4. A disk size of 300GB to 600GB are required, as a minimum, on each node regardless of its persona, compared to what many 2.4 deployments required (200GB). Cisco also advises that if you increase the disk size of your VM, you must perform a fresh installation of Cisco ISE to detect the increased capacity. There is no supported method of increasing the disk size.</p>
+<p>The other challenge of building new PSN VM's is that without a load balancer, all of your routers, switches, and wireless controllers are referencing TACACS/RADIUS server IP addresses that exist directly on the PSN's. Cisco's documentation walks through creating new VM's with new IP addresses, which means that you will need to reconfigure all network infrastructure to point to a new TACACS/RADIUS server IP address. This can involve a significant amount of time if you're not using automation to implement this task. You do have the ability to change the IP address of the new 3.0 PSN after it has been created and the old 2.4 PSN has been shutdown, but this involves additional steps as well (e.g. having to de-register and re-register the PSN from the admin node, adjusting DNS entries). Instead, this guide walks through keeping both 2.4 and 3.0 VM's with the same IP addresses, but shutting down the 2.4 VM before building the new 3.0 VM. There is a brief moment in time where impact can be seen by the network device must wait for keepalives to fail to a PSN thats being migrated, before it starts to query a secondary PSN that isn't currently being migrated.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Another important aspect of upgrading from ISE 2.4 to 3.0 is that licensing changes to requiring smart licensing. If you don't yet have smart licensing, but need to perform an upgrade, you can enable the grace period license which should provide 90 days for you to continue using all necessary features until you migrade to smart licensing. The steps to adjust licensing are not covered in this guide.</p>
+</div>
+<h2 id="implementation-and-verification-plan">Implementation and Verification Plan<a class="headerlink" href="#implementation-and-verification-plan" title="Permanent link">&para;</a></h2>
+<h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>The steps documented below outline how to migrate Cisco ISE 2.4 VM's to 3.0 VM's using the <a href="https://www.cisco.com/c/en/us/td/docs/security/ise/3-0/upgrade_guide/HTML/b_upgrade_method_3_0.html#id_121933">Backup and Restore method</a>. Depending on the size of your infrastructure, you may choose to migrate the PSN's over multiple change windows. This will depend on how frequenty you make changes in your environment, as you will end up having a 'split' cluster where one admin and monitor node remain on version 2.4 while another admin and monitor node are on version 3.0. Throughout multiple change windows, you can disable a version 2.4 PSN and build the 3.0 PSN. If you are frequently making policy changes, you either need to make them in both the 2.4 and 3.0 admin nodes, or migrate all PSN's during the same change window.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The steps to perform on VMWare ESXi are not covered in this guide. Refer to Cisco's documentation for VM requirements, and VMWare's documentation for implementation steps that might be necessary to create the VM.</p>
+</div>
+<h3 id="step-0-pre-change-readiness">Step 0 - Pre-Change Readiness<a class="headerlink" href="#step-0-pre-change-readiness" title="Permanent link">&para;</a></h3>
+<p>To prepare for your migration you will want to ensure the status of multiple elements and perform backups of critical configuration and certificates. This can be accomplished as follows:</p>
+<ol>
+<li>Login to your 2.4 Primary Admin Node (PAN).</li>
+<li>Confirm all certificates are valid and not expired by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and check the status of all <strong>Trusted Certificates</strong>.</li>
+<li>For each external identity source, ensure that connectivity from each PSN to each source is OK. As an example, for AD browse to <strong>Administration &gt; Identity Management &gt; External Identity Sources &gt; Active Directory…</strong> and for each join point check the reachability status for each PSN.<blockquote>
+<p>Identify the AD credentials which are necessary for each AD join-point. These are not restored when using the backup and restore method. Each join-point will need to be recreated later on in this guide.</p>
+</blockquote>
+</li>
+<li>Export any System Certificates that are used by your deployment by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and clicking on <strong>System Certificates</strong>.</li>
+<li>Export any non-default Trusted Certificates that are used by your deploymet by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and clicking on <strong>Trusted Certificates</strong>. Many of the certificates here are CA signed certificates that will exist in ISE version 3.0 and are not necessary to manually export and re-import. Only the certificates that you have imported for your organization.<blockquote>
+<p>Certificates are not automatically restored in the backup and restore method, therefore it is critical to create a backup of these in case issues are experienced during the upgrade.</p>
+</blockquote>
+</li>
+<li>Document PAN auto-failover settings by browsing to <strong>Administration &gt; System &gt; Deployment &gt; PAN Failover</strong> and documenting the status and value for all settings.</li>
+<li>Perform a manual Configuration Data Backup of the Cisco ISE settings. If you require logs to be backed up and referencable in the new ISE 3.0 implementation, perform an Operational Backup (this will be significantly larger and require more time). Browse to <strong>Administration &gt; System &gt; Backup &amp; Restore</strong>, select <strong>Configuration Data Backup</strong> and click on <strong>Backup Now</strong>. Provide the necessary details and utilize an existing backup repository.</li>
+<li>SSH to each Cisco ISE node and log the output of the following commands to file. These will later be used to reconfigure the new Cisco ISE 3.0 VM's, as well as to capture the status of each VM prior to the upgrade to identify any anomalies if they happen (e.g. high CPU, application services not running, etc)</li>
+<li>show clock</li>
+<li>show version</li>
+<li>show ntp</li>
+<li>show uptime</li>
+<li>show cpu usage</li>
+<li>show repository</li>
+<li>show application</li>
+<li>show application status ise</li>
+<li>show running-config</li>
+<li>Ensure that a DNS entry exists for each Cisco ISE node, as this will be used as part of the re-registration process when joining a PSN to the version 3.0 ISE admin node.</li>
+</ol>
+<h3 id="step-1-create-cisco-ise-30-primary-admin-node">Step 1 - Create Cisco ISE 3.0 Primary Admin Node<a class="headerlink" href="#step-1-create-cisco-ise-30-primary-admin-node" title="Permanent link">&para;</a></h3>
+<p>During this step we will be disabling the version 2.4 secondary admin node (SAN) and re-creating it as the version 3.0 primary admin node (PAN).</p>
+<ol>
+<li>Login to your 2.4 Primary Admin Node (PAN).</li>
+<li>Disable PAN auto-failover by browsing to <strong>Administration &gt; System &gt; Deployment &gt; PAN Failover</strong> and unchecking the <strong>Enable PAN Auto Failover</strong> option, then click save.</li>
+<li>Disjoin the SAN from each AD join-point. Browse to <strong>Administration &gt; Identity Management &gt; External Identity Sources</strong>, click the <strong>Active Directory</strong> folder and navigate to each join-point and perform the following steps:</li>
+<li>Find the SAN and select the checkbox next to it</li>
+<li>Click the <strong>Leave</strong> button to Disjoin the SAN</li>
+<li>De-register the SAN from the version 2.4 cluster. Browse to <strong>Administration &gt; System &gt; Deployment</strong> and check the box next to the SAN. Click the <strong>Deregister</strong> button and then <strong>OK</strong> to de-register the SAN from the cluster.</li>
+<li>Shutdown the version 2.4 SAN VM in VMWare.</li>
+<li>Create the ISE version 3.0 VM which will be configured with the properties of the version 2.4's SAN (except it will be the PAN of the version 3.0 cluster)</li>
+<li>Once the VM is built in the hypervisor, use the serial console to connect and issue the <strong>setup</strong> command. This will prompt you for various parameters such as hostname, IP address, DNS and NTP servers, local admin credentials to use, etc. You can find this information from the output of the <strong>show running-config</strong> that was captured during step 0 of this guide.</li>
+<li>After entering the initial setup parameters, the node will reload. Log back in to the CLI using the serial console and configure any remaining features by comparing the output of the <strong>show running-config</strong> from before the change with what is currently in the configuration. An example of what may need to be configured would be features like SNMP (enabling it, community strings, trap destinations, etc.) and any other local accounts.</li>
+<li>Confirm that the node is running the correct version and patches with the <strong>show version</strong> command and that the ISE process is running with the <strong>show application status ise</strong>.</li>
+<li>Browse to the IP address or FQDN of the version 3.0 PAN that has just been created and login. The web GUI's admin credentials are those that were set using the <strong>setup</strong> command on the CLI
+    &gt; Both the web and CLI admin credentials may start off as the <em>same</em> credential, but Cisco ISE treats them as two completely separate accounts.</li>
+<li>Set the role of the version 3.0 PAN as an admin node by browsing to <strong>Administration &gt; System &gt; Deployment</strong> and clicking on <strong>Deployment</strong>. Select the node from the list and enable the <strong>Administration</strong> role on the <strong>General Settings</strong> tab.</li>
+<li>Browse to <strong>Administration &gt; System &gt; Maintenance &gt; Repository</strong> and create a repository so that the backup can be imported.</li>
+<li>Import this nodes system certificate by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and click on <strong>System Certificates</strong>. Click on <strong>Import</strong> and fill in the details of the version 3.0 PAN and select the certificate file for this node that was exported during step 0.</li>
+<li>Import all trusted certificates by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and click on <strong>Trusted Certificates</strong>. Import each Trusted Certificate that were exported during step 0, and compare the configuration with that of the existing version 2.4 PAN that should still be accessible.</li>
+<li>Create the Active Directory join-points by browsing to <strong>Administration &gt; Identity Management &gt; External Identity Sources</strong> and clicking on <strong>Active Directory</strong>. Once again, you can look at both the version 2.4 PAN and the new version 3.0 PAN at the same time to ensure that each join-point is created the same.</li>
+<li>Join the version 3.0 PAN to each AD join-point. Under each join-points <strong>Connection</strong> tab click the <strong>Join</strong> button, select the new node from the list, provide the AD credentials gathered as part of step 0, and click submit. Confirm that the status of the node for each join-point is <strong>Operational</strong>.</li>
+<li>Restore the ISE backup by SSH'ing to the version 3.0 PAN and logging in. Run the command <strong>restore FILE_NAME repository REPO_NAME encryption-key plain ENC_KEY</strong> using the repository name that was created earlier, along with the filename that was given to the backup during step 0.</li>
+<li>You can monitor the backup restoration using the <strong>show restore status</strong> command. Once the restore has been completed, the node will reload. SSH back into this node and issue the <strong>show application status ise</strong> command to ensure the ISE process is running.</li>
+<li>Log back into the version 3.0 PAN web GUI. Make the version 3.0 PAN the primary admin node by browsing to <strong>Administration &gt; System &gt; Deployment</strong> and click the name of the node. Under the <strong>General Settings</strong> click the button that says <strong>Make Primary</strong>.</li>
+</ol>
+<h3 id="step-2-create-cisco-ise-30-primary-monitor-node">Step 2 - Create Cisco ISE 3.0 Primary Monitor Node<a class="headerlink" href="#step-2-create-cisco-ise-30-primary-monitor-node" title="Permanent link">&para;</a></h3>
+<p>During this step we will be disabling the version 2.4 secondary monitor node (SMN) and re-creating it as the version 3.0 primary monitor node (PMN). Many of these steps are the same as in step 1 when creating the ISE 3.0 PAN, so the steps are shortened for brevity.</p>
+<ol>
+<li>Login to your 2.4 PAN's web GUI.</li>
+<li>Disjoin the SMN from each AD join-point in the version 2.4 PAN.</li>
+<li>De-register the SMN in the version 2.4 PAN.</li>
+<li>Shutdown the version 2.4 SMN VM (don't delete), create the new version 3.0 SMN VM and configure over the serial console using the <strong>setup</strong> command, referencing the <strong>show running-config</strong> that was captured during step 0 of this guide. The node will reload after finishing the setup, log back in and configure any remaining elements (SNMP, local accounts, etc.) by comparing the <strong>show running-config</strong> that was gathered in step 0 with the current output of the configuration on the version 3.0 node.</li>
+<li>Validate that the node is running the proper version of software with <strong>show version</strong> and that the ISE process is running with <strong>show application status ise</strong>.</li>
+<li>Login to your 3.0 PAN's web GUI.</li>
+<li>Register the verison 3.0 PMN VM as the primary monitoring node by registering the node in the version 3.0 PAN.</li>
+<li>Set the role of the version 3.0 PMN as a monitor node by browsing to <strong>Administration &gt; System &gt; Deployment</strong> and clicking on <strong>Deployment</strong>. Select the node from the list and enable the <strong>Monitor</strong> role on the <strong>General Settings</strong> tab, setting it to primary if prompted.</li>
+<li>Import this nodes system certificate by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and click on <strong>System Certificates</strong>. Click on <strong>Import</strong> and fill in the details of the version 3.0 PMN and select the certificate file for this node that was exported during step 0.</li>
+<li>Join the node to each AD join-point and ensure that its status is <strong>Operational</strong>.</li>
+</ol>
+<h3 id="step-3-create-cisco-ise-30-node-groups">Step 3 - Create Cisco ISE 3.0 Node Groups<a class="headerlink" href="#step-3-create-cisco-ise-30-node-groups" title="Permanent link">&para;</a></h3>
+<p>If you use node groups in your ISE deployment, follow the steps listed below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Node groups are not re-created when using the backup and restore method with Cisco ISE. They must be manually recreated.</p>
+</div>
+<ol>
+<li>Login to your 3.0 PAN's web GUI.</li>
+<li>Browse to <strong>Administration &gt; Deployment</strong> and under the <strong>Deployment</strong> column click the gear icon and <strong>Create Node Group</strong>.</li>
+<li>Create the node groups by also logging into your version 2.4 PAN and comparing the configuration with your new version 3.0 PAN.</li>
+</ol>
+<h3 id="step-4-create-cisco-ise-30-policy-service-nodes">Step 4 - Create Cisco ISE 3.0 Policy Service Nodes<a class="headerlink" href="#step-4-create-cisco-ise-30-policy-service-nodes" title="Permanent link">&para;</a></h3>
+<p>During this step we will be disabling a version 2.4 policy service node (PSN) and re-creating it as a version 3.0 PSN. Many of these steps are the same as in step 1 when creating the ISE 3.0 PAN, so the steps are shortened for brevity. Perform each of these steps for each PSN, but only migrate one PSN at a time.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At this stage, you may choose to migrate PSN's across multiple change windows depending on your organizations needs. However, if you need to make any policy configuration changes in Cisco ISE you will need to perform identical changes in both the version 2.4 and 3.0 PAN's. There will also be a period in time where the admin and monitor nodes of each cluster are not redundant.</p>
+</div>
+<ol>
+<li>Login to your 2.4 PAN's web GUI.</li>
+<li>Disable the Policy Service feature for this node so that it will no longer respond to TACACS/RADUS requests (allowing any network device that used this PSN to mark it as down after a period of time and reference another PSN), by browsing to <strong>Administration &gt; System &gt; Deployments</strong>, clicking on the node, navigating to the <strong>General Settings</strong> tab and deselecting the checkbox for <strong>Policy Service</strong>, then click <strong>Save</strong>.</li>
+<li>Disjoin the PSN from each AD join-point in the version 2.4 PAN.</li>
+<li>De-register the PSN in the version 2.4 PAN.</li>
+<li>Shutdown the version 2.4 PSN VM (don't delete), create the new version 3.0 PSN VM and configure over the serial console using the <strong>setup</strong> command, referencing the <strong>show running-config</strong> that was captured during step 0 of this guide. The node will reload after finishing the setup, log back in and configure any remaining elements (SNMP, local accounts, etc.) by comparing the <strong>show running-config</strong> that was gathered in step 0 with the current output of the configuration on the version 3.0 node.</li>
+<li>Validate that the node is running the proper version of software with <strong>show version</strong> and that the ISE process is running with <strong>show application status ise</strong>.</li>
+<li>Login to your 3.0 PAN's web GUI.</li>
+<li>Register the verison 3.0 PSN VM in the version 3.0 PAN's deployment.</li>
+<li>Import this nodes system certificate by browsing to <strong>Administration &gt; System &gt; Certificates</strong> and click on <strong>System Certificates</strong>. Click on <strong>Import</strong> and fill in the details of the version 3.0 PSN and select the certificate file for this node that was exported during step 0.</li>
+<li>Join the node to each AD join-point and ensure that its status is <strong>Operational</strong>.</li>
+<li>Set the role of the version 3.0 PSN by browsing to <strong>Administration &gt; System &gt; Deployment</strong> and clicking on <strong>Deployment</strong>. Select the node from the list and enable the <strong>Policy Service</strong> role on the <strong>General Settings</strong> tab and compare the remaining settings to that of the node in your version 2.4 PAN's web GUI.</li>
+<li>Login to various network devices that are configured with this PSN and issue <strong>test aaa...</strong> type commands to confirm reachability to the PSN, as well as that the PSN can authenticate a test user ID using its AD join-points. You can also monitor live requests via the version 3.0 PAN by browsing to <strong>Operations &gt; RADIUS &gt; Live Logs</strong> and <strong>Operations &gt; TACACS &gt; Live Logs</strong> to see incoming TACACS/RADIUS requests and if they are successfully authenticated/authorized.</li>
+</ol>
+<h3 id="step-5-create-cisco-ise-30-secondary-monitor-node">Step 5 - Create Cisco ISE 3.0 Secondary Monitor Node<a class="headerlink" href="#step-5-create-cisco-ise-30-secondary-monitor-node" title="Permanent link">&para;</a></h3>
+<p>During this step we will be disabling the version 2.4 primary monitor node (PMN) and re-creating it as the version 3.0 secondary monitor node (SMN). Follow the same steps that are used in step 2, but when setting the role of this SMN, if prompted set it to secondary.</p>
+<h3 id="step-6-create-cisco-ise-30-secondary-admin-node">Step 6 - Create Cisco ISE 3.0 Secondary Admin Node<a class="headerlink" href="#step-6-create-cisco-ise-30-secondary-admin-node" title="Permanent link">&para;</a></h3>
+<p>During this step we will be disabling the version 2.4 primary admin node (PAN) and re-creating it as the version 3.0 secondary admin node (SAN). Follow many of the same steps that are used in step 2, but when setting the role of this SAN, set it to Admin and if prompted mark it as secondary.</p>
+<h3 id="step-7-promote-cisco-ise-30-admin-and-monitor-nodes-optional">Step 7 - Promote Cisco ISE 3.0 Admin and Monitor Nodes (Optional)<a class="headerlink" href="#step-7-promote-cisco-ise-30-admin-and-monitor-nodes-optional" title="Permanent link">&para;</a></h3>
+<p>During this step we will be promoting the version 3.0 secondary admin and monitor nodes to primary, to match that of the previous version 2.4 deployment. If you do not have a requirement for specific nodes to be primary and other nodes to be secondary, you can ignore this step.</p>
+<ol>
+<li>Login to your 3.0 SAN's web GUI.</li>
+<li>Browse to <strong>System &gt; Deployment</strong> and click the button <strong>Promote to Primary</strong></li>
+<li>Validate the health of the new admin node by browsing to <strong>System &gt; Deployment</strong> and confirming that the <strong>Node Status</strong> is green for all nodes.</li>
+<li>Confirm that all nodes have connectivity to each AD join-point.</li>
+<li>Browse to <strong>System &gt; Deployments</strong> and select the current PMN. In the <strong>Monitoring</strong> section change the role from <strong>Primary</strong> to <strong>Secondary</strong>.</li>
+</ol>
+<h3 id="step-8-re-enable-pan-auto-failover">Step 8 - Re-Enable PAN Auto-Failover<a class="headerlink" href="#step-8-re-enable-pan-auto-failover" title="Permanent link">&para;</a></h3>
+<p>During this step we will be re-enabling the PAN auto-failover feature which was disabled in step 1.</p>
+<ol>
+<li>Login to your 3.0 Primary Admin Node (PAN).</li>
+<li>Enable PAN auto-failover by browsing to <strong>Administration &gt; System &gt; Deployment &gt; PAN Failover</strong> and checking the <strong>Enable PAN Auto Failover</strong> option. Set the auto-failover settings that were documented during step 0, then click save.</li>
+</ol>
+<h3 id="backout-plan">Backout Plan<a class="headerlink" href="#backout-plan" title="Permanent link">&para;</a></h3>
+<p>Should you need to backout to the version 2.4 Cisco ISE environment you should have all of the version 2.4 VM's in a shutdown state on their respective hypervisors. Although this consumes space and resources on the hypervisory, it is beneficial to keep these around for several weeks until the new version 3.0 environment is confirmed operational. However, if issues are encountered and you need to backout to version 2.4 you shutdown the version 3.0 VM's and re-enable the version 2.4 VM's in a similar order to how you migrated from 2.4 to 3.0. You will need to re-register and join to the AD join-points for each node.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="brianyaklin/brianyaklin.github.io"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkzMzQ1MTczNDU="
+        data-category="Announcements"
+        data-category-id="DIC_kwDOE_BUYc4CqgVU"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="1"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../../09/26/cisco-ios-xe-netconf-and-restconf-authentication-bypass-vulnerability/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Cisco IOS XE Netconf and Restconf Authentication Bypass Vulnerability">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Cisco IOS XE Netconf and Restconf Authentication Bypass Vulnerability
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../29/the-role-of-network-security-to-fight-log4shell/" class="md-footer__link md-footer__link--next" aria-label="Next: The Role of Network Security to Fight Log4Shell">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                The Role of Network Security to Fight Log4Shell
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Yaklin.ca – <a href="#__consent">Change cookie settings</a>
+
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Manage settings</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.indexes", "navigation.footer", "navigation.tracking", "search.suggest", "search.highlight", "search.share", "toc.follow", "content.code.copy", "content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
