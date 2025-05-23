@@ -5,7 +5,7 @@ repo_url: https://github.com/brianyaklin
 
 theme:
   name: material
-  # custom_dir: overrides
+  custom_dir: overrides
   features:
     - navigation.indexes
     - navigation.footer
